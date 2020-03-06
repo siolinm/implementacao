@@ -13,7 +13,12 @@ int menu(Objeto * heapPontos, Objeto * heapCert, int n){
     printf("(q)uery\n");
     printf(">>> ");
     scanf(" %c", &opt);
-    if(opt == 'p') return (0);
+    if(opt == 'p')
+    {
+        free(heapPontos);
+        free(heapCert);
+        return (0);        
+    } 
     if(opt == 'q') query(heapPontos, heapCert, n);
     if(opt == 'a') avancar(heapPontos, heapCert, n);
     if(opt == 'c') carregarArquivo(heapPontos, heapCert, n);
@@ -54,7 +59,7 @@ void carregarArquivo(Objeto * heapPontos, Objeto * heapCert, int n){
     heapCert = iniciaHeap(n);
     iniciaCertificados(heapPontos, 1, heapCert, n);
     db(for(i = 1; i < n; i++){
-        printf("Certificado referente ao ponto %d vence em %g, indice do certificado: %d\n", heapCert[i].index, heapCert[i].valor, i);
+        printf("Certificado referente ao ponto %d vence em %g,  do certificado: %d\n", heapCert[i].posicao->indice, heapCert[i].valor, i);
     });
     constroiHeap(heapCert, n-1, 0);
     menu(heapPontos, heapCert, n);

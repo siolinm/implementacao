@@ -13,7 +13,7 @@ void constroiHeap(Objeto * heap, int n, Bool maior){
     if(maior)
     for(i = 1; i <= n; i++){        
         heap[i].valor = heap[i].traj.b;    
-        heap[i].index = i;    
+        heap[i].indice = i;    
     } 
     for(i = n/2; i >= 1; i--)
         peneira(i, n, heap, maior);
@@ -26,30 +26,30 @@ void peneira(int p, int n, Objeto * heap, Bool maior){
         if(c < n && compara(heap+c, heap+c+1, maior)) c++;
         if(compara(heap+c, &a, maior)) break;
         /* melhorar isso */
-        if(!maior) (*(heap[c].indice)).indice = heap + p;
+        if(!maior) (*(heap[c].posicao)).posicao = heap + p;
         heap[p] = heap[c];        
-        heap[p].index = p;        
+        heap[p].indice = p;        
         p = c;
         c = 2*p;
     }
-    if(!maior) (*(a.indice)).indice = heap + p;
+    if(!maior) (*(a.posicao)).posicao = heap + p;
     heap[p] = a;    
-    heap[p].index = p;
+    heap[p].indice = p;
 }
 
-void atualizaHeap(Objeto *heap, int n, int indice, double valor, Bool maior){
+void atualizaHeap(Objeto *heap, int n, int posicao, double valor, Bool maior){
     /* melhorar depois */
-    Objeto a = heap[indice];
+    Objeto a = heap[posicao];
     a.valor = valor;
-    while(indice > 1 && compara(heap + indice/2, &a, maior)){
-        (*(heap[indice/2].indice)).indice = heap + indice;
-        heap[indice] = heap[indice/2];
-        heap[indice].index = indice/2;
-        indice /= 2;
+    while(posicao > 1 && compara(heap + posicao/2, &a, maior)){
+        (*(heap[posicao/2].posicao)).posicao = heap + posicao;
+        heap[posicao] = heap[posicao/2];
+        heap[posicao].indice = posicao/2;
+        posicao /= 2;
     }
-    (*(a.indice)).indice = heap + indice;
-    heap[indice] = a;    
-    heap[indice].index = indice;
+    (*(a.posicao)).posicao = heap + posicao;
+    heap[posicao] = a;    
+    heap[posicao].indice = posicao;
 
     peneira(1, n, heap, maior);
 }

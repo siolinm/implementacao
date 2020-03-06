@@ -20,9 +20,9 @@ typedef struct Objeto
     double valor;
     /* ponteiro para o objeto correspondente (certificado-ponto menor)
      */
-    struct Objeto * indice;
+    struct Objeto * posicao;
     /* posicao em que o objeto se encontra no vetor do heap */
-    int index;    
+    int indice;    
 } Objeto;
 
 typedef int Bool;

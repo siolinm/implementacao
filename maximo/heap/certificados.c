@@ -13,16 +13,16 @@ void iniciaCertificados(Objeto * heapPontos, int indiceP, Objeto * heapCert, int
     if(indiceP/2 >= 1){
         heapCert[indiceP].valor = calculaValidade(heapPontos + indiceP/2, heapPontos + indiceP);
         db(printf("Certificado entre %d e %d expira em %g\n", indiceP/2, indiceP, heapCert[indiceP].valor));
-        heapCert[indiceP].indice = heapPontos + indiceP;
-        heapPontos[indiceP].indice = heapCert + indiceP;
-        heapCert[indiceP].index = indiceP;
+        heapCert[indiceP].posicao = heapPontos + indiceP;
+        heapPontos[indiceP].posicao = heapCert + indiceP;
+        heapCert[indiceP].indice = indiceP;
     }
     if(indiceP == n && indiceP >= 1){
         heapCert[1].valor = heapCert[indiceP].valor;
-        heapCert[1].index = indiceP;
-        heapCert[1].indice = heapCert[indiceP].indice;
+        heapCert[1].indice = indiceP;
+        heapCert[1].posicao = heapCert[indiceP].posicao;
         db(printf("O ultimo certificado foi enviado para a primeira posicao do heap\n"));
-        heapPontos[indiceP].indice = heapCert + 1;        
+        heapPontos[indiceP].posicao = heapCert + 1;        
     }
 }
 
@@ -40,19 +40,19 @@ double proximoEvento(Objeto * heapCert){
 }
 /*
 void atualizaIndCertificado(Objeto * indiceC, Objeto * indiceP){
-    db(printf("Mudando o indice do ponto no certificado, novo indice: %d", indiceP));
-    (*indiceC).indice = indiceP;
+    db(printf("Mudando o posicao do ponto no certificado, novo posicao: %d", indiceP));
+    (*indiceC).posicao = indiceP;
 }
 
 void atualizaIndKDS(Objeto * indiceP, Objeto * indiceC){
-    db(printf("Mudando o indice do certificado no ponto, novo indice: %d", indiceP));
-    (*indiceP).indice = indiceC;
+    db(printf("Mudando o posicao do certificado no ponto, novo posicao: %d", indiceP));
+    (*indiceP).posicao = indiceC;
 }*/
 
 void atualizaCertificado(Objeto* heapPontos, Objeto * heapCert, Objeto * certificado, int n){
-    certificado->valor = calculaValidade(heapPontos + ((*certificado->indice).index)/2, heapPontos + ((*certificado->indice).index));
-    db(printf("Certificado entre ponto %d e %d atualizado com valor %g, tempo atual: %g\n", ((*certificado->indice).index)/2, (*certificado->indice).index, certificado->valor, getTime()));
-    atualizaHeap(heapCert, n-1, certificado->index, certificado->valor, 0);
+    certificado->valor = calculaValidade(heapPontos + ((*certificado->posicao).indice)/2, heapPontos + ((*certificado->posicao).indice));
+    db(printf("Certificado entre ponto %d e %d atualizado com valor %g, tempo atual: %g\n", ((*certificado->posicao).indice)/2, (*certificado->posicao).indice, certificado->valor, getTime()));
+    atualizaHeap(heapCert, n-1, certificado->indice, certificado->valor, 0);
 }
 
 /*
@@ -69,25 +69,25 @@ void evento(Objeto * heapPontos, Objeto * heapCert, int n){
     double tempoAtual = getTime();
     
     while(heapCert[1].valor == tempoAtual){
-        indiceP = (*(heapCert[1].indice)).index;
+        indiceP = (*(heapCert[1].posicao)).indice;
         swap(heapPontos + indiceP, heapPontos + indiceP/2);    
         if(indiceP/4 >= 1){
-            (*(heapPontos[indiceP].indice)).indice = heapPontos + indiceP;
-            (*(heapPontos[indiceP/2].indice)).indice = heapPontos + indiceP/2;
-            heapPontos[indiceP].index = indiceP;
-            heapPontos[indiceP/2].index = indiceP/2;
+            (*(heapPontos[indiceP].posicao)).posicao = heapPontos + indiceP;
+            (*(heapPontos[indiceP/2].posicao)).posicao = heapPontos + indiceP/2;
+            heapPontos[indiceP].indice = indiceP;
+            heapPontos[indiceP/2].indice = indiceP/2;
         }
         else{
-            (*(heapPontos[indiceP/2].indice)).indice = heapPontos + indiceP;
-            heapPontos[indiceP].indice = heapPontos[indiceP/2].indice;
-            heapPontos[indiceP/2].indice = NULL;
-            heapPontos[indiceP].index = indiceP;
-            heapPontos[indiceP/2].index = indiceP/2;
+            (*(heapPontos[indiceP/2].posicao)).posicao = heapPontos + indiceP;
+            heapPontos[indiceP].posicao = heapPontos[indiceP/2].posicao;
+            heapPontos[indiceP/2].posicao = NULL;
+            heapPontos[indiceP].indice = indiceP;
+            heapPontos[indiceP/2].indice = indiceP/2;
         }            
-        atualizaCertificado(heapPontos, heapCert, heapPontos[indiceP].indice, n);
-        if(indiceP/4 >= 1) atualizaCertificado(heapPontos, heapCert, heapPontos[indiceP/2].indice, n);
-        if((2*(indiceP/2) + !(indiceP % 2)) <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*(indiceP/2) + !(indiceP % 2)].indice, n);
-        if(2*indiceP <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*indiceP].indice, n);
-        if(2*indiceP + 1 <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*indiceP + 1].indice, n);
+        atualizaCertificado(heapPontos, heapCert, heapPontos[indiceP].posicao, n);
+        if(indiceP/4 >= 1) atualizaCertificado(heapPontos, heapCert, heapPontos[indiceP/2].posicao, n);
+        if((2*(indiceP/2) + !(indiceP % 2)) <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*(indiceP/2) + !(indiceP % 2)].posicao, n);
+        if(2*indiceP <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*indiceP].posicao, n);
+        if(2*indiceP + 1 <= n) atualizaCertificado(heapPontos, heapCert, heapPontos[2*indiceP + 1].posicao, n);
     }
 }
