@@ -18,11 +18,13 @@ typedef struct Objeto
 {
     Trajetoria traj;
     double valor;
+    struct Objeto * predecessor;
+    struct Objeto * sucessor;
     /* ponteiro para o objeto correspondente (certificado-ponto menor)
      */
     struct Objeto * posicao;
     /* posicao em que o objeto se encontra no vetor do heap */
-    int indice;    
+    int indice;
 } Objeto;
 
 typedef int Bool;

@@ -8,7 +8,7 @@ int altura(No * a){
     return (a ? a->alt : 0);
 }
 
-No * criaNo(double chave){
+No * criaNo(Objeto * chave){
     No * novo = (No *)malloc(sizeof(No));
 
     novo->esq = NULL;
@@ -55,8 +55,8 @@ int getBalance(No * no){
     return (no ? (no->esq->alt - no->dir->alt) : 0);
 }
 
-No * insereNo(No * raiz, double chave){
+No * insereNo(No * raiz, Objeto * chave){
     if(!raiz) return criaNo(chave);
-
+    
     
 }

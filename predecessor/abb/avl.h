@@ -4,7 +4,7 @@
 
 typedef struct No
 {
-    double chave;
+    Objeto * chave;
     No* esq;
     No* dir;
     int alt;
