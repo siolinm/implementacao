@@ -2,6 +2,7 @@
 /*
     https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
     https://www.geeksforgeeks.org/avl-tree-set-2-deletion/
+    https://www.youtube.com/watch?v=YkF76cOgtMQ&list=PLxI8Can9yAHf8k8LrUePyj0y3lLpigGcl&index=21
     https://www.youtube.com/watch?v=FzS0n_Z8lrk
 */
 
@@ -9,7 +10,12 @@ No *raiz = NULL;
 
 int altura(No *a)
 {
-    return (a ? a->alt : 0);
+    return (a ? a->alt : -1);
+}
+
+void redefineAltura(No *a)
+{
+    a->alt = max(alt(a->esq), alt(a->dir)) + 1;
 }
 
 No *criaNo(Objeto *chave)
@@ -36,8 +42,8 @@ No *rotacionaDir(No *no)
     filhoEsq->dir = no;
     no->esq = aux;
 
-    no->alt = max(no->esq->alt, no->dir->alt) + 1;
-    filhoEsq->alt = max(filhoEsq->esq->alt, filhoEsq->dir->alt) + 1;
+    redefineAltura(no);
+    redefineAltura(filhoEsq);
 
     return filhoEsq;
 }
@@ -54,22 +60,22 @@ No *rotacionaEsq(No *no)
     filhoDir->esq = no;
     no->dir = aux;
 
-    no->alt = max(no->esq->alt, no->dir->alt) + 1;
-    filhoDir->alt = max(filhoDir->esq->alt, filhoDir->dir->alt) + 1;
+    redefineAltura(no);
+    redefineAltura(filhoDir);
 
     return filhoDir;
 }
 
 int getBalance(No *no)
 {
-    return (no ? (no->esq->alt - no->dir->alt) : 0);
+    return (no ? (alt(no->esq) - alt(no->dir)) : 0);
 }
 
 No *insereNo(No *raiz, Objeto *chave)
 {
     if (!raiz)
         return criaNo(chave);
-    
+
     /* pensar em como assinalar predecessor e sucessor agora */
 
     /*insere normalmente*/
@@ -79,7 +85,7 @@ No *insereNo(No *raiz, Objeto *chave)
         raiz->dir = insereNo(raiz->dir, chave);
 
     /*atualiza a altura de um momento antes */
-    raiz->alt = max(raiz->dir->alt, raiz->esq->alt) + 1;
+    redefineAltura(raiz);
 
     int a = getBalance(raiz);
 
@@ -111,4 +117,71 @@ No *insereNo(No *raiz, Objeto *chave)
     }
 
     return raiz;
+}
+
+No *menor(No *raiz)
+{
+    while (raiz->esq)
+        raiz = raiz->esq;
+
+    return raiz;
+}
+
+No *deleteNo(No *raiz, Objeto *chave)
+{
+    No *aux;
+    /* deleta normalmente */
+    if (raiz == NULL)
+        return raiz;
+
+    if (chave == raiz->chave)
+    {
+        aux = raiz;
+        if (raiz->esq && raiz->dir)
+        {
+            raiz = menor(raiz->dir);
+            raiz->esq = aux->esq;
+            raiz->dir = aux->dir;
+            raiz->dir = deleteNo(raiz->dir, raiz->chave);
+        }
+        else
+        {
+            raiz = (raiz->esq ? raiz->esq : raiz->dir);
+        }
+        free(aux);
+    }
+    else if (compara(chave, raiz->chave, 1))
+    {
+        raiz->esq = deleteNo(raiz->esq, chave);
+    }
+    else
+    {
+        raiz->dir = deleteNo(raiz->dir, chave);
+    }
+
+    if(raiz == NULL)
+        return raiz;
+
+    int a = getBalance(raiz);
+
+    
+    if (a > 1 && getBalance(raiz->esq) >= 0){
+        return rotacionaDir(raiz);    
+    }
+    else if (a > 1)
+    {
+        raiz->esq = rotacionaEsq(raiz->esq);
+        return rotacionaDir(raiz);
+    }
+    else if (a < -1 && getBalance(raiz->dir) <= 0){
+        return rotacionaEsq(raiz);
+    }
+    else if(a < -1)
+    {
+        raiz->dir = rotacionaDir(raiz->dir);
+        return rotacionaEsq(raiz);
+    }
+
+    return raiz;
+
 }
