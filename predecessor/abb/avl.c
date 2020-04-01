@@ -163,7 +163,6 @@ No *deleteNo(No *raiz, Objeto *chave)
         return raiz;
 
     int a = getBalance(raiz);
-
     
     if (a > 1 && getBalance(raiz->esq) >= 0){
         return rotacionaDir(raiz);    

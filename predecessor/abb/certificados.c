@@ -3,15 +3,34 @@
 #include"debug.h"
 #include<stdio.h>
 
-void iniciaCertificados(Objeto * arvore, Objeto * heapCert, int n){
+int nCertificados, maxSize;
+
+void dobraTamanho(Objeto ** heapCert){
     int i;
-    
-    // for(i = 1; i < n - 1; i++){        
-    //     heapCert[i].valor = calculaValidade(arvore + i, arvore + 2*i);
-    //     heapCert[i].posicao = arvore + i;
-    //     heapCert[i].indice = i;
-    //     db(printf("Certificado entre %d e %d expira em %g\n", i-1, i, heapCert[i].valor));
-    // }
+    Objeto * novoArray = malloc((maxSize + 1)*sizeof(Objeto));
+    maxSize = maxSize << 1;
+    for(i = 1; i <= nCertificados; i++) novoArray[i] = (*heapCert)[i];
+    free(heapCert);
+    *heapCert = novoArray;
+}
+
+void insereCertificado(Objeto * ponto, Objeto * heapCert){
+    if(nCertificados == maxSize) dobraTamanho(&heapCert);
+    heapCert[++nCertificados].posicao = ponto;
+    heapCert[nCertificados].indice = nCertificados;
+    heapCert[nCertificados].valor = calculaValidade(ponto, ponto->predecessor);
+    atualizaHeap(heapCert, nCertificados, nCertificados, heapCert[nCertificados].valor, 0);
+}
+
+void criaCertificados(Objeto * ponto, Objeto * heapCert, int n){
+    int i = 1;
+    while(ponto->predecessor != NULL){
+        heapCert[i].indice = i;
+        heapCert[i].posicao = ponto;
+        heapCert[i].valor = calculaValidade(ponto, ponto->predecessor);
+        i++;
+    }
+    nCertificados = i;
 }
 
 double calculaValidade(Objeto * pontoA, Objeto * pontoB){
@@ -27,33 +46,16 @@ double proximoEvento(Objeto * heapCert){
     return heapCert[1].valor;
 }
 
-void atualizaCertificado(Objeto * heapCert, Objeto * certificado, int n){
+void atualizaCertificado(Objeto * heapCert, Objeto * certificado){
     certificado->valor = calculaValidade((certificado->posicao), (certificado->posicao)->predecessor);    
-    atualizaHeap(heapCert, n-1, certificado->indice, certificado->valor, 0);
+    atualizaHeap(heapCert, nCertificados, certificado->indice, certificado->valor, 0);
 }
 
-void evento(Objeto * lista, Objeto * heapCert, int n){
+void evento(Objeto * raiz, Objeto * heapCert){
     int index;
     double tempoAtual = getTime();
-    
-    // while(heapCert[1].valor == tempoAtual){
-    //     index = (heapCert[1].posicao)->indice;
-    //     swap(lista + index, lista + index - 1);
-    //     if(index == 1){
-    //         (lista[0].posicao)->posicao = lista + 1;
-    //         lista[1].posicao = lista[0].posicao;
-    //         lista[0].posicao = NULL;
-    //         lista[0].indice = 0;
-    //         lista[1].indice = 1;
-    //     }
-    //     else{
-    //         (lista[index].posicao)->posicao = lista + index;
-    //         (lista[index - 1].posicao)->posicao = lista + index - 1;
-    //         lista[index].indice = index;
-    //         lista[index - 1].indice = index - 1;
-    //     }
-    //     atualizaCertificado(lista, heapCert, lista[index].posicao, n);
-    //     if(index > 1) atualizaCertificado(lista, heapCert, lista[index - 1].posicao, n);
-    //     if(index < n-1) atualizaCertificado(lista, heapCert, lista[index + 1].posicao, n);        
-    // }
+
+    while(heapCert[1].valor == tempoAtual){
+        /* maneira de trocar pontos de posicao dentro da avl */
+    }    
 }

@@ -12,12 +12,12 @@ double calculaValidade(Objeto * pontoA, Objeto * pontoB);
 double proximoEvento(Objeto * heapCert);
 
 /* atualiza um certificado */
-void atualizaCertificado(Objeto* lista, Objeto * heapCert, Objeto * certificado, int n);
+void atualizaCertificado(Objeto * heapCert, Objeto * certificado);
 
 /* realiza todas as acoes inerentes a um evento:
     - conserta a KDS (torna ela verdadeira novamente);
     - atualiza os certificados necessarios;
  */
-void evento(Objeto * lista, Objeto * heapCert, int n);
+void evento(Objeto * lista, Objeto * heapCert);
 
 #endif
