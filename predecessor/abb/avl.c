@@ -26,6 +26,7 @@ No *criaNo(Objeto *chave)
     novo->dir = NULL;
     novo->chave = chave;
     novo->alt = 1;
+    chave->no = novo;
 
     return novo;
 }
@@ -84,6 +85,20 @@ No *insereNo(No *raiz, Objeto *chave)
     else
         raiz->dir = insereNo(raiz->dir, chave);
 
+    if(chave->predecessor == NULL && compara(chave, raiz->chave, 0)){
+        chave->sucessor = raiz->chave->sucessor;
+        if(raiz->chave->sucessor)
+            raiz->chave->sucessor->predecessor = chave;
+        raiz->chave->sucessor = chave;
+        chave->predecessor = raiz->chave;
+    }
+    else if(chave->sucessor == NULL && compara(chave, raiz->chave, 1)){
+        chave->predecessor = raiz->chave->predecessor;
+        if(raiz->chave->predecessor)
+            raiz->chave->predecessor->sucessor = chave;
+        raiz->chave->predecessor = chave;
+        chave->sucessor = raiz->chave;
+    }
     /*atualiza a altura de um momento antes */
     redefineAltura(raiz);
 
@@ -135,7 +150,11 @@ No *deleteNo(No *raiz, Objeto *chave)
         return raiz;
 
     if (chave == raiz->chave)
-    {
+    {        
+        if(chave->predecessor)
+            chave->predecessor->sucessor = chave->sucessor;
+        if(chave->sucessor)
+            chave->sucessor->predecessor = chave->predecessor;
         aux = raiz;
         if (raiz->esq && raiz->dir)
         {

@@ -14,12 +14,22 @@ enum{
     CERTIFICADO
 };
 
+typedef struct No
+{
+    Objeto *chave;
+    No *esq;
+    No *dir;
+    int alt;
+} No;
+
+
 typedef struct Objeto
 {
     Trajetoria traj;
     double valor;
     struct Objeto * predecessor;
     struct Objeto * sucessor;
+    No * no;
     /* ponteiro para o objeto correspondente (certificado-ponto menor)
      */
     struct Objeto * posicao;

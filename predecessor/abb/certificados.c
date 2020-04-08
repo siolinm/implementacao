@@ -54,8 +54,16 @@ void atualizaCertificado(Objeto * heapCert, Objeto * certificado){
 void evento(Objeto * raiz, Objeto * heapCert){
     int index;
     double tempoAtual = getTime();
+    
+    Objeto * antigosucessor, *novosucessor;
 
-    while(heapCert[1].valor == tempoAtual){
-        /* maneira de trocar pontos de posicao dentro da avl */
+    while(heapCert[1].valor == tempoAtual){        
+        antigosucessor = heapCert[1].posicao;
+        novosucessor = antigosucessor->predecessor;
+        antigosucessor->no = novosucessor->no;
+        antigosucessor->no->chave = antigosucessor;
+        novosucessor->no = antigosucessor->no;
+        novosucessor->no->chave = novosucessor;
+        
     }    
 }
