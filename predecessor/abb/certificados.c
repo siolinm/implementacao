@@ -8,7 +8,7 @@ int nCertificados, maxSize;
 void dobraTamanho(Objeto ** heapCert){
     int i;
     Objeto * novoArray = malloc((maxSize + 1)*sizeof(Objeto));
-    maxSize = maxSize << 1;
+    maxSize = maxSize*2;
     for(i = 1; i <= nCertificados; i++) novoArray[i] = (*heapCert)[i];
     free(heapCert);
     *heapCert = novoArray;
@@ -20,6 +20,10 @@ void insereCertificado(Objeto * ponto, Objeto * heapCert){
     heapCert[nCertificados].indice = nCertificados;
     heapCert[nCertificados].valor = calculaValidade(ponto, ponto->predecessor);
     atualizaHeap(heapCert, nCertificados, nCertificados, heapCert[nCertificados].valor, 0);
+}
+
+void removeCertificado(Objeto * certificado, Objeto * heapCert){
+
 }
 
 void criaCertificados(Objeto * ponto, Objeto * heapCert, int n){
@@ -55,15 +59,32 @@ void evento(Objeto * raiz, Objeto * heapCert){
     int index;
     double tempoAtual = getTime();
     
-    Objeto * antigosucessor, *novosucessor;
-
+    Objeto * a, *nv;
+    No * aux;
     while(heapCert[1].valor == tempoAtual){        
-        antigosucessor = heapCert[1].posicao;
-        novosucessor = antigosucessor->predecessor;
-        antigosucessor->no = novosucessor->no;
-        antigosucessor->no->chave = antigosucessor;
-        novosucessor->no = antigosucessor->no;
-        novosucessor->no->chave = novosucessor;
-        
+        a = heapCert[1].posicao;
+        nv = a->predecessor;
+        /* trocas na avl */
+        aux = a->no;
+        a->no = nv->no;
+        a->no->chave = a;
+        nv->no = aux;
+        nv->no->chave = nv;        
+        /* ajusta a lista ligada */
+        nv->sucessor = a->sucessor;
+        if(nv->sucessor)
+            nv->sucessor->predecessor = nv;
+        a->sucessor = nv;
+        a->predecessor = nv->predecessor;
+        if(a->predecessor)
+            a->predecessor->sucessor = a;
+        nv->predecessor = a;
+        /* atualiza esse certificado */
+        atualizaCertificado(heapCert, &heapCert[1]);
+        /* atualiza os outros possiveis dois */
+        if(nv->sucessor)
+            atualizaCertificado(heapCert, nv->sucessor->posicao);
+        if(a->predecessor)
+            atualizaCertificado(heapCert, a->posicao);
     }    
 }
