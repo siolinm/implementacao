@@ -1,4 +1,5 @@
 #include "avl.h"
+#include "certificados.h"
 /*
     https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
     https://www.geeksforgeeks.org/avl-tree-set-2-deletion/
@@ -8,16 +9,19 @@
 
 No *raiz = NULL;
 
+/* OK */
 int altura(No *a)
 {
     return (a ? a->alt : -1);
 }
 
+/* OK */
 void redefineAltura(No *a)
 {
     a->alt = max(alt(a->esq), alt(a->dir)) + 1;
 }
 
+/* OK */
 No *criaNo(Objeto *chave)
 {
     No *novo = (No *)malloc(sizeof(No));
@@ -31,6 +35,7 @@ No *criaNo(Objeto *chave)
     return novo;
 }
 
+/* OK */
 No *rotacionaDir(No *no)
 {
     No *filhoEsq, *aux;
@@ -49,6 +54,7 @@ No *rotacionaDir(No *no)
     return filhoEsq;
 }
 
+/* OK */
 No *rotacionaEsq(No *no)
 {
     No *filhoDir, *aux;
@@ -67,11 +73,13 @@ No *rotacionaEsq(No *no)
     return filhoDir;
 }
 
+/* OK */
 int getBalance(No *no)
 {
     return (no ? (alt(no->esq) - alt(no->dir)) : 0);
 }
 
+/* OK */
 No *insereNo(No *raiz, Objeto *chave)
 {
     if (!raiz)
@@ -91,6 +99,13 @@ No *insereNo(No *raiz, Objeto *chave)
             raiz->chave->sucessor->predecessor = chave;
         raiz->chave->sucessor = chave;
         chave->predecessor = raiz->chave;
+        if(chave->predecessor)
+            insereCertificado(chave);
+        if(chave->sucessor && chave->sucessor->posicao)
+            atualizaCertificado(chave->sucessor->posicao);
+        else if(chave->sucessor){
+            insereCertificado(chave->sucessor);
+        }
     }
     else if(chave->sucessor == NULL && compara(chave, raiz->chave, 1)){
         chave->predecessor = raiz->chave->predecessor;
@@ -98,6 +113,13 @@ No *insereNo(No *raiz, Objeto *chave)
             raiz->chave->predecessor->sucessor = chave;
         raiz->chave->predecessor = chave;
         chave->sucessor = raiz->chave;
+        if(chave->predecessor)
+            insereCertificado(chave);
+        if(chave->sucessor && chave->sucessor->posicao)
+            atualizaCertificado(chave->sucessor->posicao);
+        else if(chave->sucessor){
+            insereCertificado(chave->sucessor);
+        }
     }
     /*atualiza a altura de um momento antes */
     redefineAltura(raiz);
@@ -134,6 +156,7 @@ No *insereNo(No *raiz, Objeto *chave)
     return raiz;
 }
 
+/* OK */
 No *menor(No *raiz)
 {
     while (raiz->esq)
@@ -142,6 +165,7 @@ No *menor(No *raiz)
     return raiz;
 }
 
+/* OK */
 No *deleteNo(No *raiz, Objeto *chave)
 {
     No *aux;
