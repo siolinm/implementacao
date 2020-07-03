@@ -1,11 +1,20 @@
 #include"util.h"
 
-Bool compara(Objeto * a, Objeto * b, Bool maior){
-    return (maior ? (a->valor <= b->valor) : (a->valor >= b->valor));
+void init(int m){
+    n = m;
+    cert = malloc((n - 1)*sizeof(*cert));
+    sorted = malloc(n*sizeof(*sorted));
+    x0 = malloc(n*sizeof(*x0));
+    speed = malloc(n*sizeof(*speed));
+    Q = malloc(n*sizeof(*Q));
+    indQ = malloc(n*sizeof(*indQ));
 }
 
-void swap(Objeto * a, Objeto * b){
-    Objeto c = *a;
-    *a = *b;
-    *b = c;
+void destroy(){
+    free(cert);
+    free(sorted);
+    free(x0);
+    free(speed);
+    free(Q);
+    free(indQ);
 }

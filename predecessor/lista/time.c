@@ -1,11 +1,11 @@
 #include"time.h"
 
-static double tempoAtual = 0;
+static double now = 0;
 
 double getTime(){
-    return tempoAtual;
+    return now;
 }
 
 void setTime(double t){
-    tempoAtual = t;
+    now = t;
 }
