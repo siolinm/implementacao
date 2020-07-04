@@ -53,6 +53,10 @@ int menu(){
     return 0;
 }
 
+double proximoEvento(){
+    return cert[minPQ()];
+}
+
 void advance(){
     double t;
     printf("Digite o novo valor do tempo: ");

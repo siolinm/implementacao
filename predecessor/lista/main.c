@@ -4,8 +4,6 @@
 #include"time.h"
 #include"menu.h"
 
-int main(){    
-    int n = 0;
-    
+int main(){            
     return menu();
 }

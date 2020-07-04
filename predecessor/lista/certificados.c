@@ -24,8 +24,7 @@ void atualizaCertificado(int i){
     if(i < 0 || i >= n - 1)
         return;
     cert[i] = calculaValidade(sorted[i], sorted[i + 1]);
-    /* atualiza a fila de prioridade */
-    #warning Atualizar a fila de prioridade
+    /* atualiza a fila de prioridade */    
     altera_chavePQ(i, getTime());
 }
 
@@ -34,8 +33,11 @@ void atualizaCertificado(int i){
 */
 void evento(){
     int i;
+    int aux;
     while(cert[i = minPQ(Q)] == getTime()){
-        swap(sorted[i], sorted[i + 1]);
+        aux = sorted[i];
+        sorted[i] = sorted[i + 1];
+        sorted[i + 1] = aux;        
         atualizaCertificado(cert[i]);
         atualizaCertificado(cert[i - 1]);
         atualizaCertificado(cert[i + 1]);

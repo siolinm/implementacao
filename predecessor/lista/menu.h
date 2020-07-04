@@ -31,4 +31,9 @@ void query();
 */
 void change();
 
+/*
+    Informa qual o prazo de vencimento do proximo certificado a vencer
+*/
+double proximoEvento();
+
 #endif
