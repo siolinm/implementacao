@@ -4,9 +4,8 @@
 #include"time.h"
 #include"menu.h"
 
-int main(){
-    Objeto * lista = NULL, * heapCert = NULL;
+int main(){    
     int n = 0;
     
-    return menu(lista, heapCert, n);
+    return menu();
 }

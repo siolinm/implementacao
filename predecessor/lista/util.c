@@ -1,4 +1,5 @@
 #include"util.h"
+#include"time.h"
 
 void init(int m){
     n = m;
@@ -17,4 +18,8 @@ void destroy(){
     free(speed);
     free(Q);
     free(indQ);
+}
+
+double valor(int i){
+    return x0[i] + speed[i]*getTime();
 }

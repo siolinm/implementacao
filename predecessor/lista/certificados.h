@@ -5,22 +5,25 @@
 #ifndef _CERTIFICADO_H
 #define _CERTIFICADO_H
 
-/* inicia */
-// void iniciaCertificados(Objeto * lista, Objeto * heapCert, int n);
+/*
+    inicia cada certificado com seu devido valor
+*/
+void iniciaCertificados();
 
-// /* Calcula a validade do certificado entre dois pontos */
-// double calculaValidade(Objeto * pontoA, Objeto * pontoB);
+/*
+    calcula a validade do certificado entre o elemento de indice a 
+    e o elemento de indice b
+*/
+double calculaValidade(int a, int b);
 
-// /* Devolve quando sera o próximo evento */
-// double proximoEvento(Objeto * heapCert);
+/*
+    atualiza o valor do certificado de indice i
+*/
+void atualizaCertificado(int i);
 
-// /* atualiza um certificado */
-// void atualizaCertificado(Objeto* lista, Objeto * heapCert, Objeto * certificado, int n);
-
-// /* realiza todas as acoes inerentes a um evento:
-//     - conserta a KDS (torna ela verdadeira novamente);
-//     - atualiza os certificados necessarios;
-//  */
-// void evento(Objeto * lista, Objeto * heapCert, int n);
+/*
+    O primeiro certificado da fila de prioridade venceu;
+*/
+void evento();
 
 #endif
