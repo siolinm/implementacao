@@ -1,4 +1,5 @@
 #include<stdlib.h>
+#include<stdio.h>
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
@@ -49,6 +50,20 @@ void init(int m);
 */
 void destroy();
 
+
+/*
+    Retorna o valor do i-esimo ponto em sorted
+*/
+double valor(int i);
+
 typedef int Bool;
+
+void printS();
+
+void printC();
+
+void printPQ();
+
+void printIQ();
 
 #endif

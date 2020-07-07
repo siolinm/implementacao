@@ -4,7 +4,7 @@ O = heap.o util.o certificados.o main.o menu.o time.o heapsort.o
 predecessor: $(O)
 	gcc $(CFLAGS) $(O) -o predecessor 
 
-%.o: %.c %.h
+%.o: %.c %.h debug.h
 	gcc $(CFLAGS) -c $<
 
 # main.o: main.c menu.o certificados.o heap.o util.o debug.h time.o lista.o

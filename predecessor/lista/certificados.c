@@ -3,7 +3,7 @@
 
 void iniciaCertificados(){
     int i;
-    for(i = 0; i < n - 1; i++)
+    for(i = 1; i <= n - 1; i++)
         cert[i] = calculaValidade(sorted[i], sorted[i + 1]);    
 }
 
@@ -21,11 +21,11 @@ double calculaValidade(int a, int b){
 
 /* atualiza o valor do certificado de indice i*/
 void atualizaCertificado(int i){
-    if(i < 0 || i >= n - 1)
+    if(i < 1 || i > n - 1)
         return;
     cert[i] = calculaValidade(sorted[i], sorted[i + 1]);
     /* atualiza a fila de prioridade */    
-    altera_chavePQ(i, getTime());
+    altera_chavePQ(i, cert[i]);
 }
 
 /* 
@@ -34,12 +34,12 @@ void atualizaCertificado(int i){
 void evento(){
     int i;
     int aux;
-    while(cert[i = minPQ(Q)] == getTime()){
+    while(cert[i = minPQ()] == getTime()){
         aux = sorted[i];
         sorted[i] = sorted[i + 1];
-        sorted[i + 1] = aux;        
-        atualizaCertificado(cert[i]);
-        atualizaCertificado(cert[i - 1]);
-        atualizaCertificado(cert[i + 1]);
+        sorted[i + 1] = aux;                
+        atualizaCertificado(i);
+        atualizaCertificado(i - 1);
+        atualizaCertificado(i + 1);
     }
 }

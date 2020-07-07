@@ -16,7 +16,7 @@ void carregarArquivo(){
     arquivo = fopen(nomeDoArquivo, "r");
     fscanf(arquivo, "%d\n", &n);
     init(n);
-    for(i = 0; i < n; i++){
+    for(i = 1; i <= n; i++){
         fscanf(arquivo, "%lf %lf", &(speed[i]), &(x0[i]));
         sorted[i] = i;
     }
@@ -24,18 +24,23 @@ void carregarArquivo(){
     fclose(arquivo);
     /* ordena sorted */
     heapsort();
+    db(printS());
     iniciaCertificados();
+    db(printC());
     initPQ();
+    db(printPQ());
 }
 
 int menu(){
     char opt = 'x';
     while(opt != 'p'){
+        printf("--------------- MENU ---------------\n");
         printf("(a)vancar\n");
         printf("(c)arregar arquivo\n");
         printf("(m)udar trajetoria\n");
         printf("(p)arar\n");
         printf("(q)uery\n");
+        printf("---------------      ---------------\n");
         printf(">>> ");
         scanf(" %c", &opt);
         if(opt == 'p')
@@ -48,6 +53,15 @@ int menu(){
             change();
         else if(opt == 'c')
             carregarArquivo();
+        if(opt != 'p'){
+            db(printPQ());
+            db(printIQ());
+            db(printC());
+            db(printS());
+            db(
+                printf("Proximo evento: %g\n", proximoEvento());
+            );
+        }
     }
 
     return 0;
@@ -60,15 +74,14 @@ double proximoEvento(){
 void advance(){
     double t;
     printf("Digite o novo valor do tempo: ");
-    scanf("%lf", &t);
+    scanf(" %lf", &t);
     if(t < getTime())
         printf("Unidade de tempo inferior ao instante atual\n");
-    while(t > proximoEvento()){
+    while(t >= proximoEvento()){
         setTime(proximoEvento());
         evento();
     }
-    setTime(t);
-    menu();
+    setTime(t);    
 }
 
 void change(){
@@ -81,14 +94,12 @@ void change(){
     speed[j] = newSpeed;
     atualizaCertificado(i);
     atualizaCertificado(i - 1);
-    printf("O elemento %d agora se desloca com velocidade %g\n", j, newSpeed);
-    menu();
+    printf("O elemento %d agora se desloca com velocidade %g\n", j, newSpeed);    
 }
 
 void predecessor(int i){
-    i = i-1;
-    if(i > 0 && i < n)
-        printf("O predecessor do elemento %d e' o elemento %d\n", sorted[i], sorted[i - 1]);
+    if(i >= 1 && i < n)
+        printf("O predecessor do elemento %d e' o elemento %d\n", sorted[i], sorted[i + 1]);
     else
         printf("A posicao indicada nao possui predecessor\n");
 }
@@ -97,6 +108,5 @@ void query(){
     int i;
     printf("Digite a posicao que deseja consultar: ");
     scanf("%d", &i);
-    predecessor(i);
-    menu();
+    predecessor(i);    
 }
