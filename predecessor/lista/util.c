@@ -9,6 +9,7 @@ void init(int m){
     speed = malloc((n + 1)*sizeof(*speed));
     Q = malloc((n + 1)*sizeof(*Q));
     indQ = malloc((n + 1)*sizeof(*indQ));
+    indS = malloc((n + 1)*sizeof(*indS));
 }
 
 void destroy(){
@@ -18,6 +19,7 @@ void destroy(){
     free(speed);
     free(Q);
     free(indQ);
+    free(indS);
 }
 
 double valor(int i){
@@ -49,10 +51,26 @@ void printIQ(){
     printf("\n");
 }
 
+void printIS(){
+    int i;
+    for(i = 1; i <= n; i++)
+        printf("indS[%d] = %d\n", i, indS[i]);
+
+    printf("\n");
+}
+
 void printC(){
     int i;
     for(i = 1; i <= n-1; i++)
         printf("cert[%d] = %g\n", i, cert[i]);
 
     printf("\n");
+}
+
+void swapSorted(int i, int j){
+    int aux = sorted[i];
+    sorted[i] = sorted[j];
+    sorted[j] = aux;
+    indS[sorted[i]] = j;
+    indS[sorted[j]] = i; 
 }

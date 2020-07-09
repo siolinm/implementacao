@@ -32,12 +32,9 @@ void atualizaCertificado(int i){
     O primeiro certificado da fila de prioridade venceu;
 */
 void evento(){
-    int i;
-    int aux;
+    int i;    
     while(cert[i = minPQ()] == getTime()){
-        aux = sorted[i];
-        sorted[i] = sorted[i + 1];
-        sorted[i + 1] = aux;                
+        swapSorted(i, i + 1);               
         atualizaCertificado(i);
         atualizaCertificado(i - 1);
         atualizaCertificado(i + 1);

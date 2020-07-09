@@ -19,6 +19,7 @@ void carregarArquivo(){
     for(i = 1; i <= n; i++){
         fscanf(arquivo, "%lf %lf", &(speed[i]), &(x0[i]));
         sorted[i] = i;
+        indS[i] = i;
     }
     
     fclose(arquivo);
@@ -89,7 +90,8 @@ void change(){
     double newSpeed;
     printf("Digite o ponto e a velocidade a ser alterada: ");
     scanf("%d %lf", &i, &newSpeed);
-    j = sorted[i];
+    j = i;
+    i = indS[j];
     x0[j] += (speed[j] - newSpeed)*getTime();
     speed[j] = newSpeed;
     atualizaCertificado(i);

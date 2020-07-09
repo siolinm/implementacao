@@ -36,6 +36,11 @@ int * Q;
 int * indQ;
 
 /*
+    indS[i] e' a posicao em sorted do i-esimo elemento da entrada
+*/
+int * indS;
+
+/*
     quantidade total de elementos
 */
 int n;
@@ -55,6 +60,11 @@ void destroy();
     Retorna o valor do i-esimo ponto em sorted
 */
 double valor(int i);
+
+/*
+    Troca o i-esimo elemento de sorted pelo j-esimo
+*/
+void swapSorted(int i, int j);
 
 typedef int Bool;
 
