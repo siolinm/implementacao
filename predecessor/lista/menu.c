@@ -39,6 +39,7 @@ int menu(){
         printf("(a)vancar\n");
         printf("(c)arregar arquivo\n");
         printf("(m)udar trajetoria\n");
+        printf("(n)ow\n");
         printf("(p)arar\n");
         printf("(q)uery\n");
         printf("---------------      ---------------\n");
@@ -52,6 +53,8 @@ int menu(){
             advance();
         else if(opt == 'm') 
             change();
+        else if(opt == 'n') 
+            printf("now: %g\n", getTime());
         else if(opt == 'c')
             carregarArquivo();
         if(opt != 'p'){

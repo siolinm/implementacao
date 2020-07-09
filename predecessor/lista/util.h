@@ -76,4 +76,6 @@ void printPQ();
 
 void printIQ();
 
+void printIS();
+
 #endif

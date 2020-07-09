@@ -1,17 +1,20 @@
+#ifndef _HEAPSORT_H
+#define _HEAPSORT_H
 #include"util.h"
-#ifndef _HEAP_H
-#define _HEAP_H
+#include"time.h"
+#include"certificados.h"
+#include<stdio.h>
 
-/* aloca um vetor de tamanho n para guardar o heap */
-Objeto * iniciaHeap(int n);
+/*
+    Garante a propriedade do heap "descendo"/"peneirando"
+    os elementos
+*/
+void peneiraHeap(int i, int m);
 
-/* constroi um heap de tamanho n, maior = 1 => max heap, 0 = > min heap */
-void constroiHeap(Objeto * heap, int n, Bool maior);
+/*
+    Constroi o heap
+*/
+void initHeap();
 
-/* funcao auxiliar para construcao do heap, maior = 1 => max-heap (para os pontos), 0 => min-heap (para os certificados)*/
-void peneira(int i, int n, Objeto * heap, Bool maior);
-
-/* atualiza o heap de tamanho n na posicao  com valor valor */
-void atualizaHeap(Objeto *heap, int n, int , double valor, Bool maior);
 
 #endif

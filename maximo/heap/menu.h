@@ -2,26 +2,38 @@
 #ifndef _MENU_H
 #define _MENU_H
 
-/* avanca no tempo */
-void avancar(Objeto * heapPontos, Objeto * heapCert, int n);
+/* 
+    avanca no tempo 
+*/
+void advance();
 
-/*void criarPontos(Objeto * heapPontos, Objeto * heapCert, int n);*/
-
-/*carrega os pontos de um arquivo que está no formato:
-    nº de pontos
-    coeficiente angular (espaço em branco) coeficiente linear (do primeiro ponto)
-    coeficiente angular (espaço em branco) coeficiente linear (do segundo ponto)
+/*carrega os elementos de um arquivo que está no formato:
+    nº de elementos
+    coeficiente angular (espaço em branco) coeficiente linear (do primeiro elemento)
+    coeficiente angular (espaço em branco) coeficiente linear (do segundo elemento)
     .....
-    coeficiente angular (espaço em branco) coeficiente linear (do n-esimo ponto)
+    coeficiente angular (espaço em branco) coeficiente linear (do n-esimo elemento)
  */
-void carregarArquivo(Objeto * heapPontos, Objeto * heapCert, int n);
+void carregarArquivo();
 
 /*
     menu de opcoes
  */
-int menu(Objeto * heapPontos, Objeto * heapCert, int n);
+int menu();
 
-/* consulta o valor maximo no tempo atual */
-void query(Objeto * heapPontos, Objeto * heapCert, int n);
+/* 
+    consulta quem e' o predecessor do i-esimo elemento 
+*/
+void query();
+
+/*
+    altera a velocidade do i-esimo elementos para nova velocidade informada
+*/
+void change();
+
+/*
+    Informa qual o prazo de vencimento do proximo certificado a vencer
+*/
+double proximoEvento();
 
 #endif
