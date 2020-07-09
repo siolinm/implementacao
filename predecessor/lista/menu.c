@@ -88,7 +88,7 @@ void advance(){
 void change(){
     int i, j;
     double newSpeed;
-    printf("Digite o ponto e a velocidade a ser alterada: ");
+    printf("Digite o elemento e a velocidade a ser alterada: ");
     scanf("%d %lf", &i, &newSpeed);
     j = i;
     i = indS[j];
