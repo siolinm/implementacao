@@ -1,43 +1,81 @@
 #include<stdlib.h>
 #include<stdio.h>
-#ifndef _TIPO_H
-#define _TIPO_H
+#ifndef _UTIL_H
+#define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
 
-typedef struct Trajetoria
-{
-    double a;
-    double b;
-} Trajetoria;
+/*
+    cert[i] guarda o certificado entre i/2 e i (um valor que indica seu vencimento)
+*/
+double * cert;
 
-enum{
-    PONTO,
-    CERTIFICADO
-};
+/*
+    speed[i] e' a velocidade do i-esimo elemento
+*/
+double * speed;
 
-typedef struct Objeto
-{
-    Trajetoria traj;
-    double valor;
-    /* ponteiro para o objeto correspondente (certificado-ponto menor)
-     */
-    struct Objeto * posicao;
-    /* posicao em que o objeto estava quando perdeu */
-    int indice;    
-} Objeto;
+/*
+    x0[i] e' o valor inicial do i-esimo elemento
+*/
+double * x0;
+
+/*
+    heap[i] e' o indice do elemento que se encontra na i-esima posicao de acordo com o seu valor 
+    (maxHeap).
+*/
+int * torneio;
+
+/*
+    fila de prioridade que contem os certificados. Q[1] e' o indice do certificado com chave t minima
+*/
+int * Q;
+
+/*
+    indQ[i] e' a posicao do i-esimo certificado na fila de prioridade Q;
+*/
+int * indQ;
+
+/*
+    indH[i] e' a posicao em heap do i-esimo elemento da entrada
+*/
+int * indT;
+
+/*
+    quantidade total de elementos
+*/
+int n;
+
+/*
+    aloca os vetores assumindo que o numero de elementos e' m 
+*/
+void init(int m);
+
+/* 
+    libera a memoria alocada 
+*/
+void destroy();
+
+
+/*
+    Retorna o valor da i-esima posicao em heap
+*/
+double valor(int i);
+
+/*
+    Troca o i-esimo elemento de heap pelo j-esimo
+*/
+void swapTorneio(int i, int j);
 
 typedef int Bool;
 
-/* Funcao para comparar a e b de acordo com o parametro maior. Se maior = 1, retorna true caso a <= b.
-    Se maior = 0, retorna true caso a >= b.
-*/
-Bool compara(Objeto * a, Objeto * b, Bool maior);
+void printT();
 
-/* Troca o conteudo de a com o de b */
-void swap(Objeto * a, Objeto * b);
+void printC();
 
-void mostrePonto(Objeto * ponto);
+void printPQ();
 
-void setValor(Objeto * a, double time);
+void printIQ();
+
+void printIT();
 
 #endif
