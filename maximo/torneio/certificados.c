@@ -25,41 +25,41 @@ double calculaValidade(int a, int b){
 
 /* atualiza o valor do certificado de indice i*/
 void atualizaCertificado(int i){
-    int j;
-    j = indT[i]; /* posicao onde o elemento i perde no torneio */
-    if(j == 1){
-        cert[i] = INFINITO;
-        altera_chavePQ(i, cert[i]);
+    int j = torneio[i];
+    /*j = indT[i]; */ /* posicao onde o elemento i perde no torneio */
+    if(i == 1){
+        cert[j] = INFINITO;
+        altera_chavePQ(j, cert[j]);
         return;
     }
-    if(i < 1 || i > n)
+    if(j < 1 || j > n)
         return;
-    cert[i] = calculaValidade(torneio[j/2], torneio[j]);
+    cert[j] = calculaValidade(torneio[i/2], torneio[i]);
     /* atualiza a fila de prioridade */  
-    altera_chavePQ(i, cert[i]);
+    altera_chavePQ(j, cert[j]);
 }
 
 /* 
     O primeiro certificado da fila de prioridade venceu;
 */
 void evento(){
-    int i, j, irmao;    
+    int i, j, k;    
     while(cert[i = minPQ()] == getTime()){
         j = indT[i];
-        irmao = 2*(j/2) + !(j % 2);
+        k = 2*(j/2) + !(j % 2);
         /* se mudar no advance mudar aqui */
-        while(j > 1 && valor(j) >= valor(irmao)){
+        while(j > 1 && valor(j) >= valor(k)){
             torneio[j/2] = torneio[j];
-            irmao = 2*(j/2) + !(j % 2);
-            indT[torneio[irmao]] = irmao;
-            atualizaCertificado(torneio[irmao]);
+            k = 2*(j/2) + !(j % 2);
+            indT[torneio[k]] = k;
+            atualizaCertificado(k);
             
             j = j/2;
-            irmao = 2*(j/2) + !(j % 2);
+            k = 2*(j/2) + !(j % 2);
         }
         
         indT[torneio[j]] = j;
-        atualizaCertificado(torneio[j]);
+        atualizaCertificado(j);
 
     }
 }

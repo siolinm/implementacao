@@ -4,7 +4,7 @@
 void init(int m){
     n = m;
     cert = malloc(n*sizeof(*cert));
-    torneio = malloc((n + 1)*sizeof(*torneio));
+    torneio = malloc((2*n)*sizeof(*torneio));
     x0 = malloc((n + 1)*sizeof(*x0));
     speed = malloc((n + 1)*sizeof(*speed));
     Q = malloc((n + 1)*sizeof(*Q));

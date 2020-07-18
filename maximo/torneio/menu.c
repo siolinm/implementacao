@@ -87,7 +87,7 @@ void advance(){
 }
 
 void change(){
-    int i, j, filho;
+    int i, j, k;
     double newSpeed;
     printf("Digite o elemento e a velocidade a ser alterada: ");
     scanf("%d %lf", &i, &newSpeed);
@@ -95,9 +95,18 @@ void change(){
     i = indT[j];
     x0[j] += (speed[j] - newSpeed)*getTime();
     speed[j] = newSpeed;
-    
-    filho = i;
-    atualizaCertificado(torneio[filho]);
+        
+    atualizaCertificado(i);
+    while(i <= 2*n - 1){
+        i = 2*i;
+        if(i + 1 <= 2*n - 1){
+            if(torneio[i] != torneio[i/2]) 
+                i++;
+            k = 2*(i/2) + !(i % 2);            
+            atualizaCertificado(k);
+        }
+    }
+    /*
     while(2*i + 1 <= 2*n-1){
         if(torneio[i] == torneio[2*i]){
             filho = 2*i + 1;
@@ -107,8 +116,8 @@ void change(){
             filho = 2*i;
             i = 2*i + 1;
         }
-        atualizaCertificado(torneio[filho]);
-    }
+        atualizaCertificado(filho);
+    }*/
     printf("O elemento %d agora se desloca com velocidade %g\n", j, newSpeed);    
 }
 
