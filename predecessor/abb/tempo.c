@@ -1,4 +1,4 @@
-#include"time.h"
+#include"tempo.h"
 
 static double now = 0;
 

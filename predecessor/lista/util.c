@@ -1,10 +1,11 @@
 #include"util.h"
-#include"time.h"
+#include"tempo.h"
 
 void init(int m){
     n = m;
     cert = malloc(n*sizeof(*cert));
     sorted = malloc((n + 1)*sizeof(*sorted));
+    trivial = malloc((n + 1)*sizeof(*trivial));
     x0 = malloc((n + 1)*sizeof(*x0));
     speed = malloc((n + 1)*sizeof(*speed));
     Q = malloc((n + 1)*sizeof(*Q));
@@ -15,6 +16,7 @@ void init(int m){
 void destroy(){
     free(cert);
     free(sorted);
+    free(trivial);
     free(x0);
     free(speed);
     free(Q);

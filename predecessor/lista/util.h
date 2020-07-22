@@ -41,6 +41,11 @@ int * indQ;
 int * indS;
 
 /*
+    trivial e' semelhante a sorted
+*/
+int * trivial;
+
+/*
     quantidade total de elementos
 */
 int n;
@@ -54,7 +59,6 @@ void init(int m);
     libera a memoria alocada 
 */
 void destroy();
-
 
 /*
     Retorna o valor do i-esimo ponto em sorted

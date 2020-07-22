@@ -1,5 +1,5 @@
 CFLAGS = -Wall -ansi -g -pedantic -Wno-unused-result
-O = heap.o util.o certificados.o main.o menu.o time.o heapsort.o
+O = heap.o util.o certificados.o main.o menu.o tempo.o heapsort.o
 
 predecessor: $(O)
 	gcc $(CFLAGS) $(O) -o predecessor 
@@ -13,7 +13,7 @@ predecessor: $(O)
 # menu.o: menu.c menu.h heap.o time.o certificados.o debug.h
 # 	gcc $(CFLAGS) -c menu.c
 
-# certificados.o: certificados.c certificados.h heap.c heap.h util.c util.h debug.h time.c time.h
+# certificados.o: certificados.c certificados.h heap.c heap.h util.c util.h debug.h time.c tempo.h
 # 	gcc $(CFLAGS) -c certificados.c
 
 # heapsort.o: heap.c heap.h util.c util.h debug.h
@@ -22,7 +22,7 @@ predecessor: $(O)
 # util.o: util.c util.h debug.h
 # 	gcc $(CFLAGS) -c util.c
 
-# time.o: time.c time.h
+# time.o: time.c tempo.h
 # 	gcc $(CFLAGS) -c time.c
 
 # lista.o: lista.c lista.h util.o certificados.o time.o

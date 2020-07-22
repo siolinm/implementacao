@@ -1,79 +1,14 @@
 #include"menu.h"
-#include"time.h"
+#include"tempo.h"
 #include"util.h"
+#include"heapsort.h"
 #include"certificados.h"
-#include"avl.h"
-#include"listapontos.h"
 #include"debug.h"
 #include<stdio.h>
+#include<bits/time.h>
+#include<time.h>
 
-
-/* OK */
-int menu(Objeto * raiz, Objeto * heapCert, int n){
-    char opt;
-    printf("(a)vancar\n");
-    printf("(c)arregar arquivo\n");
-    printf("(i)nsere ponto\n");
-    printf("(d)eleta ponto\n");
-    printf("(m)udar trajetoria\n");
-    printf("(p)arar\n");
-    printf("(q)uery\n");
-    printf(">>> ");
-    scanf(" %c", &opt);
-    if(opt == 'p'){
-        if(heapCert) free(heapCert);
-        return (0);
-    } 
-    if(opt == 'q') query(raiz, heapCert, n);
-    if(opt == 'a') avancar(raiz, heapCert, n);
-    if(opt == 'm') change(raiz, heapCert, n);
-    if(opt == 'c') carregarArquivo(raiz, heapCert, n);
-
-    return 0;
-}
-
-/* OK */
-void avancar(Objeto * raiz, Objeto * heapCert, int n){
-    double t;
-    printf("Digite o novo valor do tempo: ");
-    scanf("%lf", &t);
-    while(t > proximoEvento(heapCert)){
-        setTime(proximoEvento(heapCert));
-        evento();
-    }
-    setTime(t);
-    menu(raiz, heapCert, n);
-}
-
-/* +- OK, problema: identificador para o ponto */
-void change(Objeto * raiz, Objeto * heapCert, int n){
-    int i;
-    double v;
-    Objeto * ponto;
-    printf("Digite o ponto e a velocidade a ser alterada: ");
-    scanf("%d %lf", &i, &v);
-    ponto = getPonto(i);
-    
-    ponto->traj.b = (ponto->traj.a - v)*getTime() + ponto->traj.b;
-    ponto->traj.a = v;
-    if(ponto->predecessor) atualizaCertificado(ponto->posicao);
-    if(ponto->sucessor) atualizaCertificado(ponto->sucessor->posicao);    
-    printf("O ponto %d agora se desloca com velocidade %g\n", i, v);
-    menu(raiz, heapCert, n);
-}
-
-/* +- OK, problema: identificador para o ponto */
-void query(Objeto * raiz, Objeto * heapCert, int n){
-    int i;
-    printf("Digite o ponto que deseja consultar: ");
-    scanf("%d", &i);
-    predecessor(i);
-    menu(raiz, heapCert, n);
-}
-
-
-/* !OK */
-void carregarArquivo(Objeto * raiz, Objeto * heapCert, int n){
+void carregarArquivo(){
     FILE * arquivo;
     int i = 0;
     char nomeDoArquivo[80];
@@ -82,19 +17,135 @@ void carregarArquivo(Objeto * raiz, Objeto * heapCert, int n){
 
     arquivo = fopen(nomeDoArquivo, "r");
     fscanf(arquivo, "%d\n", &n);
-    Objeto * ponto = malloc(sizeof(Objeto));
-    for(i = 0; i < n; i++){
-      fscanf(arquivo, "%lf %lf",&(ponto->traj.a), &(ponto->traj.b));
-      ponto->valor = ponto->traj.b;
-      inserePonto(ponto);
+    init(n);
+    for(i = 1; i <= n; i++){
+        fscanf(arquivo, "%lf %lf", &(speed[i]), &(x0[i]));
+        sorted[i] = i;
+        trivial[i] = i;
+        indS[i] = i;
     }
+    
     fclose(arquivo);
-    /*
-    heapCert = iniciaHeap(n-1);
-    iniciaCertificados(raiz, heapCert, n);
-    db(for(i = 1; i < n; i++){
-        printf("Certificado referente ao ponto %d vence em %g, indice do certificado: %d\n", (heapCert[i].posicao)->indice, heapCert[i].valor, i);
-    });
-    constroiHeap(heapCert, n-1, 0);
-    menu(raiz, heapCert, n);*/
+    /* ordena sorted */
+    heapsort();
+    db(printS());
+    iniciaCertificados();
+    db(printC());
+    initPQ();
+    db(printPQ());
+}
+
+int menu(){
+    char opt = 'x';
+    int * aux;
+    int correto, i;
+    double start, end;
+    start = end = 0;
+    while(opt != 'p'){
+        printf("--------------- MENU ---------------\n");
+        printf("(a)vancar\n");
+        printf("(c)arregar arquivo\n");
+        printf("con(f)erir\n");
+        printf("(m)udar trajetoria\n");
+        printf("(n)ow\n");
+        printf("(p)arar\n");
+        printf("(q)uery\n");
+        printf("query solucao (t)rivial\n");
+        printf("---------------      ---------------\n");
+        printf(">>> ");
+        scanf(" %c", &opt);
+        start = clock();
+        if(opt == 'p')
+            destroy();
+        else if(opt == 'q')
+            query();
+        else if(opt == 'a') 
+            advance();
+        else if(opt == 'm') 
+            change();
+        else if(opt == 't') 
+            queryTrivial();
+        else if(opt == 'n') 
+            printf("now: %g\n", getTime());
+        else if(opt == 'c')
+            carregarArquivo();
+        else if(opt == 'f'){
+            aux = sorted;
+            sorted = trivial;
+            heapsort();
+            sorted = aux;
+            correto = 1;
+            for(i = 1; i <= n && correto; i++)                
+                correto = (valor(sorted[i]) == valor(trivial[i]));
+            if(!correto)
+                printf("Nao ");
+            printf("correto\n");
+        }
+        end = clock();        
+        printf("A operacao levou %g segundos\n", (double)(end - start)/CLOCKS_PER_SEC);        
+        if(opt != 'p'){
+            db(printPQ());
+            db(printIQ());
+            db(printC());
+            db(printS());
+            db(
+                printf("Proximo evento: %g\n", proximoEvento());
+            );
+        }
+    }
+
+    return 0;
+}
+
+double proximoEvento(){
+    return cert[minPQ()];
+}
+
+void advance(){
+    double t;
+    printf("Digite o novo valor do tempo: ");
+    scanf(" %lf", &t);
+    if(t < getTime())
+        printf("Unidade de tempo inferior ao instante atual\n");
+    while(t >= proximoEvento()){
+        setTime(proximoEvento());
+        evento();
+    }
+    setTime(t);    
+}
+
+void change(){
+    int i, j;
+    double newSpeed;
+    printf("Digite o elemento e a velocidade a ser alterada: ");
+    scanf("%d %lf", &i, &newSpeed);
+    j = i;
+    i = indS[j];
+    x0[j] += (speed[j] - newSpeed)*getTime();
+    speed[j] = newSpeed;
+    atualizaCertificado(i);
+    atualizaCertificado(i - 1);
+    printf("O elemento %d agora se desloca com velocidade %g\n", j, newSpeed);    
+}
+
+void predecessor(int i){
+    if(i >= 1 && i < n)
+        printf("O predecessor do elemento %d e' o elemento %d\n", sorted[i], sorted[i + 1]);
+    else
+        printf("A posicao indicada nao possui predecessor\n");
+}
+
+void query(){
+    int i;
+    printf("Digite a posicao que deseja consultar: ");
+    scanf("%d", &i);
+    predecessor(i);
+}
+
+void queryTrivial(){
+    int * aux = sorted;
+    sorted = trivial;
+    heapsort();
+    query();
+    sorted = aux;
 }

@@ -1,4 +1,5 @@
 #include"certificados.h"
+#include"pq.h"
 #include<stdio.h>
 
 void iniciaCertificados(){

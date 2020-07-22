@@ -1,5 +1,5 @@
 #include"heap.h"
-#include"time.h"
+#include"tempo.h"
 #include"debug.h"
 #include"util.h"
 #ifndef _CERTIFICADO_H

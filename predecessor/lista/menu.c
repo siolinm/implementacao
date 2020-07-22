@@ -1,10 +1,12 @@
 #include"menu.h"
-#include"time.h"
+#include"tempo.h"
 #include"util.h"
 #include"heapsort.h"
 #include"certificados.h"
 #include"debug.h"
 #include<stdio.h>
+#include<bits/time.h>
+#include<time.h>
 
 void carregarArquivo(){
     FILE * arquivo;
@@ -19,6 +21,7 @@ void carregarArquivo(){
     for(i = 1; i <= n; i++){
         fscanf(arquivo, "%lf %lf", &(speed[i]), &(x0[i]));
         sorted[i] = i;
+        trivial[i] = i;
         indS[i] = i;
     }
     
@@ -34,17 +37,24 @@ void carregarArquivo(){
 
 int menu(){
     char opt = 'x';
+    int * aux;
+    int correto, i;
+    double start, end;
+    start = end = 0;
     while(opt != 'p'){
         printf("--------------- MENU ---------------\n");
         printf("(a)vancar\n");
         printf("(c)arregar arquivo\n");
+        printf("con(f)erir\n");
         printf("(m)udar trajetoria\n");
         printf("(n)ow\n");
         printf("(p)arar\n");
         printf("(q)uery\n");
+        printf("query solucao (t)rivial\n");
         printf("---------------      ---------------\n");
         printf(">>> ");
         scanf(" %c", &opt);
+        start = clock();
         if(opt == 'p')
             destroy();
         else if(opt == 'q')
@@ -53,10 +63,26 @@ int menu(){
             advance();
         else if(opt == 'm') 
             change();
+        else if(opt == 't') 
+            queryTrivial();
         else if(opt == 'n') 
             printf("now: %g\n", getTime());
         else if(opt == 'c')
             carregarArquivo();
+        else if(opt == 'f'){
+            aux = sorted;
+            sorted = trivial;
+            heapsort();
+            sorted = aux;
+            correto = 1;
+            for(i = 1; i <= n && correto; i++)                
+                correto = (valor(sorted[i]) == valor(trivial[i]));
+            if(!correto)
+                printf("Nao ");
+            printf("correto\n");
+        }
+        end = clock();        
+        printf("A operacao levou %g segundos\n", (double)(end - start)/CLOCKS_PER_SEC);        
         if(opt != 'p'){
             db(printPQ());
             db(printIQ());
@@ -113,5 +139,13 @@ void query(){
     int i;
     printf("Digite a posicao que deseja consultar: ");
     scanf("%d", &i);
-    predecessor(i);    
+    predecessor(i);
+}
+
+void queryTrivial(){
+    int * aux = sorted;
+    sorted = trivial;
+    heapsort();
+    query();
+    sorted = aux;
 }

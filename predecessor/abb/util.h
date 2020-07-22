@@ -1,50 +1,60 @@
 #include<stdlib.h>
-#ifndef _TIPO_H
-#define _TIPO_H
+#include<stdio.h>
+#ifndef _UTIL_H
+#define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
 
-typedef struct Trajetoria
+typedef struct Certificate
 {
-    double a;
-    double b;
-} Trajetoria;
+    int id;
+    double value;
+    int pos
+} Certificate;
 
-enum{
-    PONTO,
-    CERTIFICADO
-};
-
-typedef struct No
+typedef struct Element
 {
-    Objeto *chave;
-    No *esq;
-    No *dir;
-    int alt;
-} No;
+    int id;
+    double speed;
+    double initv;
+    Element * next;
+    Element * prev;
+} Element;
 
+/*
+    quantidade total de elementos
+*/
+int n;
 
-typedef struct Objeto
-{
-    Trajetoria traj;
-    double valor;
-    struct Objeto * predecessor;
-    struct Objeto * sucessor;
-    No * no;
-    /* ponteiro para o objeto correspondente (certificado-ponto menor)
-     */
-    struct Objeto * posicao;
-    /* posicao em que o objeto se encontra no vetor do heap */
-    int indice;
-} Objeto;
+/*
+    vetor para a fila de prioridade
+*/
+int * Q;
+
+/*
+    id do ultimo elemento adicionado
+*/
+int lastID;
+
+/*
+    aloca os vetores assumindo que o numero de elementos e' m 
+*/
+void init();
+
+/* 
+    libera a memoria alocada 
+*/
+void destroy();
+
+/*
+    Retorna o valor do i-esimo ponto em sorted
+*/
+double valor(Element * e);
+
+/*
+    Troca o elemento i pelo elemento j na arvore
+*/
+void swap(Element * i, Element * j);
 
 typedef int Bool;
-
-/* Funcao para comparar a e b de acordo com o parametro maior. Se maior = 1, retorna true caso a <= b.
-    Se maior = 0, retorna true caso a >= b.
-*/
-Bool compara(Objeto * a, Objeto * b, Bool maior);
-
-/* Troca o conteudo de a com o de b */
-void swap(Objeto * a, Objeto * b);
 
 #endif
