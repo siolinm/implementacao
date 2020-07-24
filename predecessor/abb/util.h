@@ -8,17 +8,28 @@ typedef struct Certificate
 {
     int id;
     double value;
-    int pos
+    int pos;
 } Certificate;
 
-typedef struct Element
+typedef struct Object
 {
     int id;
     double speed;
     double initv;
-    Element * next;
-    Element * prev;
-} Element;
+    Object * next;
+    Object * prev;
+    No * node;
+} Object;
+
+typedef struct No
+{
+    No * left;
+    No * right;
+    Object * key;
+    int height;
+    int less;
+} No;
+
 
 /*
     quantidade total de elementos
@@ -48,12 +59,12 @@ void destroy();
 /*
     Retorna o valor do i-esimo ponto em sorted
 */
-double valor(Element * e);
+double valor(Object * e);
 
 /*
     Troca o elemento i pelo elemento j na arvore
 */
-void swap(Element * i, Element * j);
+void swap(Object * i, Object * j);
 
 typedef int Bool;
 

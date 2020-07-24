@@ -7,7 +7,7 @@
 #include<stdio.h>
 #include<bits/time.h>
 #include<time.h>
-
+/*
 void carregarArquivo(){
     FILE * arquivo;
     int i = 0;
@@ -25,8 +25,7 @@ void carregarArquivo(){
         indS[i] = i;
     }
     
-    fclose(arquivo);
-    /* ordena sorted */
+    fclose(arquivo);    
     heapsort();
     db(printS());
     iniciaCertificados();
@@ -149,3 +148,4 @@ void queryTrivial(){
     query();
     sorted = aux;
 }
+*/

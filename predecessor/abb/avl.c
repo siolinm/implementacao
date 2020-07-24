@@ -12,25 +12,25 @@ No *raiz = NULL;
 /* OK */
 int altura(No *a)
 {
-    return (a ? a->alt : -1);
+    return (a ? a->height : -1);
 }
 
 /* OK */
 void redefineAltura(No *a)
 {
-    a->alt = max(alt(a->esq), alt(a->dir)) + 1;
+    a->height = max(altura(a->left), altura(a->right)) + 1;
 }
 
 /* OK */
-No *criaNo(Objeto *chave)
+No *criaNo(Object *key)
 {
     No *novo = (No *)malloc(sizeof(No));
 
-    novo->esq = NULL;
-    novo->dir = NULL;
-    novo->chave = chave;
-    novo->alt = 1;
-    chave->no = novo;
+    novo->left = NULL;
+    novo->right = NULL;
+    novo->key = key;
+    novo->height = 1;
+    key->node = novo;
 
     return novo;
 }
@@ -40,13 +40,13 @@ No *rotacionaDir(No *no)
 {
     No *filhoEsq, *aux;
 
-    filhoEsq = no->esq;
+    filhoEsq = no->left;
     if (!filhoEsq)
         return no;
-    aux = filhoEsq->dir;
+    aux = filhoEsq->right;
 
-    filhoEsq->dir = no;
-    no->esq = aux;
+    filhoEsq->right = no;
+    no->left = aux;
 
     redefineAltura(no);
     redefineAltura(filhoEsq);
@@ -59,13 +59,13 @@ No *rotacionaEsq(No *no)
 {
     No *filhoDir, *aux;
 
-    filhoDir = no->dir;
+    filhoDir = no->right;
     if (!filhoDir)
         return no;
-    aux = filhoDir->esq;
+    aux = filhoDir->left;
 
-    filhoDir->esq = no;
-    no->dir = aux;
+    filhoDir->left = no;
+    no->right = aux;
 
     redefineAltura(no);
     redefineAltura(filhoDir);
@@ -76,11 +76,11 @@ No *rotacionaEsq(No *no)
 /* OK */
 int getBalance(No *no)
 {
-    return (no ? (alt(no->esq) - alt(no->dir)) : 0);
+    return (no ? (altura(no->left) - altura(no->right)) : 0);
 }
 
 /* OK */
-No *insereNo(No *raiz, Objeto *chave)
+No *insereNo(No *raiz, Object *chave)
 {
     if (!raiz)
         return criaNo(chave);
@@ -88,39 +88,35 @@ No *insereNo(No *raiz, Objeto *chave)
     /* pensar em como assinalar predecessor e sucessor agora */
 
     /*insere normalmente*/
-    if (compara(chave, raiz->chave, 1))
-        raiz->esq = insereNo(raiz->esq, chave);
+    if (valor(chave) < valor(raiz->key))
+        raiz->left = insereNo(raiz->left, chave);
     else
-        raiz->dir = insereNo(raiz->dir, chave);
-
-    if(chave->predecessor == NULL && compara(chave, raiz->chave, 0)){
-        chave->sucessor = raiz->chave->sucessor;
-        if(raiz->chave->sucessor)
-            raiz->chave->sucessor->predecessor = chave;
-        raiz->chave->sucessor = chave;
-        chave->predecessor = raiz->chave;
-        if(chave->predecessor)
-            insereCertificado(chave);
-        if(chave->sucessor && chave->sucessor->posicao)
-            atualizaCertificado(chave->sucessor->posicao);
-        else if(chave->sucessor){
-            insereCertificado(chave->sucessor);
-        }
+        raiz->right = insereNo(raiz->right, chave);
+    /*
+    - O predecessor de um nó é o maior elemento da subárvore esquerda e o sucessor é o menor elemento da subárvore direita.
+    - Caso a subárvore esquerda não exista o predecessor dele é o primeiro nó menor do que ele "no caminho para cima" 
+    (subo para o pai dele e checo se essa é a subárvore direita do pai dele), 
+    se eu chegar na raiz sem achar um nó assim, então ele não tem predecessor. */
+    if(chave->prev == NULL && valor(chave) >= valor(raiz->key)){
+        /* achei o predecessor de quem inseri */
+        chave->prev = raiz->key;
+        chave->next = raiz->key->next;
+        if(chave->next)
+            chave->next->prev = chave;
+        raiz->key->next = chave;        
     }
-    else if(chave->sucessor == NULL && compara(chave, raiz->chave, 1)){
-        chave->predecessor = raiz->chave->predecessor;
-        if(raiz->chave->predecessor)
-            raiz->chave->predecessor->sucessor = chave;
-        raiz->chave->predecessor = chave;
-        chave->sucessor = raiz->chave;
-        if(chave->predecessor)
-            insereCertificado(chave);
-        if(chave->sucessor && chave->sucessor->posicao)
-            atualizaCertificado(chave->sucessor->posicao);
-        else if(chave->sucessor){
-            insereCertificado(chave->sucessor);
-        }
-    }
+    else if(chave->next == NULL && valor(chave) < valor(raiz->key)){        
+        /*
+        - Caso a subárvore direita não exista o sucessor dele é o primeiro nó maior do que ele "no caminho para cima" 
+        (subo para o pai dele e checo se essa é a subárvore esquerda do pai dele), 
+        se eu chegar na raiz sem achar um nó assim, então ele não tem sucessor.
+        */
+        chave->next = raiz->key;
+        chave->prev = raiz->key->prev;
+        if(chave->prev)
+            chave->prev->next = chave;
+        raiz->key->prev = chave;
+    }    
     /*atualiza a altura de um momento antes */
     redefineAltura(raiz);
 
@@ -130,26 +126,26 @@ No *insereNo(No *raiz, Objeto *chave)
      e o no foi inserido a esquerda do filho esquerdo, entao para balancear basta rodar para direita, 
      pq o filho esquerdo vai virar a nova raiz balanceando as alturas
      */
-    if (a > 1 && chave < raiz->esq->chave)
+    if (a > 1 && chave < raiz->left->key)
         return rotacionaDir(raiz);
 
     /*problema na subarvore esquerda
     e o no foi inserido a direita do filho esquerdo, 
     entao eu transformo no caso anterior e rotaciono para direita de novo
      */
-    if (a > 1 && chave > raiz->esq->chave)
+    if (a > 1 && chave > raiz->left->key)
     {
-        raiz->esq = rotacionaEsq(raiz->esq);
+        raiz->left = rotacionaEsq(raiz->left);
         return rotacionaDir(raiz);
     }
 
     /* espelhado do caso para esquerda */
-    if (a < -1 && chave > raiz->dir->chave)
+    if (a < -1 && chave > raiz->right->key)
         return rotacionaEsq(raiz);
 
-    if (a < -1 && chave < raiz->dir->chave)
+    if (a < -1 && chave < raiz->right->key)
     {
-        raiz->dir = rotacionaDir(raiz->dir);
+        raiz->right = rotacionaDir(raiz->right);
         return rotacionaEsq(raiz);
     }
 
@@ -159,47 +155,47 @@ No *insereNo(No *raiz, Objeto *chave)
 /* OK */
 No *menor(No *raiz)
 {
-    while (raiz->esq)
-        raiz = raiz->esq;
+    while (raiz->left)
+        raiz = raiz->left;
 
     return raiz;
 }
 
 /* OK */
-No *deleteNo(No *raiz, Objeto *chave)
+No *deleteNo(No *raiz, Object *chave)
 {
     No *aux;
     /* deleta normalmente */
     if (raiz == NULL)
         return raiz;
 
-    if (chave == raiz->chave)
-    {        
-        if(chave->predecessor)
-            chave->predecessor->sucessor = chave->sucessor;
-        if(chave->sucessor)
-            chave->sucessor->predecessor = chave->predecessor;
+    if (chave == raiz->key)
+    {
+        if(chave->prev)
+            chave->prev->next = chave->next;
+        if(chave->next)
+            chave->next->prev = chave->prev;
         aux = raiz;
-        if (raiz->esq && raiz->dir)
+        if (raiz->left && raiz->right)
         {
-            raiz = menor(raiz->dir);
-            raiz->esq = aux->esq;
-            raiz->dir = aux->dir;
-            raiz->dir = deleteNo(raiz->dir, raiz->chave);
+            raiz = menor(raiz->right);
+            raiz->left = aux->left;
+            raiz->right = aux->right;
+            raiz->right = deleteNo(raiz->right, raiz->key);
         }
         else
         {
-            raiz = (raiz->esq ? raiz->esq : raiz->dir);
+            raiz = (raiz->left ? raiz->left : raiz->right);
         }
         free(aux);
     }
-    else if (compara(chave, raiz->chave, 1))
+    else if (valor(chave) < valor(raiz->key))
     {
-        raiz->esq = deleteNo(raiz->esq, chave);
+        raiz->left = deleteNo(raiz->left, chave);
     }
     else
     {
-        raiz->dir = deleteNo(raiz->dir, chave);
+        raiz->right = deleteNo(raiz->right, chave);
     }
 
     if(raiz == NULL)
@@ -207,20 +203,20 @@ No *deleteNo(No *raiz, Objeto *chave)
 
     int a = getBalance(raiz);
     
-    if (a > 1 && getBalance(raiz->esq) >= 0){
+    if (a > 1 && getBalance(raiz->left) >= 0){
         return rotacionaDir(raiz);    
     }
     else if (a > 1)
     {
-        raiz->esq = rotacionaEsq(raiz->esq);
+        raiz->left = rotacionaEsq(raiz->left);
         return rotacionaDir(raiz);
     }
-    else if (a < -1 && getBalance(raiz->dir) <= 0){
+    else if (a < -1 && getBalance(raiz->right) <= 0){
         return rotacionaEsq(raiz);
     }
     else if(a < -1)
     {
-        raiz->dir = rotacionaDir(raiz->dir);
+        raiz->right = rotacionaDir(raiz->right);
         return rotacionaEsq(raiz);
     }
 
