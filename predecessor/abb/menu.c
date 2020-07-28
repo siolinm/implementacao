@@ -1,13 +1,12 @@
 #include"menu.h"
 #include"tempo.h"
 #include"util.h"
-#include"heapsort.h"
 #include"certificados.h"
 #include"debug.h"
 #include<stdio.h>
 #include<bits/time.h>
 #include<time.h>
-/*
+
 void carregarArquivo(){
     FILE * arquivo;
     int i = 0;
@@ -148,4 +147,3 @@ void queryTrivial(){
     query();
     sorted = aux;
 }
-*/

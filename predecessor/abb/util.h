@@ -4,13 +4,14 @@
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
 
+/*
 typedef struct Certificate
 {
     int id;
     double value;
     int pos;
 } Certificate;
-
+*/
 typedef struct Object
 {
     int id;
@@ -18,6 +19,8 @@ typedef struct Object
     double initv;
     Object * next;
     Object * prev;
+    double certificate;
+    int pqpos;
     No * node;
 } Object;
 
@@ -39,7 +42,7 @@ int n;
 /*
     vetor para a fila de prioridade
 */
-int * Q;
+Object ** Q;
 
 /*
     id do ultimo elemento adicionado
@@ -55,6 +58,11 @@ void init();
     libera a memoria alocada 
 */
 void destroy();
+
+/*
+    destroi o objeto obj
+*/
+void destroyObject(Object * obj);
 
 /*
     Retorna o valor do i-esimo ponto em sorted

@@ -11,7 +11,7 @@ void initPQ();
     devolve o certificado com 
     menor valor da fila de prioridade
 */
-int minPQ();
+Object * minPQ();
 
 /*
     Devolver o valor do certificado que 
@@ -23,12 +23,14 @@ double value(int i);
     Ajusta o valor do i-esimo certificado para t
     e ajusta a PQ de acordo
 */
-void altera_chavePQ(int i, double t);
+void updatePQ(Object * c, double t);
 
 /*
     Garante a propriedade do heap "descendo"/"peneirando"
     os elementos
 */
 void peneira(int i, int m);
+
+void insertPQ(Object * obj);
 
 #endif
