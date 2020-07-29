@@ -7,7 +7,6 @@
     https://www.youtube.com/watch?v=FzS0n_Z8lrk
 */
 
-No *raiz = NULL;
 
 /* OK */
 int altura(No *a)

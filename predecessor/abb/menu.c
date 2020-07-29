@@ -1,6 +1,8 @@
 #include"menu.h"
 #include"tempo.h"
 #include"util.h"
+#include"avl.h"
+#include"pq.h"
 #include"certificados.h"
 #include"debug.h"
 #include<stdio.h>
@@ -9,6 +11,7 @@
 
 void carregarArquivo(){
     FILE * arquivo;
+    Object * obj;
     int i = 0;
     char nomeDoArquivo[80];
     printf("Digite o nome do arquivo: ");
@@ -18,19 +21,16 @@ void carregarArquivo(){
     fscanf(arquivo, "%d\n", &n);
     init(n);
     for(i = 1; i <= n; i++){
-        fscanf(arquivo, "%lf %lf", &(speed[i]), &(x0[i]));
-        sorted[i] = i;
-        trivial[i] = i;
-        indS[i] = i;
+        obj = malloc(sizeof(*obj));
+        fscanf(arquivo, "%lf %lf", &(obj->speed), &(obj->initv));
+        obj->id = lastID++;
+        Q[i] = obj;
+        raiz = insereNo(raiz, obj);
     }
-    
+
     fclose(arquivo);    
-    heapsort();
-    db(printS());
-    iniciaCertificados();
-    db(printC());
+    iniciaCertificados(raiz);    
     initPQ();
-    db(printPQ());
 }
 
 int menu(){
@@ -42,13 +42,11 @@ int menu(){
     while(opt != 'p'){
         printf("--------------- MENU ---------------\n");
         printf("(a)vancar\n");
-        printf("(c)arregar arquivo\n");
-        printf("con(f)erir\n");
+        printf("(c)arregar arquivo\n");        
         printf("(m)udar trajetoria\n");
         printf("(n)ow\n");
         printf("(p)arar\n");
-        printf("(q)uery\n");
-        printf("query solucao (t)rivial\n");
+        printf("(q)uery\n");        
         printf("---------------      ---------------\n");
         printf(">>> ");
         scanf(" %c", &opt);
@@ -61,31 +59,13 @@ int menu(){
             advance();
         else if(opt == 'm') 
             change();
-        else if(opt == 't') 
-            queryTrivial();
         else if(opt == 'n') 
             printf("now: %g\n", getTime());
         else if(opt == 'c')
             carregarArquivo();
-        else if(opt == 'f'){
-            aux = sorted;
-            sorted = trivial;
-            heapsort();
-            sorted = aux;
-            correto = 1;
-            for(i = 1; i <= n && correto; i++)                
-                correto = (valor(sorted[i]) == valor(trivial[i]));
-            if(!correto)
-                printf("Nao ");
-            printf("correto\n");
-        }
         end = clock();        
         printf("A operacao levou %g segundos\n", (double)(end - start)/CLOCKS_PER_SEC);        
         if(opt != 'p'){
-            db(printPQ());
-            db(printIQ());
-            db(printC());
-            db(printS());
             db(
                 printf("Proximo evento: %g\n", proximoEvento());
             );
@@ -96,7 +76,7 @@ int menu(){
 }
 
 double proximoEvento(){
-    return cert[minPQ()];
+    return minPQ()->certificate;
 }
 
 void advance(){
@@ -111,7 +91,7 @@ void advance(){
     }
     setTime(t);    
 }
-
+/*
 void change(){
     int i, j;
     double newSpeed;
@@ -139,11 +119,4 @@ void query(){
     scanf("%d", &i);
     predecessor(i);
 }
-
-void queryTrivial(){
-    int * aux = sorted;
-    sorted = trivial;
-    heapsort();
-    query();
-    sorted = aux;
-}
+*/

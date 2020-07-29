@@ -4,8 +4,16 @@
 #include"pq.h"
 #include<stdio.h>
 
-void criaCertificado(Object * obj){    
-    obj->certificate = expire(obj, obj->next);    
+void iniciaCertificados(No * raiz){
+    if(!raiz)
+        return; 
+    iniciaCertificados(raiz->left);
+    iniciaCertificados(raiz->right);
+    criaCertificado(raiz->key);
+}
+
+void criaCertificado(Object * obj){
+    obj->certificate = expire(obj, obj->next);
 }
 
 double expire(Object * a, Object * b){
@@ -17,7 +25,7 @@ double expire(Object * a, Object * b){
 
 void update(Object * obj){
     if(obj == NULL)
-        return;  
+        return;
     updatePQ(obj, expire(obj, obj->next));
 }
 

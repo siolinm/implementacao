@@ -3,7 +3,7 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
-
+#define INITIAL_SIZE 100
 /*
 typedef struct Certificate
 {
@@ -33,7 +33,6 @@ typedef struct No
     int less;
 } No;
 
-
 /*
     quantidade total de elementos
 */
@@ -45,9 +44,9 @@ int n;
 Object ** Q;
 
 /*
-    id do ultimo elemento adicionado
+    id do ultimo elemento nao adicionado
 */
-int lastID;
+int lastID = 1;
 
 /*
     aloca os vetores assumindo que o numero de elementos e' m 
@@ -72,7 +71,7 @@ double valor(Object * e);
 /*
     Troca o elemento i pelo elemento j na arvore
 */
-void swap(Object * i, Object * j);
+void swapObjects(Object * i, Object * j);
 
 typedef int Bool;
 

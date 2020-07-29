@@ -3,7 +3,7 @@
 #include"util.h"
 #include"debug.h"
 int m = 0;
-int maxsize = 100;
+int maxsize = INITIAL_SIZE;
 
 void initPQ(){
     int i;
@@ -47,12 +47,12 @@ void updatePQ(Object * obj, double t){
     int pai, j;
     double x;
     obj->certificate = t;
-    j = obj->pqpos;    
+    j = obj->pqpos;
     pai = j;
     x = value(j);
     while(pai/2 >= 1 && x < value(pai/2)){
         Q[pai] = Q[pai/2];
-        Q[pai/2]->pqpos = pai;        
+        Q[pai/2]->pqpos = pai;
         pai = pai/2;
     }
     Q[pai] = obj;
