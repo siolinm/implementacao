@@ -25,6 +25,7 @@ void insertPQ(Object * obj){
         maxsize = 2*maxsize;
     }
     Q[++m] = obj;
+    obj->pqpos = m;
     updatePQ(m, obj->certificate);
 }
 

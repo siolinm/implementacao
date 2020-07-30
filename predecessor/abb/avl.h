@@ -21,4 +21,6 @@ No *insereNo(No *raiz, Object *chave);
 No *menor(No *raiz);
 
 No *deleteNo(No *raiz, Object *chave);
+
+Object * queryKth(int i);
 #endif

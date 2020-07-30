@@ -33,4 +33,5 @@ void peneira(int i, int m);
 
 void insertPQ(Object * obj);
 
+void deletePQ(Object * obj);
 #endif
