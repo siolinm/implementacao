@@ -29,6 +29,7 @@ No *criaNo(Object *key)
     novo->right = NULL;
     novo->key = key;
     novo->height = 1;
+    novo->children = 0;
     key->node = novo;
 
     return novo;
@@ -46,6 +47,8 @@ No *rotacionaDir(No *no)
 
     filhoEsq->right = no;
     no->left = aux;
+
+    no->children -= filhoEsq->children + 1;
 
     redefineAltura(no);
     redefineAltura(filhoEsq);
@@ -65,6 +68,8 @@ No *rotacionaEsq(No *no)
 
     filhoDir->left = no;
     no->right = aux;
+
+    filhoDir->children += no->children + 1;
 
     redefineAltura(no);
     redefineAltura(filhoDir);
@@ -87,10 +92,13 @@ No *insereNo(No *raiz, Object *chave)
     /* pensar em como assinalar predecessor e sucessor agora */
 
     /*insere normalmente*/
-    if (valor(chave) < valor(raiz->key))
+    if (valor(chave) < valor(raiz->key)){
         raiz->left = insereNo(raiz->left, chave);
+        raiz->children += 1;
+    }
     else
         raiz->right = insereNo(raiz->right, chave);
+
     /*
     - O predecessor de um nó é o maior elemento da subárvore esquerda e o sucessor é o menor elemento da subárvore direita.
     - Caso a subárvore esquerda não exista o predecessor dele é o primeiro nó menor do que ele "no caminho para cima" 
@@ -191,6 +199,7 @@ No *deleteNo(No *raiz, Object *chave)
     else if (valor(chave) < valor(raiz->key))
     {
         raiz->left = deleteNo(raiz->left, chave);
+        raiz->children -= 1;
     }
     else
     {
@@ -221,4 +230,14 @@ No *deleteNo(No *raiz, Object *chave)
 
     return raiz;
 
+}
+
+Object * queryKth(No *raiz, int i){
+    if(raiz->children == i - 1)
+        return raiz->key;
+
+    if(raiz->children < i)
+        return queryKth(raiz->right, i - raiz->children - 1);    
+
+    return queryKth(raiz->left, i);
 }

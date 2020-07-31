@@ -131,7 +131,7 @@ void query(){
     Object * obj;
     printf("Digite a posicao que deseja consultar: ");
     scanf("%d", &i);
-    obj = queryKth(i);
+    obj = queryKth(raiz, i);
     printf("O i-esimo elemento tem id: %d\n", obj->id);
 }
 

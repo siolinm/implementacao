@@ -30,7 +30,7 @@ typedef struct No
     No * right;
     Object * key;
     int height;
-    int less;
+    int children;
 } No;
 
 /*
