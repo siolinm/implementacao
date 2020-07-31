@@ -1,5 +1,7 @@
 #include"debug.h"
 #include"util.h"
+#include"tempo.h"
+#include"pq.h"
 #ifndef _CERTIFICADO_H
 #define _CERTIFICADO_H
 

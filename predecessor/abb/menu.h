@@ -1,4 +1,13 @@
+#include"tempo.h"
 #include"util.h"
+#include"queries.h"
+#include"avl.h"
+#include"pq.h"
+#include"certificados.h"
+#include"debug.h"
+#include<stdio.h>
+#include<bits/time.h>
+#include<time.h>
 #ifndef _MENU_H
 #define _MENU_H
 
@@ -35,12 +44,12 @@ void change();
 /*
     insere elemento com velocidade v e valor inicial xt
 */
-void insert(double v, double xt);
+void insert();
 
 /*
     delete elemento com id i
 */
-void delete(int i);
+void delete();
 
 /*
     Informa qual o prazo de vencimento do proximo certificado a vencer

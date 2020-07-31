@@ -1,14 +1,4 @@
 #include"menu.h"
-#include"tempo.h"
-#include"util.h"
-#include"queries.h"
-#include"avl.h"
-#include"pq.h"
-#include"certificados.h"
-#include"debug.h"
-#include<stdio.h>
-#include<bits/time.h>
-#include<time.h>
 
 void carregarArquivo(){
     FILE * arquivo;
@@ -25,8 +15,11 @@ void carregarArquivo(){
         obj = malloc(sizeof(*obj));
         fscanf(arquivo, "%lf %lf", &(obj->speed), &(obj->initv));
         obj->id = lastID++;
+        obj->prev = obj->next = NULL;
         Q[i] = obj;
+        obj->pqpos = i;
         raiz = insereNo(raiz, obj);
+        root = insereNoQ(root, obj);
     }
 
     fclose(arquivo);    
@@ -35,16 +28,15 @@ void carregarArquivo(){
 }
 
 int menu(){
-    char opt = 'x';
-    int * aux;
-    int correto, i;
     double start, end;
+    char opt = 'x';    
     start = end = 0;
     while(opt != 'p'){
         printf("--------------- MENU ---------------\n");
         printf("(a)vancar\n");
-        printf("(c)arregar arquivo\n");        
+        printf("(c)arregar arquivo\n");
         printf("(d)eletar elemento\n");
+        db(printf("(e)xibir arvore\n");)
         printf("(i)nserir elemento\n");
         printf("(m)udar trajetoria\n");
         printf("(n)ow\n");
@@ -64,6 +56,17 @@ int menu(){
             insert();
         else if(opt == 'd') 
             delete();
+        db(else if(opt == 'e'){
+            printf("---------------ARVORE DOS VALORES---------------\n");
+            print(NULL, 1, raiz, 0);
+            printf("\n\n");
+            printf("---------------ARVORE DOS IDs---------------\n");
+            printQ(NULL, 1, root, 0);
+            printf("---------------FILA DE PRIORIDADE---------------\n");
+            printPQ(NULL, 1, 1, 0);
+            printf("---------------LISTA LIGADA---------------\n");
+            printL();            
+        })
         else if(opt == 'm') 
             change();
         else if(opt == 'n') 
@@ -105,10 +108,12 @@ void insert(){
     printf("Digite a velocidade e o valor inicial do elemento (no instante atual): ");
     scanf("%lf %lf", &speed, &initv);
     obj = malloc(sizeof(*obj));
+    obj->prev = obj->next = NULL;
     obj->speed = speed;
     obj->initv = initv - speed*getTime();
     obj->id = lastID++;
     raiz = insereNo(raiz, obj);
+    criaCertificado(obj);
     root = insereNoQ(root, obj);
     insertPQ(obj);
     printf("O elemento foi criado com id: %d\n", obj->id);
@@ -145,6 +150,6 @@ void change(){
     obj->initv += (obj->speed - newSpeed)*getTime();
     obj->speed = newSpeed;
     update(obj);
-    update(obj->prev);
+    update(obj->next);
     printf("O elemento %d agora se desloca com velocidade %g\n", id, newSpeed);    
 }

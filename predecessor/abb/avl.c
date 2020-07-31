@@ -7,7 +7,6 @@
     https://www.youtube.com/watch?v=FzS0n_Z8lrk
 */
 
-
 /* OK */
 int altura(No *a)
 {
@@ -48,7 +47,7 @@ No *rotacionaDir(No *no)
     filhoEsq->right = no;
     no->left = aux;
 
-    no->children -= filhoEsq->children + 1;
+    filhoEsq->children += no->children + 1;
 
     redefineAltura(no);
     redefineAltura(filhoEsq);
@@ -69,7 +68,7 @@ No *rotacionaEsq(No *no)
     filhoDir->left = no;
     no->right = aux;
 
-    filhoDir->children += no->children + 1;
+    no->children -= filhoDir->children + 1;
 
     redefineAltura(no);
     redefineAltura(filhoDir);
@@ -86,25 +85,27 @@ int getBalance(No *no)
 /* OK */
 No *insereNo(No *raiz, Object *chave)
 {
+    int a;
     if (!raiz)
         return criaNo(chave);
 
     /* pensar em como assinalar predecessor e sucessor agora */
 
     /*insere normalmente*/
-    if (valor(chave) < valor(raiz->key)){
+    if (value(chave) < value(raiz->key)){
         raiz->left = insereNo(raiz->left, chave);
-        raiz->children += 1;
     }
-    else
+    else{
+        raiz->children += 1;
         raiz->right = insereNo(raiz->right, chave);
+    }
 
     /*
     - O predecessor de um nó é o maior elemento da subárvore esquerda e o sucessor é o menor elemento da subárvore direita.
     - Caso a subárvore esquerda não exista o predecessor dele é o primeiro nó menor do que ele "no caminho para cima" 
     (subo para o pai dele e checo se essa é a subárvore direita do pai dele), 
     se eu chegar na raiz sem achar um nó assim, então ele não tem predecessor. */
-    if(chave->prev == NULL && valor(chave) >= valor(raiz->key)){
+    if(chave->prev == NULL && value(chave) >= value(raiz->key)){
         /* achei o predecessor de quem inseri */
         chave->prev = raiz->key;
         chave->next = raiz->key->next;
@@ -112,7 +113,7 @@ No *insereNo(No *raiz, Object *chave)
             chave->next->prev = chave;
         raiz->key->next = chave;        
     }
-    else if(chave->next == NULL && valor(chave) < valor(raiz->key)){        
+    else if(chave->next == NULL && value(chave) < value(raiz->key)){        
         /*
         - Caso a subárvore direita não exista o sucessor dele é o primeiro nó maior do que ele "no caminho para cima" 
         (subo para o pai dele e checo se essa é a subárvore esquerda do pai dele), 
@@ -127,7 +128,7 @@ No *insereNo(No *raiz, Object *chave)
     /*atualiza a altura de um momento antes */
     redefineAltura(raiz);
 
-    int a = getBalance(raiz);
+    a = getBalance(raiz);
 
     /* o problema na altura ocorreu na subarvore esquerda
      e o no foi inserido a esquerda do filho esquerdo, entao para balancear basta rodar para direita, 
@@ -172,6 +173,7 @@ No *menor(No *raiz)
 No *deleteNo(No *raiz, Object *chave)
 {
     No *aux;
+    int a;
     /* deleta normalmente */
     if (raiz == NULL)
         return raiz;
@@ -196,20 +198,20 @@ No *deleteNo(No *raiz, Object *chave)
         }
         free(aux);
     }
-    else if (valor(chave) < valor(raiz->key))
+    else if (value(chave) < value(raiz->key))
     {
         raiz->left = deleteNo(raiz->left, chave);
-        raiz->children -= 1;
     }
     else
     {
         raiz->right = deleteNo(raiz->right, chave);
+        raiz->children -= 1;
     }
 
     if(raiz == NULL)
         return raiz;
 
-    int a = getBalance(raiz);
+    a = getBalance(raiz);
     
     if (a > 1 && getBalance(raiz->left) >= 0){
         return rotacionaDir(raiz);    
@@ -237,7 +239,73 @@ Object * queryKth(No *raiz, int i){
         return raiz->key;
 
     if(raiz->children < i)
-        return queryKth(raiz->right, i - raiz->children - 1);    
+        return queryKth(raiz->left, i - raiz->children - 1);    
 
-    return queryKth(raiz->left, i);
+    return queryKth(raiz->right, i);
+}
+
+void print(char * prefix, int size, No * r, int b){
+	int i;
+    char * novo;
+    if(prefix == NULL){
+        prefix = malloc(sizeof(*prefix));
+        prefix[0] = '\0';
+    }
+    if(r != NULL)
+    {
+        for(i = 0; prefix[i] != '\0'; i++)
+            printf("%c", prefix[i]);
+
+        if(b) 
+            printf("├──"); 
+        else 
+            printf("└──" );
+        printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));        
+		
+        novo = malloc((size + 4)*sizeof(*novo));
+        for(i = 0; i < size; i++)
+            novo[i] = prefix[i];
+        if(b)
+            novo[size - 1] = '|';
+        else
+            novo[size - 1] = ' ';
+        for(i = size; i < size + 4; i++)
+            novo[i] = ' ';        
+        novo[size + 3] = '\0';
+		print(novo, size + 4, r->left, 1);
+        print(novo, size + 4, r->right, 0);
+        
+    }
+    if(!b)
+        free(prefix);
+}
+
+void printL(){
+    No * aux;
+    Object * obj, * lobj;
+    aux = menor(raiz);
+    obj = aux->key;
+    while(obj != NULL){
+        /*printf("%d: %g*t + %g = %g", obj->id, obj->speed, obj->initv, value(obj));*/
+        /*printf("%d: %g", obj->id, value(obj));*/
+        /*printf("%d", obj->id);*/
+        if(obj->next)
+            /*printf(" --> ")*/;
+        else{
+            lobj = obj;
+            printf("\n");
+        }     
+        obj = obj->next;
+    }
+    obj = lobj;
+    while(obj != NULL){
+        printf("%d", obj->id);
+        if(obj->prev)
+            printf(" (%gs)--> ", obj->certificate);
+        else{
+            lobj = obj;
+            printf("\n");
+        }        
+        obj = obj->prev;
+    }
 }

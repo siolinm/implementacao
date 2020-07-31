@@ -1,23 +1,36 @@
 #include"queries.h"
-#include"util.h"
 #include"avl.h"
+
+No *criaNoQ(Object *key)
+{
+    No *novo = (No *)malloc(sizeof(No));
+
+    novo->left = NULL;
+    novo->right = NULL;
+    novo->key = key;
+    novo->height = 1;
+    novo->children = 0;    
+
+    return novo;
+}
 
 /* OK */
 No *insereNoQ(No *raiz, Object *chave)
 {
+    int a;
     if (!raiz)
-        return criaNo(chave);    
+        return criaNoQ(chave);    
 
     /*insere normalmente*/
     if (chave->id < raiz->key->id)
-        raiz->left = insereNo(raiz->left, chave);
+        raiz->left = insereNoQ(raiz->left, chave);
     else
-        raiz->right = insereNo(raiz->right, chave);
+        raiz->right = insereNoQ(raiz->right, chave);
       
     /*atualiza a altura de um momento antes */
     redefineAltura(raiz);
 
-    int a = getBalance(raiz);
+    a = getBalance(raiz);
 
     /* o problema na altura ocorreu na subarvore esquerda
      e o no foi inserido a esquerda do filho esquerdo, entao para balancear basta rodar para direita, 
@@ -26,7 +39,8 @@ No *insereNoQ(No *raiz, Object *chave)
     if (a > 1 && chave < raiz->left->key)
         return rotacionaDir(raiz);
 
-    /*problema na subarvore esquerda
+    /*
+    problema na subarvore esquerda
     e o no foi inserido a direita do filho esquerdo, 
     entao eu transformo no caso anterior e rotaciono para direita de novo
      */
@@ -54,6 +68,7 @@ No *insereNoQ(No *raiz, Object *chave)
 No *deleteNoQ(No *raiz, Object *chave)
 {
     No *aux;
+    int a;
     /* deleta normalmente */
     if (raiz == NULL)
         return raiz;
@@ -66,7 +81,7 @@ No *deleteNoQ(No *raiz, Object *chave)
             raiz = menor(raiz->right);
             raiz->left = aux->left;
             raiz->right = aux->right;
-            raiz->right = deleteNo(raiz->right, raiz->key);
+            raiz->right = deleteNoQ(raiz->right, raiz->key);
         }
         else
         {
@@ -76,17 +91,17 @@ No *deleteNoQ(No *raiz, Object *chave)
     }
     else if (chave->id < raiz->key->id)
     {
-        raiz->left = deleteNo(raiz->left, chave);
+        raiz->left = deleteNoQ(raiz->left, chave);
     }
     else
     {
-        raiz->right = deleteNo(raiz->right, chave);
+        raiz->right = deleteNoQ(raiz->right, chave);
     }
 
     if(raiz == NULL)
         return raiz;
 
-    int a = getBalance(raiz);
+    a = getBalance(raiz);
     
     if (a > 1 && getBalance(raiz->left) >= 0){
         return rotacionaDir(raiz);    
@@ -111,7 +126,7 @@ No *deleteNoQ(No *raiz, Object *chave)
 
 Object * queryQ(No * raiz, int id){
     if(!raiz)
-        return -1;
+        return NULL;
 
     if(id < raiz->key->id)
         return queryQ(raiz->left, id);
@@ -119,4 +134,40 @@ Object * queryQ(No * raiz, int id){
         return queryQ(raiz->right, id);
     
     return raiz->key;
+}
+
+void printQ(char * prefix, int size, No * r, int b){
+	int i;
+    char * novo;
+    if(prefix == NULL){
+        prefix = malloc(sizeof(*prefix));
+        prefix[0] = '\0';
+    }
+    if(r != NULL)
+    {
+        for(i = 0; prefix[i] != '\0'; i++)
+            printf("%c", prefix[i]);
+
+        if(b) 
+            printf("├──"); 
+        else 
+            printf("└──" );
+        printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));        
+		
+        novo = malloc((size + 4)*sizeof(*novo));
+        for(i = 0; i < size; i++)
+            novo[i] = prefix[i];
+        if(b)
+            novo[size - 1] = '|';
+        else
+            novo[size - 1] = ' ';
+        for(i = size; i < size + 4; i++)
+            novo[i] = ' ';        
+        novo[size + 3] = '\0';
+		printQ(novo, size + 4, r->left, 1);
+        printQ(novo, size + 4, r->right, 0);
+        
+    }
+    if(!b)
+        free(prefix);
 }

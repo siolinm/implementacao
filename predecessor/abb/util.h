@@ -1,5 +1,7 @@
 #include<stdlib.h>
 #include<stdio.h>
+#include"tempo.h"
+#include"debug.h"
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
@@ -12,23 +14,24 @@ typedef struct Certificate
     int pos;
 } Certificate;
 */
+
 typedef struct Object
 {
     int id;
     double speed;
     double initv;
-    Object * next;
-    Object * prev;
+    struct Object * next;
+    struct Object * prev;
     double certificate;
     int pqpos;
-    No * node;
+    struct No * node;
 } Object;
 
 typedef struct No
 {
-    No * left;
-    No * right;
-    Object * key;
+    struct No * left;
+    struct No * right;
+    struct Object * key;
     int height;
     int children;
 } No;
@@ -46,7 +49,11 @@ Object ** Q;
 /*
     id do ultimo elemento nao adicionado
 */
-int lastID = 1;
+int lastID;
+
+No * root;
+
+No * raiz;
 
 /*
     aloca os vetores assumindo que o numero de elementos e' m 
@@ -64,14 +71,13 @@ void destroy();
 void destroyObject(Object * obj);
 
 /*
-    Retorna o valor do i-esimo ponto em sorted
-*/
-double valor(Object * e);
-
-/*
     Troca o elemento i pelo elemento j na arvore
 */
 void swapObjects(Object * i, Object * j);
+
+double value(Object * e);
+
+void printL();
 
 typedef int Bool;
 

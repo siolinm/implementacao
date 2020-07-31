@@ -2,8 +2,6 @@
 #ifndef _AVL_H
 #define _AVL_H
 
-No *raiz = NULL;
-
 int altura(No *a);
 
 void redefineAltura(No *a);
@@ -23,5 +21,7 @@ No *menor(No *raiz);
 No *deleteNo(No *raiz, Object *chave);
 
 Object * queryKth(No *raiz, int i);
+
+void print(char * prefix, int size, No * r, int b);
 
 #endif

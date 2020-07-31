@@ -1,9 +1,10 @@
 #include"util.h"
-#include"tempo.h"
 
 void init(int m){
+    lastID = 1;
+    root = raiz = NULL;
     n = m;
-    Q = malloc((n + 1)*sizeof(*Q));
+    Q = malloc((INITIAL_SIZE + 1)*sizeof(*Q));
 }
 
 void destroy(){
@@ -18,18 +19,25 @@ double value(Object * e){
     return e->initv + e->speed*getTime();
 }
 
-void swapObjects(Object * a, Object * b){
-    Object * c, *d;
+/*
+    assumindo que b->next = a
+*/
+void swapObjects(Object * a, Object * b){    
     No * noa = a->node;
     No * nob = b->node;
+    
     noa->key = b;
-    nob->key = a;
-
-    c = b->next;
-    d = b->prev;
+    b->node = noa;
+    
+    nob->key = a;        
+    a->node = nob;
 
     b->next = a->next;
-    b->prev = a->prev;
-    a->next = c;
-    a->prev = d;
+    a->prev = b->prev;    
+    b->prev = a;
+    a->next = b;
+    if(a->prev)
+        a->prev->next = a;
+    if(b->next)
+        b->next->prev = b;
 }

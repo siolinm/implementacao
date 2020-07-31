@@ -1,5 +1,5 @@
 CFLAGS = -Wall -ansi -g -pedantic -Wno-unused-result
-O = util.o certificados.o main.o menu.o tempo.o heapsort.o
+O = util.o certificados.o main.o menu.o tempo.o avl.o queries.o pq.o
 
 predecessor: $(O)
 	gcc $(CFLAGS) $(O) -o predecessor 

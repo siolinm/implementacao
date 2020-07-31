@@ -1,7 +1,4 @@
 #include"certificados.h"
-#include"util.h"
-#include"tempo.h"
-#include"pq.h"
 #include<stdio.h>
 
 void iniciaCertificados(No * raiz){
@@ -13,7 +10,7 @@ void iniciaCertificados(No * raiz){
 }
 
 void criaCertificado(Object * obj){
-    obj->certificate = expire(obj, obj->next);
+    obj->certificate = expire(obj, obj->prev);
 }
 
 double expire(Object * a, Object * b){
@@ -26,13 +23,15 @@ double expire(Object * a, Object * b){
 void update(Object * obj){
     if(obj == NULL)
         return;
-    updatePQ(obj, expire(obj, obj->next));
+    updatePQ(obj, expire(obj, obj->prev));
 }
 
 void evento(){
     Object * obj = minPQ();
     while(obj->certificate == getTime()){
-        swapObjects(obj, obj->next);
+        swapObjects(obj, obj->prev);
+        printL();
+        obj = obj->next;
         update(obj);
         update(obj->prev);
         update(obj->next);
