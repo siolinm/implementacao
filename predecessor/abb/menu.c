@@ -46,8 +46,11 @@ int menu(){
         printf(">>> ");
         scanf(" %c", &opt);
         start = clock();
-        if(opt == 'p')
+        if(opt == 'p'){
             destroy();
+            removeAll(raiz);
+            removeAllQ(root);
+        }
         else if(opt == 'q')
             query();
         else if(opt == 'a') 
@@ -65,7 +68,7 @@ int menu(){
             printf("---------------FILA DE PRIORIDADE---------------\n");
             printPQ(NULL, 1, 1, 0);
             printf("---------------LISTA LIGADA---------------\n");
-            printL();            
+            printL();
         })
         else if(opt == 'm') 
             change();
@@ -116,19 +119,23 @@ void insert(){
     criaCertificado(obj);
     root = insereNoQ(root, obj);
     insertPQ(obj);
+    update(obj->next);
     printf("O elemento foi criado com id: %d\n", obj->id);
 }
 
 void delete(){
     int id;
-    Object * obj;
+    Object * obj, * prox;
     printf("Digite o ID do objeto a ser deletado: ");
-    scanf("%d", &id);
+    scanf("%d", &id);    
     obj = queryQ(root, id);
+    prox = obj->next;
     raiz = deleteNo(raiz, obj);
+    db(printf("deletei da primeira\n"));
     root = deleteNoQ(root, obj);
     deletePQ(obj);    
     destroyObject(obj);
+    update(prox);
 }
 
 void query(){

@@ -5,16 +5,12 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
+/*tamanho inicial da PQ*/
 #define INITIAL_SIZE 100
-/*
-typedef struct Certificate
-{
-    int id;
-    double value;
-    int pos;
-} Certificate;
-*/
 
+/*
+    Um elemento
+*/
 typedef struct Object
 {
     int id;
@@ -27,6 +23,9 @@ typedef struct Object
     struct No * node;
 } Object;
 
+/*
+    Um no da arvore
+*/
 typedef struct No
 {
     struct No * left;
@@ -51,14 +50,20 @@ Object ** Q;
 */
 int lastID;
 
+/*
+    raiz da arvore de ids
+*/
 No * root;
 
+/*
+    raiz da arvore de elementos
+*/
 No * raiz;
 
 /*
     aloca os vetores assumindo que o numero de elementos e' m 
 */
-void init();
+void init(int m);
 
 /* 
     libera a memoria alocada 
@@ -71,12 +76,18 @@ void destroy();
 void destroyObject(Object * obj);
 
 /*
-    Troca o elemento i pelo elemento j na arvore
+    Troca o elemento i pelo elemento j na arvore e na lista ligada
 */
 void swapObjects(Object * i, Object * j);
 
+/*
+    valor do objeto e no instante atual
+*/
 double value(Object * e);
 
+/*
+    Exibe a lista ligada (para debug)
+*/
 void printL();
 
 typedef int Bool;

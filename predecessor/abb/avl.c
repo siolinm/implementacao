@@ -184,19 +184,18 @@ No *deleteNo(No *raiz, Object *chave)
             chave->prev->next = chave->next;
         if(chave->next)
             chave->next->prev = chave->prev;
-        aux = raiz;
         if (raiz->left && raiz->right)
         {
-            raiz = menor(raiz->right);
-            raiz->left = aux->left;
-            raiz->right = aux->right;
+            aux = menor(raiz->right);
+            raiz->key = aux->key;
             raiz->right = deleteNo(raiz->right, raiz->key);
         }
         else
         {
+            aux = raiz;
             raiz = (raiz->left ? raiz->left : raiz->right);
-        }
-        free(aux);
+            free(aux);
+        }   
     }
     else if (value(chave) < value(raiz->key))
     {
@@ -308,4 +307,13 @@ void printL(){
         }        
         obj = obj->prev;
     }
+}
+
+void removeAll(No * raiz){
+    if(!raiz)
+        return;
+    removeAll(raiz->left);
+    removeAll(raiz->right);
+    destroyObject(raiz->key);
+    free(raiz);
 }

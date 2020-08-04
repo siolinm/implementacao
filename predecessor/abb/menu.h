@@ -32,12 +32,12 @@ void carregarArquivo();
 int menu();
 
 /*
-    consulta quem e' o predecessor do i-esimo elemento 
+    consulta quem e' o i-esimo elemento 
 */
 void query();
 
 /*
-    altera a velocidade do i-esimo elementos para nova velocidade informada
+    altera a velocidade do i-esimo elemento para nova velocidade informada
 */
 void change();
 
@@ -47,7 +47,7 @@ void change();
 void insert();
 
 /*
-    delete elemento com id i
+    deleta elemento com id i
 */
 void delete();
 
@@ -56,9 +56,5 @@ void delete();
 */
 double proximoEvento();
 
-/*
-    ordena o vetor trivial com um heapsort 
-*/
-void queryTrivial();
 
 #endif

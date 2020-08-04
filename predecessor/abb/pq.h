@@ -20,7 +20,7 @@ Object * minPQ();
 double valor(int i);
 
 /*
-    Ajusta o valor do i-esimo certificado para t
+    Ajusta o valor do certificado do objeto c para t
     e ajusta a PQ de acordo
 */
 void updatePQ(Object * c, double t);
@@ -31,9 +31,18 @@ void updatePQ(Object * c, double t);
 */
 void peneira(int i, int m);
 
+/*
+    insere o objeto obj na PQ
+*/
 void insertPQ(Object * obj);
 
+/*
+    remove o objeto obj da PQ
+*/
 void deletePQ(Object * obj);
 
+/*
+    exibe a PQ (para debug)
+*/
 void printPQ(char * prefix, int size, int idx, int b);
 #endif

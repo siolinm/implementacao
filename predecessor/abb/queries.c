@@ -74,20 +74,19 @@ No *deleteNoQ(No *raiz, Object *chave)
         return raiz;
 
     if (chave->id == raiz->key->id)
-    {        
-        aux = raiz;
+    {                
         if (raiz->left && raiz->right)
         {
-            raiz = menor(raiz->right);
-            raiz->left = aux->left;
-            raiz->right = aux->right;
+            aux = menor(raiz->right);
+            raiz->key = aux->key;
             raiz->right = deleteNoQ(raiz->right, raiz->key);
         }
         else
         {
+            aux = raiz;
             raiz = (raiz->left ? raiz->left : raiz->right);
-        }
-        free(aux);
+            free(aux);
+        }        
     }
     else if (chave->id < raiz->key->id)
     {
@@ -170,4 +169,12 @@ void printQ(char * prefix, int size, No * r, int b){
     }
     if(!b)
         free(prefix);
+}
+
+void removeAllQ(No * raiz){
+    if(!raiz)
+        return;
+    removeAllQ(raiz->left);
+    removeAllQ(raiz->right);    
+    free(raiz);
 }
