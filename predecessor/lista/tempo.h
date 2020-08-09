@@ -1,7 +1,7 @@
 #ifndef _TIME_H
 #define _TIME_H
 
-#define INFINITO 100000000.0
+#define INFINITE 100000000.0
 
 /* devolve o tempo atual */
 double getTime();

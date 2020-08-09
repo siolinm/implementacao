@@ -23,7 +23,7 @@ double value(int i);
     Ajusta o valor do i-esimo certificado para t
     e ajusta a PQ de acordo
 */
-void altera_chavePQ(int i, double t);
+void updatePQ(int i, double t);
 
 /*
     Garante a propriedade do heap "descendo"/"peneirando"

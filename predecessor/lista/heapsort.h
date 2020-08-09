@@ -1,18 +1,17 @@
-#ifndef _HEAPSORT_H
-#define _HEAPSORT_H
 #include"util.h"
 #include"tempo.h"
-#include"certificados.h"
+#include"certificates.h"
 #include<stdio.h>
+#ifndef _HEAPSORT_H
+#define _HEAPSORT_H
 
 /*
-    Garante a propriedade do heap "descendo"/"peneirando"
-    os elementos
+    Assegurates the heap property by "sieving" elements
 */
-void peneiraHeap(int i, int m);
+void sieveHeap(int i, int m);
 
 /*
-    Constroi o heap e ordena o vetor sorted
+    Builds heap and sorts "sorted"
 */
 void heapsort();
 

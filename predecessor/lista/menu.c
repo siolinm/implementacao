@@ -2,7 +2,7 @@
 #include"tempo.h"
 #include"util.h"
 #include"heapsort.h"
-#include"certificados.h"
+#include"certificates.h"
 #include"debug.h"
 #include<stdio.h>
 #include<bits/time.h>
@@ -89,7 +89,7 @@ int menu(){
             db(printC());
             db(printS());
             db(
-                printf("Proximo evento: %g\n", proximoEvento());
+                printf("Proximo event: %g\n", proximoEvento());
             );
         }
     }
@@ -109,7 +109,7 @@ void advance(){
         printf("Unidade de tempo inferior ao instante atual\n");
     while(t >= proximoEvento()){
         setTime(proximoEvento());
-        evento();
+        event();
     }
     setTime(t);    
 }
@@ -123,8 +123,8 @@ void change(){
     i = indS[j];
     x0[j] += (speed[j] - newSpeed)*getTime();
     speed[j] = newSpeed;
-    atualizaCertificado(i);
-    atualizaCertificado(i - 1);
+    update(i);
+    update(i - 1);
     printf("O elemento %d agora se desloca com velocidade %g\n", j, newSpeed);    
 }
 

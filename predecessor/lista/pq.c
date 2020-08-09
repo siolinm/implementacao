@@ -23,7 +23,7 @@ double value(int i){
     return cert[Q[i]];
 }
 
-void altera_chavePQ(int i, double t){
+void updatePQ(int i, double t){
     int pai, j;
     double x;
     j = indQ[i];

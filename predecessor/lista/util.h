@@ -26,7 +26,7 @@ double * x0;
 int * sorted;
 
 /*
-    fila de prioridade que contem os certificados. Q[1] e' o indice do certificado com chave t minima
+    fila de prioridade que contem os certificates. Q[1] e' o indice do certificado com chave t minima
 */
 int * Q;
 
