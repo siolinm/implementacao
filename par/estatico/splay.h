@@ -18,8 +18,6 @@ void query(Item * key);
 
 void insert(Item * key);
 
-void remove(Item * key);
-
 void splay(Node * x);
 
 void rotateLeft(Node * x);
@@ -31,5 +29,11 @@ Node * insertR(Node * root, Item * key);
 Node * removeR(Node * root, Item * key);
 
 Node * createNode(Item * key);
+
+Node * queryLow(Node * start);
+
+Node * queryUp(Node * start);
+
+Node * cutCands();
 
 #endif
