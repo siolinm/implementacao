@@ -30,10 +30,12 @@ Node * removeR(Node * root, Item * key);
 
 Node * createNode(Item * key);
 
-Node * queryLow(Node * start);
+Node * queryLow(Item * p, Node * start);
 
-Node * queryUp(Node * start);
+Node * queryUp(Item * p, Node * start);
 
-Node * cutCands();
+Node * lcands(Item * p);
+
+Item * lcand(Node * lcandsRoot, Item * min);
 
 #endif

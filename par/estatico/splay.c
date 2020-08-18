@@ -1,8 +1,8 @@
 #include"splay.h"
 
-root = NULL;
+#define minimum(a, b) a->x > b->x ? b : a
 
-Node * splayNode = NULL;
+root = NULL;
 
 Node * createNode(Item * key){
     Node * new = malloc(sizeof(*new));
@@ -78,15 +78,92 @@ void query(Item * key){
         splay(x);
 }
 
-Node * queryLow(Node * start){
+Node * queryLow(Item * p, Node * start){
     Node *x = start;
-
     
+    /* I go down while the points are above the line */
+    while(x && checkLine(p, x->key, -0.5*PI_3) == 1)
+        x = x->left;
+
+    /* x should now be the first point that i found below the line */
+    while(x && x->right && checkLine(p, x->right->key, -0.5*PI_3) < 1)
+        x = x->right;
+
+    return x;
 }
 
-Node * queryUp(Node * start){    
+Node * queryUp(Item * p, Node * start){    
+    Node *x = start;
+    
+    /* I go up while the points are below or in the line */
+    while(x && checkLine(p, x->key, 0.5*PI_3) < 1)
+        x = x->right;
 
+    /* x should now be the first point that i found above the line */
+    while(x && x->left && checkLine(p, x->left->key, 0.5*PI_3) == 1)
+        x = x->left;
+
+    return x;
 }
+
+Node * lcands(Item * p){
+    Node * x, *lcandsRoot;
+    int low = 0;
+    x = queryLow(p, root);
+
+    if(x){
+        low = 1;
+        splay(x);
+    }
+
+    if(!low){
+        x = queryUp(p, root);
+    }
+    else{
+        x = queryUp(p, root->right);
+        root->right->parent = NULL;
+    }
+
+    if(x){
+        splay(x);
+        lcandsRoot = x->left;
+        x->left = NULL;
+        if(low){
+            root->right = x;
+            x->parent = root;
+        }
+    }
+    else{
+        if(low){
+            lcandsRoot = root->right;
+            root->right = NULL;
+        }
+        else{
+            lcandsRoot = root;
+            root = NULL;
+        }
+    }
+
+    return lcandsRoot;
+}
+
+Item * lcand(Node * lcandsRoot, Item * min){
+    if(!lcandsRoot)
+        return min;
+    
+    if(!min)
+        min = lcandsRoot->key;
+    else
+        min = minimum(lcandsRoot->key, min);
+    
+    min = minimum(lcand(lcandsRoot->left, min), min);
+    min = minimum(lcand(lcandsRoot->right, min), min);
+
+    free(lcandsRoot);
+    
+    return min;
+}
+
 
 void insert(Item * key){
     Node * new = createNode(key);

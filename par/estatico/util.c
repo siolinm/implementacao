@@ -1,5 +1,4 @@
 #include"util.h"
-#include"math.h"
 
 void init(int m){
     points = malloc((m+1)*sizeof(*points));
@@ -17,5 +16,21 @@ void swapPoints(int i, int j){
     Point * aux;
     aux = points[i];
     points[i] = points[j];
-    points[j] = aux;
+    points[j] = aux;    
+}
+
+int checkLine(Point * a, Point * c, double theta){
+    Point b;
+    b.x = cos(theta)*(getXCoordinate(a) + 1) - sin(theta)*(getYCoordinate(a));
+    b.y = sin(theta)*(getXCoordinate(a) + 1) + cos(theta)*(getYCoordinate(a));
+
+    double x = (b.x - getXCoordinate(a))*(getYCoordinate(c) - getYCoordinate(a));
+    x -= (b.y - getYCoordinate(a))*(getXCoordinate(c) - getXCoordinate(a));
+
+    if(x > 0)
+        x = 1;
+    else if(x < 0)
+        x = -1;
+
+    return (int)x;
 }
