@@ -2,7 +2,7 @@
 
 #define minimum(a, b) (getXCoordinate(a) > getXCoordinate(b) ? b : a)
 
-root = NULL;
+Node * root = NULL;
 
 Node * createNode(Item * key){
     Node * new = malloc(sizeof(*new));

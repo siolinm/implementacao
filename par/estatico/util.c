@@ -21,8 +21,12 @@ void swapPoints(int i, int j){
 
 int checkLine(Point * a, Point * c, double theta){
     Point b;
-    b.x = cos(theta)*(getXCoordinate(a) + 1) - sin(theta)*(getYCoordinate(a));
-    b.y = sin(theta)*(getXCoordinate(a) + 1) + cos(theta)*(getYCoordinate(a));
+    /*
+        b.x = cos(theta)*(getXCoordinate(a) + 1) - sin(theta)*(getYCoordinate(a));
+        b.y = sin(theta)*(getXCoordinate(a) + 1) + cos(theta)*(getYCoordinate(a));
+    */
+    b.x = cos(theta) + getXCoordinate(a);
+    b.y = sin(theta) + getYCoordinate(a);
 
     double x = (b.x - getXCoordinate(a))*(getYCoordinate(c) - getYCoordinate(a));
     x -= (b.y - getYCoordinate(a))*(getXCoordinate(c) - getXCoordinate(a));

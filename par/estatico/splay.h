@@ -12,8 +12,6 @@ typedef struct Node
     Item * key;
 } Node;
 
-Node * root;
-
 void query(Item * key);
 
 void insert(Item * key);
@@ -37,5 +35,7 @@ Node * queryUp(Item * p, Node * start);
 Node * lcands(Item * p);
 
 Item * lcand(Node * lcandsRoot, Item * min);
+
+int compare(Item * a, Item * b);
 
 #endif
