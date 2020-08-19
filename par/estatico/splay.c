@@ -1,6 +1,6 @@
 #include"splay.h"
 
-#define minimum(a, b) a->x > b->x ? b : a
+#define minimum(a, b) (getXCoordinate(a) > getXCoordinate(b) ? b : a)
 
 root = NULL;
 

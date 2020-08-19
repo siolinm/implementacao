@@ -111,7 +111,7 @@ No *insereNo(No *raiz, Object *chave)
         chave->next = raiz->key->next;
         if(chave->next)
             chave->next->prev = chave;
-        raiz->key->next = chave;        
+        raiz->key->next = chave; 
     }
     else if(chave->next == NULL && value(chave) < value(raiz->key)){        
         /*
@@ -188,6 +188,7 @@ No *deleteNo(No *raiz, Object *chave)
         {
             aux = menor(raiz->right);
             raiz->key = aux->key;
+            raiz->key->node = raiz;
             raiz->right = deleteNo(raiz->right, raiz->key);
         }
         else
@@ -195,7 +196,7 @@ No *deleteNo(No *raiz, Object *chave)
             aux = raiz;
             raiz = (raiz->left ? raiz->left : raiz->right);
             free(aux);
-        }   
+        }
     }
     else if (value(chave) < value(raiz->key))
     {
