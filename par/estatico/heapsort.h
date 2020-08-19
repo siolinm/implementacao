@@ -9,7 +9,7 @@
 void sieve(int i, int m);
 
 /*
-    Builds heap and sorts "sorted"
+    Builds heap and sorts "points"
 */
 void heapsort();
 
