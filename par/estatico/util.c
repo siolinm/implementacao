@@ -1,7 +1,16 @@
 #include"util.h"
 
+
 void init(int m){
+    points = NULL;
     points = malloc((m+1)*sizeof(*points));
+}
+
+void destroy(){
+    int i;
+    for(i = 1; i <= n; i++)
+        free(points[i]);
+    free(points);
 }
 
 double getXCoordinate(Point * a){
@@ -21,20 +30,23 @@ void swapPoints(int i, int j){
 
 int checkLine(Point * a, Point * c, double theta){
     Point b;
-    /*
-        b.x = cos(theta)*(getXCoordinate(a) + 1) - sin(theta)*(getYCoordinate(a));
-        b.y = sin(theta)*(getXCoordinate(a) + 1) + cos(theta)*(getYCoordinate(a));
-    */
+    double x;
     b.x = cos(theta) + getXCoordinate(a);
     b.y = sin(theta) + getYCoordinate(a);
 
-    double x = (b.x - getXCoordinate(a))*(getYCoordinate(c) - getYCoordinate(a));
+    x = (b.x - getXCoordinate(a))*(getYCoordinate(c) - getYCoordinate(a));
     x -= (b.y - getYCoordinate(a))*(getXCoordinate(c) - getXCoordinate(a));
 
-    if(x > 0)
+    if(x > EPS)
         x = 1;
-    else if(x < 0)
+    else if(x < -EPS)
         x = -1;
+    else
+        x = 0;
 
     return (int)x;
+}
+
+double distance(Point * a, Point * b){
+    return sqrt((a->x - b->x)*(a->x - b->x) + (a->y - b->y)*(a->y - b->y));
 }

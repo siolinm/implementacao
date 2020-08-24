@@ -2,8 +2,6 @@
 #ifndef _SPLAY_H
 #define _SPLAY_H
 
-typedef Point Item;
-
 typedef struct Node
 {
     struct Node * left;
@@ -11,6 +9,8 @@ typedef struct Node
     struct Node * parent;
     Item * key;
 } Node;
+
+Node * root;
 
 void query(Item * key);
 
@@ -37,5 +37,9 @@ Node * lcands(Item * p);
 Item * lcand(Node * lcandsRoot, Item * min);
 
 int compare(Item * a, Item * b);
+
+void freeAll(Node * r);
+
+void print(char * prefix, int size, Node * r, int b);
 
 #endif

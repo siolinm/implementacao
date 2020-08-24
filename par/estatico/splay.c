@@ -2,8 +2,6 @@
 
 #define minimum(a, b) (getXCoordinate(a) > getXCoordinate(b) ? b : a)
 
-Node * root = NULL;
-
 Node * createNode(Item * key){
     Node * new = malloc(sizeof(*new));
     new->left = new->right = NULL;
@@ -107,13 +105,16 @@ Node * queryUp(Item * p, Node * start){
 }
 
 Node * lcands(Item * p){
-    Node * x, *lcandsRoot;
+    Node * x, *lowNode, *lcandsRoot;
     int low = 0;
+    if(!root)
+        return NULL;
     x = queryLow(p, root);
 
     if(x){
         low = 1;
         splay(x);
+        lowNode = x;
     }
 
     if(!low){
@@ -121,14 +122,16 @@ Node * lcands(Item * p){
     }
     else{
         x = queryUp(p, root->right);
-        root->right->parent = NULL;
+        if(root->right)
+            root->right->parent = NULL;
     }
 
     if(x){
-        splay(x);
+        splay(x);        
         lcandsRoot = x->left;
         x->left = NULL;
         if(low){
+            root = lowNode;
             root->right = x;
             x->parent = root;
         }
@@ -148,6 +151,7 @@ Node * lcands(Item * p){
 }
 
 Item * lcand(Node * lcandsRoot, Item * min){
+    Item * aux;
     if(!lcandsRoot)
         return min;
     
@@ -155,9 +159,16 @@ Item * lcand(Node * lcandsRoot, Item * min){
         min = lcandsRoot->key;
     else
         min = minimum(lcandsRoot->key, min);
-    
-    min = minimum(lcand(lcandsRoot->left, min), min);
-    min = minimum(lcand(lcandsRoot->right, min), min);
+
+    if(lcandsRoot->left){
+        aux = lcand(lcandsRoot->left, min);
+        min = minimum(aux, min);
+    }
+
+    if(lcandsRoot->right){
+        aux = lcand(lcandsRoot->right, min);
+        min = minimum(aux, min);
+    }
 
     free(lcandsRoot);
     
@@ -197,7 +208,7 @@ void insert(Item * key){
 }
 
 void splay(Node * x){
-    while(x->parent){
+    while(x && x->parent){
         /*
             l or r case
         */
@@ -240,4 +251,52 @@ int compare(Item * a, Item * b){
     if(getYCoordinate(a) > getYCoordinate(b))
         return 1;
     return 0;
+}
+
+void freeAll(Node * r){
+    if(r != NULL){
+        freeAll(r->left);
+        freeAll(r->right);        
+        free(r);
+    }
+    root = NULL;
+}
+
+void print(char * prefix, int size, Node * r, int b){
+	int i;
+    char * new;
+    if(prefix == NULL){
+        prefix = malloc(sizeof(*prefix));
+        prefix[0] = '\0';
+    }
+    if(r != NULL)
+    {
+        for(i = 0; prefix[i] != '\0'; i++)
+            printf("%c", prefix[i]);
+
+        if(b) 
+            printf("├──"); 
+        else 
+            printf("└──" );
+        printf("(%g, %g)", r->key->x, r->key->y);
+        if(r->parent){
+            printf("'s parent: (%g, %g)", r->parent->key->x, r->parent->key->y);
+        }
+		printf("\n");
+        new = malloc((size + 4)*sizeof(*new));
+        for(i = 0; i < size; i++)
+            new[i] = prefix[i];
+        if(b)
+            new[size - 1] = '|';
+        else
+            new[size - 1] = ' ';
+        for(i = size; i < size + 4; i++)
+            new[i] = ' ';        
+        new[size + 3] = '\0';
+		print(new, size + 4, r->left, 1);
+        print(new, size + 4, r->right, 0);
+        
+    }
+    if(!b)
+        free(prefix);
 }

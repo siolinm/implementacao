@@ -1,8 +1,10 @@
 #include"math.h"
 #include<stdlib.h>
+#include<stdio.h>
 #ifndef _UTIL_H
 #define _UTIL_H
-
+#define INFINITE 1e8
+#define EPS 1e-6
 #define PI_3 acos(0.5)
 
 typedef struct Point
@@ -10,6 +12,8 @@ typedef struct Point
     double x;
     double y;
 } Point;
+
+typedef Point Item;
 
 /*
     Coordinate system rotation
@@ -31,6 +35,8 @@ int n;
 */
 void init(int m);
 
+void destroy();
+
 /*
     Get x coordinate from points[i] in the coordinate system rotated by angle
 */
@@ -50,6 +56,11 @@ void swapPoints(int i, int j);
 
 */
 int checkLine(Point * a, Point * c, double theta);
+
+/*
+
+*/
+double distance(Item * a, Item * b);
 
 
 #endif
