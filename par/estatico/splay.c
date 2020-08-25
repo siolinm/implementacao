@@ -63,19 +63,6 @@ void rotateRight(Node * x){
         root = aux;
 }
 
-void query(Item * key){
-    Node * x = root;
-    while(x && x->key != key) {
-        if(compare(x->key, key))
-            x = x->left;
-        else
-            x = x->right;
-    }
-
-    if(x != NULL)
-        splay(x);
-}
-
 Node * queryLow(Item * p, Node * start){
     Node *x = start;
     
@@ -104,7 +91,7 @@ Node * queryUp(Item * p, Node * start){
     return x;
 }
 
-Node * lcands(Item * p){
+Node * cands(Item * p){
     Node * x, *lowNode, *lcandsRoot;
     int low = 0;
     if(!root)

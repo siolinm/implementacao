@@ -1,25 +1,25 @@
 #include"heapsort.h"
 #include"util.h"
 
-double valor(int i){
+double value(int i){
     return getXCoordinate(points[i]);
 }
 
 void sieve(int i, int m){
     Point * aux = points[i];
-    int filho = 2*i, pai = i;
-    double x = valor(i);
-    while(filho <= m){
-        if(filho < m && valor(filho) < valor(filho + 1)) 
-            filho += 1;
+    int c = 2*i, p = i;
+    double x = value(i);
+    while(c <= m){
+        if(c < m && value(c) < value(c + 1)) 
+            c += 1;
 
-        if(x >= valor(filho))
+        if(x >= value(c))
             break;
-        points[pai] = points[filho];        
-        pai = filho;
-        filho = 2*pai;
+        points[p] = points[c];        
+        p = c;
+        c = 2*p;
     }
-    points[pai] = aux;
+    points[p] = aux;
 }
 
 void heapsort(){
@@ -28,7 +28,7 @@ void heapsort(){
     for(i = n/2; i >= 1; i--)
         sieve(i, n);
     
-    for(i = n; i > 1; i--){     
+    for(i = n; i > 1; i--){
         swapPoints(1, i);
         sieve(1, i-1);
     }

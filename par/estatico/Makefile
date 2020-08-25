@@ -6,3 +6,12 @@ par: $(O)
 
 %.o: %.c %.h debug.h
 	gcc $(CFLAGS) -c $<
+
+clean:
+	rm *.o par points brute *~
+
+brute: brute.c
+	gcc -o brute brute.c -lm
+
+points: generate.c
+	gcc -o points generate.c

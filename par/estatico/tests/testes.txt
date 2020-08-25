@@ -1,0 +1,10 @@
+1 - Apenas dois pontos, cone horizontal
+2 - Apenas dois pontos, cone para cima
+3 - Apenas dois pontos, cona para baixo
+4 - Três pontos, dois no cone de cima
+5 - 4 pontos, com up e low no cone horizontal
+6 - 4 pontos, com up e low no cone para baixo
+7 - 4 pontos, com up e low no cone para cima
+8 - 3 pontos, com dois pontos no cone horizontal, todos com a mesma distância entre si
+9 - 3 pontos, com dois pontos sobre o cone para cima
+10 - 3 pontos, com dois pontos sobre o cone para baixo

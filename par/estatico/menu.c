@@ -31,7 +31,7 @@ double closestDistance(){
                 print(NULL, 1, root, 0);
                 printf("---------------          ---------------\n");
             );            
-            lcandsRoot = lcands(points[i]);
+            lcandsRoot = cands(points[i]);
             db(
                 printf("--------------- (%g, %g) ---------------\n", points[i]->x, points[i]->y);
                 print(NULL, 1, root, 0);
@@ -53,14 +53,12 @@ double closestDistance(){
 }
 
 void menu(int argc, char * argv[]){
-    char opt = 'x', mode = 'i';
-    double start, end;
+    char opt = 'x', mode = 'i';    
     if(argc > 1){
         if(argv[1][0] == '-'){
             mode = argv[1][1];
         }
-    }
-    start = end = 0;
+    }    
     while(opt != 's'){
         if(mode == 'i'){
             printf("--------------- MENU ---------------\n");

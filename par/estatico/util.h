@@ -38,12 +38,12 @@ void init(int m);
 void destroy();
 
 /*
-    Get x coordinate from points[i] in the coordinate system rotated by angle
+    Get x coordinate from point a in the coordinate system rotated by angle
 */
 double getXCoordinate(Point * a);
 
 /*
-    Get y coordinate from points[i] in the coordinate system rotated by angle
+    Get y coordinate from point a in the coordinate system rotated by angle
 */
 double getYCoordinate(Point * a);
 
@@ -53,12 +53,14 @@ double getYCoordinate(Point * a);
 void swapPoints(int i, int j);
 
 /*
-
+    Returns 1 if point c is to the left of the 
+    parallel line to the x-axis that passes through point c rotated by theta (counterclockwise)
+    0 if point c is in that line and -1 if point c is to the right of that line
 */
 int checkLine(Point * a, Point * c, double theta);
 
 /*
-
+    Calculates the distance between items (points) a and b
 */
 double distance(Item * a, Item * b);
 
