@@ -1,6 +1,5 @@
 #include"util.h"
 
-
 void init(int m){
     points = NULL;
     points = malloc((m+1)*sizeof(*points));

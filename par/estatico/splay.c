@@ -93,19 +93,21 @@ Node * queryUp(Item * p, Node * start){
 
 Node * cands(Item * p){
     Node * x, *lowNode, *lcandsRoot;
+    double b;    
     int low = 0;
-    if(!root)
-        return NULL;
     x = queryLow(p, root);
-
+    printf("%% %c cone\n", p->nome);
     if(x){
         low = 1;
+        b = (b2(p) + b1(x->key))/2;
+        printf("\\draw (%.2lf, %.2lf) -- (%.2lf, %.2lf);\n", p->x, p->y, (b-b1(x->key))*(3/sqrt(3)), b);
         splay(x);
         lowNode = x;
     }
 
     if(!low){
         x = queryUp(p, root);
+        printf("\\draw (%.2lf, %.2lf) -- (%.2lf, %.2lf);\n", p->x, p->y, xmax, -RAIZ3_3*xmax + b2(p));        
     }
     else{
         x = queryUp(p, root->right);
@@ -122,8 +124,11 @@ Node * cands(Item * p){
             root->right = x;
             x->parent = root;
         }
+        b = (b2(x->key) + b1(p))/2;
+        printf("\\draw (%.2lf, %.2lf) -- (%.2lf, %.2lf);\n", p->x, p->y, (b-b1(p))*(3/sqrt(3)), b);
     }
     else{
+        printf("\\draw (%.2lf, %.2lf) -- (%.2lf, %.2lf);\n", p->x, p->y, xmax, RAIZ3_3*xmax + b1(p));        
         if(low){
             lcandsRoot = root->right;
             root->right = NULL;

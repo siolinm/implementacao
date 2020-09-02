@@ -12,8 +12,27 @@ void loadPoints(char mode){
         if(mode == 'i')
             printf("Enter the %d-th point coordinates: ", i);
         points[i] = malloc(sizeof(*(points[i])));
-        scanf("%lf %lf", &(points[i]->x), &(points[i]->y));
+        scanf("%lf %lf %c", &(points[i]->x), &(points[i]->y), &(points[i]->nome));
     }
+}
+
+void draw(){
+    int i = 0;
+    Point * lcandp;
+    Node * lcandsRoot;
+    double minDistance = INFINITE, pdistance;
+    root = NULL;
+    for(i = 1; i <= n; i++)
+        printf("\\node[label={[label distance = -3mm]160:$%c$}] at (%.2lf, %.2lf) {\\textbullet};\n",  points[i]->nome, points[i]->x, points[i]->y);
+    printf("\n");
+    angle = 0;
+    heapsort();
+    for(i = n; i >= 1; i--){                        
+        lcandsRoot = cands(points[i]);            
+        lcandp = lcand(lcandsRoot, NULL);
+        insert(points[i]);
+    }
+    freeAll(root);
 }
 
 double closestDistance(){
@@ -53,13 +72,20 @@ double closestDistance(){
 }
 
 void menu(int argc, char * argv[]){
-    char opt = 'x', mode = 'i';    
+    char opt = 'x';
+    mode = 'i';
     if(argc > 1){
         if(argv[1][0] == '-'){
             mode = argv[1][1];
         }
     }
-    if(mode != 'i'){
+    if(mode == 'd'){
+        xmax = atof(argv[2]);
+        loadPoints(mode);
+        draw();        
+        destroy();
+    }
+    if(mode == 'n'){
         loadPoints(mode);        
         printf("%g\n", closestDistance());
         destroy();

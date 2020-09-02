@@ -6,11 +6,15 @@
 #define INFINITE 1e8
 #define EPS 1e-6
 #define PI_3 acos(0.5)
+#define RAIZ3_3 sqrt(3)/3
+#define b1(p) (p->y - RAIZ3_3*p->x)
+#define b2(p) (p->y + RAIZ3_3*p->x)
 
 typedef struct Point
 {
     double x;
     double y;
+    char nome;
 } Point;
 
 typedef Point Item;
@@ -24,6 +28,10 @@ double angle;
     Vector of points
 */
 Point ** points;
+
+char mode;
+
+double xmax;
 
 /*
     Number of points
