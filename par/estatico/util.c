@@ -28,14 +28,11 @@ void swapPoints(int i, int j){
     points[j] = aux;    
 }
 
-int checkLine(Point * a, Point * c, double theta){
-    Point b;
+int checkLine(Point * a, Point * c, double theta){    
     double x;
-    b.x = cos(theta) + getXCoordinate(a);
-    b.y = sin(theta) + getYCoordinate(a);
 
-    x = (b.x - getXCoordinate(a))*(getYCoordinate(c) - getYCoordinate(a));
-    x -= (b.y - getYCoordinate(a))*(getXCoordinate(c) - getXCoordinate(a));
+    x = (cos(theta))*(getYCoordinate(c) - getYCoordinate(a));
+    x -= (sin(theta))*(getXCoordinate(c) - getXCoordinate(a));
 
     if(x > EPS)
         x = 1;

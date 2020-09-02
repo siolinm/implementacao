@@ -58,8 +58,13 @@ void menu(int argc, char * argv[]){
         if(argv[1][0] == '-'){
             mode = argv[1][1];
         }
-    }    
-    while(opt != 's'){
+    }
+    if(mode != 'i'){
+        loadPoints(mode);        
+        printf("%g\n", closestDistance());
+        destroy();
+    }
+    while(opt != 's' && mode == 'i'){
         if(mode == 'i'){
             printf("--------------- MENU ---------------\n");
             printf("(l)oad points\n");
@@ -76,5 +81,6 @@ void menu(int argc, char * argv[]){
         }
         else if(opt == 'l')
             loadPoints(mode);
-    }    
+    }
+
 }
