@@ -62,7 +62,7 @@ void destroy();
 
 
 /*
-    returns the value of the element in the i-th position in heap
+    returns the value of the element in the i-th position in tourn
 */
 double value(int i);
 

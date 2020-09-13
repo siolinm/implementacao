@@ -9,7 +9,7 @@
 /* 
     advance in time
 */
-void advance();
+void advance(double t);
 
 /*
 loads the elements from a file in the following format:
@@ -34,7 +34,7 @@ void query();
 /*
     changes the speed of the i-th element
 */
-void change();
+void change(int j, double v);
 
 /*
     returns the next event time

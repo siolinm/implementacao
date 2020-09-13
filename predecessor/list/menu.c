@@ -38,7 +38,7 @@ int menu(){
     char opt = 'x';
     int * aux;
     int correct, i;
-    double start, end;
+    double start, end, t;
     start = end = 0;
     while(opt != 's'){
         printf("--------------- MENU ---------------\n");
@@ -56,10 +56,16 @@ int menu(){
             destroy();
         else if(opt == 'q')
             query();
-        else if(opt == 'a')
-            advance();
-        else if(opt == 'c')
-            change();
+        else if(opt == 'a'){
+            printf("Enter the new time value: ");
+            scanf(" %lf", &t);
+            advance(t);
+        }
+        else if(opt == 'c'){
+            printf("Enter the element's id and the new speed: ");
+            scanf("%d %lf", &i, &t);
+            change(i, t);
+        }
         else if(opt == 't')
             queryNaive();
         else if(opt == 'n')
@@ -98,10 +104,7 @@ double nextEvent(){
     return cert[minPQ()];
 }
 
-void advance(){
-    double t;
-    printf("Enter the new time value: ");
-    scanf(" %lf", &t);
+void advance(double t){        
     if(t < getTime())
         printf("Time earlier than current time\n");
     while(t >= nextEvent()){
@@ -111,24 +114,21 @@ void advance(){
     setTime(t);    
 }
 
-void change(){
-    int i, j;
-    double newSpeed;
-    printf("Enter the element's id and the new speed: ");
-    scanf("%d %lf", &i, &newSpeed);
-    j = i;
+void change(int j, double v){
+    int i;
+
     i = indS[j];
-    x0[j] += (speed[j] - newSpeed)*getTime();
-    speed[j] = newSpeed;
+    x0[j] += (speed[j] - v)*getTime();
+    speed[j] = v;
     update(i);
     update(i - 1);
 
-    printf("Element %d now has a speed of %g\n", j, newSpeed);    
+    printf("Element %d now has a speed of %g\n", j, v);    
 }
 
 void query_kth(int i){
     if(i >= 1 && i < n)
-        printf("The %d-th element predecessor is %d\n", sorted[i], sorted[i + 1]);
+        printf("The %dº element predecessor is %d\n", sorted[i], sorted[i + 1]);
     else
         printf("This position does not have a predecessor\n");
 }

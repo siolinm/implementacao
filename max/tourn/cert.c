@@ -36,6 +36,8 @@ void update(int i){
     updatePQ(j, cert[j]);
 }
 
+
+
 /* 
     The first certificate in the PQ has expired
 */
@@ -45,7 +47,7 @@ void event(){
         j = indT[i];
         k = 2*(j/2) + !(j % 2);
         
-        while(j > 1 && value(j) >= value(k)){
+        while(j > 1 && (value(j) > value(k) || (value(j) == value(k) && speed[tourn[j]] > speed[tourn[k]]))){
             tourn[j/2] = tourn[j];
             k = 2*(j/2) + !(j % 2);
             indT[tourn[k]] = k;
@@ -57,6 +59,5 @@ void event(){
         
         indT[tourn[j]] = j;
         update(j);
-
     }
 }

@@ -81,6 +81,10 @@ int getBalance(Node *no)
     return (no ? (height(no->left) - height(no->right)) : 0);
 }
 
+int compare(Object * a, Object * b){
+    return (value(a) < value(b) || (value(a) == value(b) && a->speed < b->speed));
+}
+
 /* OK */
 Node *insertNode(Node *r, Object *key)
 {
@@ -88,7 +92,7 @@ Node *insertNode(Node *r, Object *key)
     if (!r)
         return newNode(key);
 
-    if (value(key) < value(r->key)){
+    if (compare(key, r->key)){
         r->left = insertNode(r->left, key);
     }
     else{
@@ -96,22 +100,20 @@ Node *insertNode(Node *r, Object *key)
         r->right = insertNode(r->right, key);
     }
 
-    if(key->prev == NULL && value(key) >= value(r->key)){
-     
+    if(key->prev == NULL && !compare(key, r->key)){
         key->prev = r->key;
         key->next = r->key->next;
         if(key->next)
             key->next->prev = key;
         r->key->next = key; 
     }
-    else if(key->next == NULL && value(key) < value(r->key)){        
-
+    else if(key->next == NULL && compare(key, r->key)){
         key->next = r->key;
         key->prev = r->key->prev;
         if(key->prev)
             key->prev->next = key;
         r->key->prev = key;
-    }    
+    }
     
     setHeight(r);
 
@@ -178,7 +180,7 @@ Node *deleteNode(Node *r, Object *key)
             free(aux);
         }
     }
-    else if (value(key) < value(r->key))
+    else if (compare(key, r->key))
     {
         r->left = deleteNode(r->left, key);
     }

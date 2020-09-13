@@ -28,7 +28,8 @@ void loadFile(){
 }
 
 int menu(){
-    double start, end;
+    int j;
+    double start, end, t, x;
     char opt = 'x';    
     start = end = 0;
     while(opt != 's'){
@@ -53,12 +54,21 @@ int menu(){
         }
         else if(opt == 'q')
             query();
-        else if(opt == 'a') 
-            advance();
-        else if(opt == 'i') 
-            insert();
-        else if(opt == 'd') 
-            delete();
+        else if(opt == 'a') {
+            printf("Enter the new time value: ");
+            scanf(" %lf", &t);
+            advance(t);
+        }
+        else if(opt == 'i') {
+            printf("Enter the speed and the element's value: ");
+            scanf("%lf %lf", &t, &x);
+            insert(x, t);
+        }
+        else if(opt == 'd'){
+            printf("Enter the object ID: ");
+            scanf("%d", &j);
+            delete(j);
+        }
         db(else if(opt == 'p'){
             printf("---------------AVL TREE---------------\n");
             print(NULL, 1, r, 0);
@@ -70,8 +80,11 @@ int menu(){
             printf("---------------LINKED LIST---------------\n");
             printL();
         })
-        else if(opt == 'c') 
-            change();
+        else if(opt == 'c') {    
+            printf("Enter the element and the new speed: ");
+            scanf("%d %lf", &j, &t);        
+            change(j, t);
+        }
         else if(opt == 'n') 
             printf("now: %g\n", getTime());
         else if(opt == 'l')
@@ -92,10 +105,7 @@ double nextEvent(){
     return minPQ()->certificate;
 }
 
-void advance(){
-    double t;
-    printf("Enter the new time value: ");
-    scanf(" %lf", &t);
+void advance(double t){    
     if(t < getTime())
         printf("Time earlier than current time\n");
     while(t >= nextEvent()){
@@ -105,15 +115,13 @@ void advance(){
     setTime(t);    
 }
 
-void insert(){
-    Object * obj;
-    double speed, initv;
-    printf("Enter the speed and the element's value: ");
-    scanf("%lf %lf", &speed, &initv);
+void insert(double xt, double v){
+    Object * obj;    
+    
     obj = malloc(sizeof(*obj));
     obj->prev = obj->next = NULL;
-    obj->speed = speed;
-    obj->initv = initv - speed*getTime();
+    obj->speed = v;
+    obj->initv = xt - v*getTime();
     obj->id = lastID++;
     r = insertNode(r, obj);
     newCert(obj);
@@ -123,12 +131,10 @@ void insert(){
     printf("The element has been created with an id: %d\n", obj->id);
 }
 
-void delete(){
-    int id;
+void delete(int i){
     Object * obj, * next;
-    printf("Enter the object ID: ");
-    scanf("%d", &id);
-    obj = queryQ(root, id);
+    
+    obj = queryQ(root, i);
     next = obj->next;
     r = deleteNode(r, obj);
     root = deleteNodeQ(root, obj);
@@ -146,16 +152,13 @@ void query(){
     printf("The %d-th element has an id: %d\n", i, obj->id);
 }
 
-void change(){
-    Object * obj;
-    int id;
-    double newSpeed;
-    printf("Enter the element and the new speed: ");
-    scanf("%d %lf", &id, &newSpeed);
-    obj = queryQ(root, id);    
-    obj->initv += (obj->speed - newSpeed)*getTime();
-    obj->speed = newSpeed;
+void change(int j, double v){
+    Object * obj;    
+    
+    obj = queryQ(root, j);    
+    obj->initv += (obj->speed - v)*getTime();
+    obj->speed = v;
     update(obj);
     update(obj->next);
-    printf("The element %d now has a speed of %g\n", id, newSpeed);    
+    printf("The element %d now has a speed of %g\n", j, v);    
 }

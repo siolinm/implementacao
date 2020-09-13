@@ -29,6 +29,8 @@ void loadFile(){
 }
 
 int menu(){
+    double t;
+    int j;
     char opt = 'x';
     while(opt != 's'){
         printf("--------------- MENU ---------------\n");
@@ -46,10 +48,16 @@ int menu(){
             destroy();
         else if(opt == 'q')
             query();
-        else if(opt == 'a') 
-            advance();
-        else if(opt == 'c') 
-            change();
+        else if(opt == 'a') {
+            printf("Enter the new time value: ");
+            scanf(" %lf", &t);
+            advance(t);
+        }
+        else if(opt == 'c') {
+            printf("Enter the element's id and the new speed: ");
+            scanf("%d %lf", &j, &t);
+            change(j, t);
+        }
         else if(opt == 'n') 
             printf("now: %g\n", getTime());
         else if(opt == 'l')
@@ -73,10 +81,7 @@ double nextEvent(){
     return cert[minPQ()];
 }
 
-void advance(){
-    double t;
-    printf("Enter the new time value: ");
-    scanf(" %lf", &t);
+void advance(double t){        
     if(t < getTime())
         printf("Time earlier than current time\n");
     
@@ -87,15 +92,12 @@ void advance(){
     setTime(t);    
 }
 
-void change(){
-    int i, j, k;
-    double newSpeed;
-    printf("Enter the element's id and the new speed: ");
-    scanf("%d %lf", &i, &newSpeed);
-    j = i;
+void change(int j, double v){
+    int i, k;    
+        
     i = indT[j];
-    x0[j] += (speed[j] - newSpeed)*getTime();
-    speed[j] = newSpeed;
+    x0[j] += (speed[j] - v)*getTime();
+    speed[j] = v;
         
     update(i);
     while(i <= 2*n - 1){
@@ -108,7 +110,7 @@ void change(){
         }
     }
 
-    printf("Element %d now has a speed of %g\n", j, newSpeed);    
+    printf("Element %d now has a speed of %g\n", j, v);    
 }
 
 void query(){    
