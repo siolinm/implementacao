@@ -1,5 +1,4 @@
 #include "avl.h"
-#include "certificados.h"
 /*
     https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
     https://www.geeksforgeeks.org/avl-tree-set-2-deletion/
@@ -8,245 +7,226 @@
 */
 
 /* OK */
-int altura(No *a)
+int height(Node *a)
 {
     return (a ? a->height : -1);
 }
 
 /* OK */
-void redefineAltura(No *a)
+void setHeight(Node *a)
 {
-    a->height = max(altura(a->left), altura(a->right)) + 1;
+    a->height = max(height(a->left), height(a->right)) + 1;
 }
 
 /* OK */
-No *criaNo(Object *key)
+Node *newNode(Object *key)
 {
-    No *novo = (No *)malloc(sizeof(No));
+    Node *new = (Node *)malloc(sizeof(Node));
 
-    novo->left = NULL;
-    novo->right = NULL;
-    novo->key = key;
-    novo->height = 1;
-    novo->children = 0;
-    key->node = novo;
+    new->left = NULL;
+    new->right = NULL;
+    new->key = key;
+    new->height = 1;
+    new->children = 0;
+    key->node = new;
 
-    return novo;
+    return new;
 }
 
 /* OK */
-No *rotacionaDir(No *no)
+Node *rotateRight(Node *no)
 {
-    No *filhoEsq, *aux;
+    Node *leftChild, *aux;
 
-    filhoEsq = no->left;
-    if (!filhoEsq)
+    leftChild = no->left;
+    if (!leftChild)
         return no;
-    aux = filhoEsq->right;
+    aux = leftChild->right;
 
-    filhoEsq->right = no;
+    leftChild->right = no;
     no->left = aux;
 
-    filhoEsq->children += no->children + 1;
+    leftChild->children += no->children + 1;
 
-    redefineAltura(no);
-    redefineAltura(filhoEsq);
+    setHeight(no);
+    setHeight(leftChild);
 
-    return filhoEsq;
+    return leftChild;
 }
 
 /* OK */
-No *rotacionaEsq(No *no)
+Node *rotateLeft(Node *no)
 {
-    No *filhoDir, *aux;
+    Node *rightChild, *aux;
 
-    filhoDir = no->right;
-    if (!filhoDir)
+    rightChild = no->right;
+    if (!rightChild)
         return no;
-    aux = filhoDir->left;
+    aux = rightChild->left;
 
-    filhoDir->left = no;
+    rightChild->left = no;
     no->right = aux;
 
-    no->children -= filhoDir->children + 1;
+    no->children -= rightChild->children + 1;
 
-    redefineAltura(no);
-    redefineAltura(filhoDir);
+    setHeight(no);
+    setHeight(rightChild);
 
-    return filhoDir;
+    return rightChild;
 }
 
 /* OK */
-int getBalance(No *no)
+int getBalance(Node *no)
 {
-    return (no ? (altura(no->left) - altura(no->right)) : 0);
+    return (no ? (height(no->left) - height(no->right)) : 0);
 }
 
 /* OK */
-No *insereNo(No *raiz, Object *chave)
+Node *insertNode(Node *r, Object *key)
 {
     int a;
-    if (!raiz)
-        return criaNo(chave);
+    if (!r)
+        return newNode(key);
 
-    /* pensar em como assinalar predecessor e sucessor agora */
-
-    /*insere normalmente*/
-    if (value(chave) < value(raiz->key)){
-        raiz->left = insereNo(raiz->left, chave);
+    if (value(key) < value(r->key)){
+        r->left = insertNode(r->left, key);
     }
     else{
-        raiz->children += 1;
-        raiz->right = insereNo(raiz->right, chave);
+        r->children += 1;
+        r->right = insertNode(r->right, key);
     }
 
-    /*
-    - O predecessor de um nó é o maior elemento da subárvore esquerda e o sucessor é o menor elemento da subárvore direita.
-    - Caso a subárvore esquerda não exista o predecessor dele é o primeiro nó menor do que ele "no caminho para cima" 
-    (subo para o pai dele e checo se essa é a subárvore direita do pai dele), 
-    se eu chegar na raiz sem achar um nó assim, então ele não tem predecessor. */
-    if(chave->prev == NULL && value(chave) >= value(raiz->key)){
-        /* achei o predecessor de quem inseri */
-        chave->prev = raiz->key;
-        chave->next = raiz->key->next;
-        if(chave->next)
-            chave->next->prev = chave;
-        raiz->key->next = chave; 
+    if(key->prev == NULL && value(key) >= value(r->key)){
+     
+        key->prev = r->key;
+        key->next = r->key->next;
+        if(key->next)
+            key->next->prev = key;
+        r->key->next = key; 
     }
-    else if(chave->next == NULL && value(chave) < value(raiz->key)){        
-        /*
-        - Caso a subárvore direita não exista o sucessor dele é o primeiro nó maior do que ele "no caminho para cima" 
-        (subo para o pai dele e checo se essa é a subárvore esquerda do pai dele), 
-        se eu chegar na raiz sem achar um nó assim, então ele não tem sucessor.
-        */
-        chave->next = raiz->key;
-        chave->prev = raiz->key->prev;
-        if(chave->prev)
-            chave->prev->next = chave;
-        raiz->key->prev = chave;
+    else if(key->next == NULL && value(key) < value(r->key)){        
+
+        key->next = r->key;
+        key->prev = r->key->prev;
+        if(key->prev)
+            key->prev->next = key;
+        r->key->prev = key;
     }    
-    /*atualiza a altura de um momento antes */
-    redefineAltura(raiz);
+    
+    setHeight(r);
 
-    a = getBalance(raiz);
+    a = getBalance(r);
 
-    /* o problema na altura ocorreu na subarvore esquerda
-     e o no foi inserido a esquerda do filho esquerdo, entao para balancear basta rodar para direita, 
-     pq o filho esquerdo vai virar a nova raiz balanceando as alturas
-     */
-    if (a > 1 && chave < raiz->left->key)
-        return rotacionaDir(raiz);
+    if (a > 1 && key < r->left->key)
+        return rotateRight(r);
 
-    /*problema na subarvore esquerda
-    e o no foi inserido a direita do filho esquerdo, 
-    entao eu transformo no caso anterior e rotaciono para direita de novo
-     */
-    if (a > 1 && chave > raiz->left->key)
+    if (a > 1 && key > r->left->key)
     {
-        raiz->left = rotacionaEsq(raiz->left);
-        return rotacionaDir(raiz);
+        r->left = rotateLeft(r->left);
+        return rotateRight(r);
     }
 
-    /* espelhado do caso para esquerda */
-    if (a < -1 && chave > raiz->right->key)
-        return rotacionaEsq(raiz);
+    
+    if (a < -1 && key > r->right->key)
+        return rotateLeft(r);
 
-    if (a < -1 && chave < raiz->right->key)
+    if (a < -1 && key < r->right->key)
     {
-        raiz->right = rotacionaDir(raiz->right);
-        return rotacionaEsq(raiz);
+        r->right = rotateRight(r->right);
+        return rotateLeft(r);
     }
 
-    return raiz;
+    return r;
 }
 
 /* OK */
-No *menor(No *raiz)
+Node *leftmost(Node *r)
 {
-    while (raiz->left)
-        raiz = raiz->left;
+    while (r->left)
+        r = r->left;
 
-    return raiz;
+    return r;
 }
 
 /* OK */
-No *deleteNo(No *raiz, Object *chave)
+Node *deleteNode(Node *r, Object *key)
 {
-    No *aux;
+    Node *aux;
     int a;
-    /* deleta normalmente */
-    if (raiz == NULL)
-        return raiz;
+    
+    if (r == NULL)
+        return r;
 
-    if (chave == raiz->key)
+    if (key == r->key)
     {
-        if(chave->prev)
-            chave->prev->next = chave->next;
-        if(chave->next)
-            chave->next->prev = chave->prev;
-        if (raiz->left && raiz->right)
+        if(key->prev)
+            key->prev->next = key->next;
+        if(key->next)
+            key->next->prev = key->prev;
+        if (r->left && r->right)
         {
-            aux = menor(raiz->right);
-            raiz->key = aux->key;
-            raiz->key->node = raiz;
-            raiz->right = deleteNo(raiz->right, raiz->key);
+            aux = leftmost(r->right);
+            r->key = aux->key;
+            r->key->node = r;        
+            r->right = deleteNode(r->right, r->key);
+            r->children -= 1;
         }
         else
         {
-            aux = raiz;
-            raiz = (raiz->left ? raiz->left : raiz->right);
+            aux = r;
+            r = (r->left ? r->left : r->right);
             free(aux);
         }
     }
-    else if (value(chave) < value(raiz->key))
+    else if (value(key) < value(r->key))
     {
-        raiz->left = deleteNo(raiz->left, chave);
+        r->left = deleteNode(r->left, key);
     }
     else
     {
-        raiz->right = deleteNo(raiz->right, chave);
-        raiz->children -= 1;
+        r->right = deleteNode(r->right, key);
+        r->children -= 1;
     }
 
-    if(raiz == NULL)
-        return raiz;
+    if(r == NULL)
+        return r;
 
-    a = getBalance(raiz);
+    a = getBalance(r);
     
-    if (a > 1 && getBalance(raiz->left) >= 0){
-        return rotacionaDir(raiz);    
+    if (a > 1 && getBalance(r->left) >= 0){
+        return rotateRight(r);    
     }
     else if (a > 1)
     {
-        raiz->left = rotacionaEsq(raiz->left);
-        return rotacionaDir(raiz);
+        r->left = rotateLeft(r->left);
+        return rotateRight(r);
     }
-    else if (a < -1 && getBalance(raiz->right) <= 0){
-        return rotacionaEsq(raiz);
+    else if (a < -1 && getBalance(r->right) <= 0){
+        return rotateLeft(r);
     }
     else if(a < -1)
     {
-        raiz->right = rotacionaDir(raiz->right);
-        return rotacionaEsq(raiz);
+        r->right = rotateRight(r->right);
+        return rotateLeft(r);
     }
 
-    return raiz;
+    return r;
 
 }
 
-Object * queryKth(No *raiz, int i){
-    if(raiz->children == i - 1)
-        return raiz->key;
+Object * query_kth(Node *r, int i){
+    if(r->children == i - 1)
+        return r->key;
 
-    if(raiz->children < i)
-        return queryKth(raiz->left, i - raiz->children - 1);    
+    if(r->children < i)
+        return query_kth(r->left, i - r->children - 1);    
 
-    return queryKth(raiz->right, i);
+    return query_kth(r->right, i);
 }
 
-void print(char * prefix, int size, No * r, int b){
+void print(char * prefix, int size, Node * r, int b){
 	int i;
-    char * novo;
+    char * newprefix;
     if(prefix == NULL){
         prefix = malloc(sizeof(*prefix));
         prefix[0] = '\0';
@@ -262,18 +242,18 @@ void print(char * prefix, int size, No * r, int b){
             printf("└──" );
         printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));        
 		
-        novo = malloc((size + 4)*sizeof(*novo));
+        newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
-            novo[i] = prefix[i];
+            newprefix[i] = prefix[i];
         if(b)
-            novo[size - 1] = '|';
+            newprefix[size - 1] = '|';
         else
-            novo[size - 1] = ' ';
+            newprefix[size - 1] = ' ';
         for(i = size; i < size + 4; i++)
-            novo[i] = ' ';        
-        novo[size + 3] = '\0';
-		print(novo, size + 4, r->left, 1);
-        print(novo, size + 4, r->right, 0);
+            newprefix[i] = ' ';        
+        newprefix[size + 3] = '\0';
+		print(newprefix, size + 4, r->left, 1);
+        print(newprefix, size + 4, r->right, 0);
         
     }
     if(!b)
@@ -281,9 +261,9 @@ void print(char * prefix, int size, No * r, int b){
 }
 
 void printL(){
-    No * aux;
+    Node * aux;
     Object * obj, * lobj;
-    aux = menor(raiz);
+    aux = leftmost(r);
     obj = aux->key;
     while(obj != NULL){
         /*printf("%d: %g*t + %g = %g", obj->id, obj->speed, obj->initv, value(obj));*/
@@ -310,11 +290,11 @@ void printL(){
     }
 }
 
-void removeAll(No * raiz){
-    if(!raiz)
+void removeAll(Node * r){
+    if(!r)
         return;
-    removeAll(raiz->left);
-    removeAll(raiz->right);
-    destroyObject(raiz->key);
-    free(raiz);
+    removeAll(r->left);
+    removeAll(r->right);
+    destroyObject(r->key);
+    free(r);
 }

@@ -1,29 +1,29 @@
 #include"menu.h"
 
-void carregarArquivo(){
-    FILE * arquivo;
+void loadFile(){
+    FILE * file;
     Object * obj;
     int i = 0;
-    char nomeDoArquivo[80];
-    printf("Digite o nome do arquivo: ");
-    scanf("%s", nomeDoArquivo);
+    char filename[80];
+    printf("Enter the file name: ");
+    scanf("%s", filename);
 
-    arquivo = fopen(nomeDoArquivo, "r");
-    fscanf(arquivo, "%d\n", &n);
+    file = fopen(filename, "r");
+    fscanf(file, "%d\n", &n);
     init(n);
     for(i = 1; i <= n; i++){
         obj = malloc(sizeof(*obj));
-        fscanf(arquivo, "%lf %lf", &(obj->speed), &(obj->initv));
+        fscanf(file, "%lf %lf", &(obj->speed), &(obj->initv));
         obj->id = lastID++;
         obj->prev = obj->next = NULL;
         Q[i] = obj;
         obj->pqpos = i;
-        raiz = insereNo(raiz, obj);
-        root = insereNoQ(root, obj);
+        r = insertNode(r, obj);
+        root = insertNodeQ(root, obj);
     }
 
-    fclose(arquivo);    
-    iniciaCertificados(raiz);    
+    fclose(file);
+    initCert(r);    
     initPQ();
 }
 
@@ -31,24 +31,24 @@ int menu(){
     double start, end;
     char opt = 'x';    
     start = end = 0;
-    while(opt != 'p'){
+    while(opt != 's'){
         printf("--------------- MENU ---------------\n");
-        printf("(a)vancar\n");
-        printf("(c)arregar arquivo\n");
-        printf("(d)eletar elemento\n");
-        db(printf("(e)xibir arvore\n");)
-        printf("(i)nserir elemento\n");
-        printf("(m)udar trajetoria\n");
+        printf("(a)dvance\n");
+        printf("(c)hange trajectory\n");
+        printf("(d)elete\n");
+        printf("(i)nsert\n");
+        printf("(l)oad file\n");
         printf("(n)ow\n");
-        printf("(p)arar\n");
+        db(printf("(p)rint tree\n");)
         printf("(q)uery\n");
+        printf("(s)top\n");
         printf("---------------      ---------------\n");
-        printf(">>> ");
+        printf(">>> ");        
         scanf(" %c", &opt);
         start = clock();
-        if(opt == 'p'){
+        if(opt == 's'){
             destroy();
-            removeAll(raiz);
+            removeAll(r);
             removeAllQ(root);
         }
         else if(opt == 'q')
@@ -59,28 +59,28 @@ int menu(){
             insert();
         else if(opt == 'd') 
             delete();
-        db(else if(opt == 'e'){
-            printf("---------------ARVORE DOS VALORES---------------\n");
-            print(NULL, 1, raiz, 0);
+        db(else if(opt == 'p'){
+            printf("---------------AVL TREE---------------\n");
+            print(NULL, 1, r, 0);
             printf("\n\n");
-            printf("---------------ARVORE DOS IDs---------------\n");
+            printf("---------------ID TREE---------------\n");
             printQ(NULL, 1, root, 0);
-            printf("---------------FILA DE PRIORIDADE---------------\n");
+            printf("---------------PRIORITY QUEUE---------------\n");
             printPQ(NULL, 1, 1, 0);
-            printf("---------------LISTA LIGADA---------------\n");
+            printf("---------------LINKED LIST---------------\n");
             printL();
         })
-        else if(opt == 'm') 
+        else if(opt == 'c') 
             change();
         else if(opt == 'n') 
             printf("now: %g\n", getTime());
-        else if(opt == 'c')
-            carregarArquivo();
+        else if(opt == 'l')
+            loadFile();
         end = clock();        
-        printf("A operacao levou %g segundos\n", (double)(end - start)/CLOCKS_PER_SEC);        
-        if(opt != 'p'){
+        printf("The operation took %g seconds\n", (double)(end - start)/CLOCKS_PER_SEC);        
+        if(opt != 's'){
             db(
-                printf("Proximo evento: %g\n", proximoEvento());
+                printf("Next event: %g\n", nextEvent());
             );
         }
     }
@@ -88,75 +88,74 @@ int menu(){
     return 0;
 }
 
-double proximoEvento(){
+double nextEvent(){
     return minPQ()->certificate;
 }
 
 void advance(){
     double t;
-    printf("Digite o novo valor do tempo: ");
+    printf("Enter the new time value: ");
     scanf(" %lf", &t);
     if(t < getTime())
-        printf("Unidade de tempo inferior ao instante atual\n");
-    while(t >= proximoEvento()){
-        setTime(proximoEvento());
-        evento();
+        printf("Time earlier than current time\n");
+    while(t >= nextEvent()){
+        setTime(nextEvent());
+        event();
     }
-    setTime(t);
+    setTime(t);    
 }
 
 void insert(){
     Object * obj;
     double speed, initv;
-    printf("Digite a velocidade e o valor inicial do elemento (no instante atual): ");
+    printf("Enter the speed and the element's value: ");
     scanf("%lf %lf", &speed, &initv);
     obj = malloc(sizeof(*obj));
     obj->prev = obj->next = NULL;
     obj->speed = speed;
     obj->initv = initv - speed*getTime();
     obj->id = lastID++;
-    raiz = insereNo(raiz, obj);
-    criaCertificado(obj);
-    root = insereNoQ(root, obj);
+    r = insertNode(r, obj);
+    newCert(obj);
+    root = insertNodeQ(root, obj);
     insertPQ(obj);
     update(obj->next);
-    printf("O elemento foi criado com id: %d\n", obj->id);
+    printf("The element has been created with an id: %d\n", obj->id);
 }
 
 void delete(){
     int id;
-    Object * obj, * prox;
-    printf("Digite o ID do objeto a ser deletado: ");
-    scanf("%d", &id);    
+    Object * obj, * next;
+    printf("Enter the object ID: ");
+    scanf("%d", &id);
     obj = queryQ(root, id);
-    prox = obj->next;
-    raiz = deleteNo(raiz, obj);
-    db(printf("deletei da primeira\n"));
-    root = deleteNoQ(root, obj);
-    deletePQ(obj);    
+    next = obj->next;
+    r = deleteNode(r, obj);
+    root = deleteNodeQ(root, obj);
+    deletePQ(obj);
     destroyObject(obj);
-    update(prox);
+    update(next);
 }
 
 void query(){
     int i;
     Object * obj;
-    printf("Digite a posicao que deseja consultar: ");
+    printf("Enter the position: ");
     scanf("%d", &i);
-    obj = queryKth(raiz, i);
-    printf("O i-esimo elemento tem id: %d\n", obj->id);
+    obj = query_kth(r, i);
+    printf("The %d-th element has an id: %d\n", i, obj->id);
 }
 
 void change(){
     Object * obj;
     int id;
     double newSpeed;
-    printf("Digite o id do elemento e a velocidade a ser alterada: ");
+    printf("Enter the element and the new speed: ");
     scanf("%d %lf", &id, &newSpeed);
     obj = queryQ(root, id);    
     obj->initv += (obj->speed - newSpeed)*getTime();
     obj->speed = newSpeed;
     update(obj);
     update(obj->next);
-    printf("O elemento %d agora se desloca com velocidade %g\n", id, newSpeed);    
+    printf("The element %d now has a speed of %g\n", id, newSpeed);    
 }

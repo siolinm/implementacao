@@ -1,15 +1,15 @@
 #include<stdlib.h>
 #include<stdio.h>
-#include"tempo.h"
+#include"currentTime.h"
 #include"debug.h"
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
-/*tamanho inicial da PQ*/
+/*priority queue initial size*/
 #define INITIAL_SIZE 100
 
 /*
-    Um elemento
+    An element/object
 */
 typedef struct Object
 {
@@ -20,73 +20,73 @@ typedef struct Object
     struct Object * prev;
     double certificate;
     int pqpos;
-    struct No * node;
+    struct Node * node;
 } Object;
 
 /*
-    Um no da arvore
+    An avl node
 */
-typedef struct No
+typedef struct Node
 {
-    struct No * left;
-    struct No * right;
+    struct Node * left;
+    struct Node * right;
     struct Object * key;
     int height;
     int children;
-} No;
+} Node;
 
 /*
-    quantidade total de elementos
+    total number of elements
 */
 int n;
 
 /*
-    vetor para a fila de prioridade
+    priority queue
 */
 Object ** Q;
 
 /*
-    id do ultimo elemento nao adicionado
+   last not used id
 */
 int lastID;
 
 /*
-    raiz da arvore de ids
+    queries tree root
 */
-No * root;
+Node * root;
 
 /*
-    raiz da arvore de elementos
+    avl tree root
 */
-No * raiz;
+Node * r;
 
 /*
-    aloca os vetores assumindo que o numero de elementos e' m 
+    allocate all memory needed for m elements
 */
 void init(int m);
 
 /* 
-    libera a memoria alocada 
+    deallocates the memory used 
 */
 void destroy();
 
 /*
-    destroi o objeto obj
+    deallocates memory used by obj
 */
 void destroyObject(Object * obj);
 
 /*
-    Troca o elemento i pelo elemento j na arvore e na lista ligada
+    swaps element i with element j in the avl tree and the linked list
 */
 void swapObjects(Object * i, Object * j);
 
 /*
-    valor do objeto e no instante atual
+    e object's value
 */
 double value(Object * e);
 
 /*
-    Exibe a lista ligada (para debug)
+    prints the linked list (for debug)
 */
 void printL();
 

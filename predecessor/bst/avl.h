@@ -1,65 +1,67 @@
 #include "util.h"
+#include "cert.h"
 #ifndef _AVL_H
 #define _AVL_H
 
 /*
-    Retorna a altura do no a, -1 se NULL;
+    returns the height of node a, -1 if NULL;
 */
-int altura(No *a);
+int height(Node *a);
 
 /*
-    Recalcula a altura do no a;
+    recalculates the node a height and sets its new value;
 */
-void redefineAltura(No *a);
+void setHeight(Node *a);
 
 /*
-    Cria um no com chave key;
+    returns a new node with key key;
 */
-No *criaNo(Object *key);
+Node *newNode(Object *key);
 
 /*
-    Rotaciona o no para direita
+    rotates the node to the right
 */
-No *rotacionaDir(No *no);
+Node *rotateRight(Node *no);
 
 /*
-    Rotaciona o no para esquerda
+    rotates the node to the left
 */
-No *rotacionaEsq(No *no);
+Node *rotateLeft(Node *no);
 
 /*
-    Retorna o balanco do no, que eh a diferenca entre a altura do filho esquerdo e a altura do filho direito
+    returns the node's balance, which is height(node->left) - height(node->right)
+    0 if NULL
 */
-int getBalance(No *no);
+int getBalance(Node *no);
 
 /*
-    Insere recursivamente a chave na arvore e ajusta a lista ligada de chaves
+    recursively inserts node r with key key and adjusts the linked list, returning the new root
 */
-No *insereNo(No *raiz, Object *chave);
+Node *insertNode(Node *r, Object *key);
 
 /*
-    Retorna o menor elemento da arvore com raiz raiz
+    returns the leftmost in element in the subtree with root r
 */
-No *menor(No *raiz);
+Node *leftmost(Node *r);
 
 /*
-    Deleta recursivamente a chave da arvore e ajusta a lista ligada de chaves
+    recusiverly deletes from the avl tree the node with key key, adjusting the linked list in the process, returning the new root
 */
-No *deleteNo(No *raiz, Object *chave);
+Node *deleteNode(Node *r, Object *key);
 
 /*
-    Busca o k-esimo elemento na arvore recursivamente
+    queries for the k-th element in the avl tree
 */
-Object * queryKth(No *raiz, int i);
+Object * query_kth(Node *r, int i);
 
 /*
-    Exibe a arvore horizontalmente (para debug)
+    Prints the avl tree horizontally (for debug)
 */
-void print(char * prefix, int size, No * r, int b);
+void print(char * prefix, int size, Node * r, int b);
 
 /*
-    desaloca toda memoria alocada
+   deallocates all memory used
 */
-void removeAll(No * raiz);
+void removeAll(Node * r);
 
 #endif

@@ -3,37 +3,37 @@
 #define _QUERIES_H
 
 /*
-    Arvore de acordo com os ids
+    BST ordered by ids
 */
 
 /*
-    Busca pelo id 
+    returns the object with id id
 */
-Object * queryQ(No * raiz, int id);
+Object * queryQ(Node * r, int id);
 
 /*
-    deleta a chave da arvore recursivamente e retorna uma nova raiz
+    recusiverly deletes from the tree the node with key key, returning the new root
 */
-No *deleteNoQ(No *raiz, Object *chave);
+Node *deleteNodeQ(Node *r, Object *key);
 
 /*
-    insere a chave da arvore recursivamente e retorna uma nova raiz
+    recursively inserts node r with key key, returning the new root
 */
-No *insereNoQ(No *raiz, Object *chave);
+Node *insertNodeQ(Node *r, Object *key);
 
 /*
-    cria um no com chave key
+    returns a new node with key key;
 */
-No *criaNoQ(Object *key);
+Node *newNodeQ(Object *key);
 
 /*
-    exibe a arvore dos ids (para debug)
+    prints the tree horizontally (for debug)
 */
-void printQ(char * prefix, int size, No * r, int b);
+void printQ(char * prefix, int size, Node * r, int b);
 
 /*
-    desaloca toda memoria alocada
+    deallocates all memory used
 */
-void removeAllQ(No * raiz);
+void removeAllQ(Node * r);
 
 #endif

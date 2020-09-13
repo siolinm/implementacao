@@ -5,7 +5,7 @@
 #define max(a, b) ((a > b) ? a : b)
 
 /*
-    cert[i] keeps the certificate between i/2 and i (the time that the certificate expires)
+    cert[i] keeps the certificate between tourn[indT[i]/2] and tourn[indT[i]] (the time that the certificate expires)
 */
 double * cert;
 

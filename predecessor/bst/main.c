@@ -1,6 +1,6 @@
 #include<stdio.h>
-#include"certificados.h"
-#include"tempo.h"
+#include"cert.h"
+#include"currentTime.h"
 #include"menu.h"
 
 int main(){            

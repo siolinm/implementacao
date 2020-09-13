@@ -2,7 +2,7 @@
 
 void init(int m){
     lastID = 1;
-    root = raiz = NULL;
+    root = r = NULL;
     n = m;
     Q = malloc((INITIAL_SIZE + 1)*sizeof(*Q));
 }
@@ -20,11 +20,11 @@ double value(Object * e){
 }
 
 /*
-    assumindo que b->next = a
+    assuming b->next = a
 */
 void swapObjects(Object * a, Object * b){    
-    No * noa = a->node;
-    No * nob = b->node;
+    Node * noa = a->node;
+    Node * nob = b->node;
     
     noa->key = b;
     b->node = noa;

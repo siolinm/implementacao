@@ -1,23 +1,25 @@
 #include"util.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include"util.h"
+#include"debug.h"
 #ifndef _HEAP_H
 #define _HEAP_H
 
 /*
-    Inicializa a fila de prioridade
+    initializes the priority queue
 */
 void initPQ();
 
 /*
-    devolve o certificado com 
-    menor valor da fila de prioridade
+    returns the certificate with minimum value
 */
 Object * minPQ();
 
 /*
-    Devolver o valor do certificado que 
-    esta na posicao i da fila de prioridade
+    returns the value of the certificate in the i-th priority queue position
 */
-double valor(int i);
+double valuePQ(int i);
 
 /*
     Ajusta o valor do certificado do objeto c para t
@@ -26,23 +28,22 @@ double valor(int i);
 void updatePQ(Object * c, double t);
 
 /*
-    Garante a propriedade do heap "descendo"/"peneirando"
-    os elementos
+    assegurates the heap property by "sieving" elements
 */
-void peneira(int i, int m);
+void sieve(int i, int m);
 
 /*
-    insere o objeto obj na PQ
+    inserts object obj in the PQ
 */
 void insertPQ(Object * obj);
 
 /*
-    remove o objeto obj da PQ
+    deletes object obj from the PQ
 */
 void deletePQ(Object * obj);
 
 /*
-    exibe a PQ (para debug)
+    shows the PQ (for debug)
 */
 void printPQ(char * prefix, int size, int idx, int b);
 #endif

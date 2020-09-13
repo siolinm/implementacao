@@ -1,143 +1,132 @@
 #include"queries.h"
 #include"avl.h"
 
-No *criaNoQ(Object *key)
+Node *newNodeQ(Object *key)
 {
-    No *novo = (No *)malloc(sizeof(No));
+    Node *new = (Node *)malloc(sizeof(Node));
 
-    novo->left = NULL;
-    novo->right = NULL;
-    novo->key = key;
-    novo->height = 1;
-    novo->children = 0;    
+    new->left = NULL;
+    new->right = NULL;
+    new->key = key;
+    new->height = 1;
+    new->children = 0;    
 
-    return novo;
+    return new;
 }
 
 /* OK */
-No *insereNoQ(No *raiz, Object *chave)
+Node *insertNodeQ(Node *r, Object *key)
 {
     int a;
-    if (!raiz)
-        return criaNoQ(chave);    
-
-    /*insere normalmente*/
-    if (chave->id < raiz->key->id)
-        raiz->left = insereNoQ(raiz->left, chave);
+    if (!r)
+        return newNodeQ(key);    
+    
+    if (key->id < r->key->id)
+        r->left = insertNodeQ(r->left, key);
     else
-        raiz->right = insereNoQ(raiz->right, chave);
+        r->right = insertNodeQ(r->right, key);
       
-    /*atualiza a altura de um momento antes */
-    redefineAltura(raiz);
+    
+    setHeight(r);
 
-    a = getBalance(raiz);
+    a = getBalance(r);
 
-    /* o problema na altura ocorreu na subarvore esquerda
-     e o no foi inserido a esquerda do filho esquerdo, entao para balancear basta rodar para direita, 
-     pq o filho esquerdo vai virar a nova raiz balanceando as alturas
-     */
-    if (a > 1 && chave < raiz->left->key)
-        return rotacionaDir(raiz);
+    if (a > 1 && key < r->left->key)
+        return rotateRight(r);
 
-    /*
-    problema na subarvore esquerda
-    e o no foi inserido a direita do filho esquerdo, 
-    entao eu transformo no caso anterior e rotaciono para direita de novo
-     */
-    if (a > 1 && chave > raiz->left->key)
+    if (a > 1 && key > r->left->key)
     {
-        raiz->left = rotacionaEsq(raiz->left);
-        return rotacionaDir(raiz);
+        r->left = rotateLeft(r->left);
+        return rotateRight(r);
     }
 
-    /* espelhado do caso para esquerda */
-    if (a < -1 && chave > raiz->right->key)
-        return rotacionaEsq(raiz);
+    if (a < -1 && key > r->right->key)
+        return rotateLeft(r);
 
-    if (a < -1 && chave < raiz->right->key)
+    if (a < -1 && key < r->right->key)
     {
-        raiz->right = rotacionaDir(raiz->right);
-        return rotacionaEsq(raiz);
+        r->right = rotateRight(r->right);
+        return rotateLeft(r);
     }
 
-    return raiz;
+    return r;
 }
 
 
 /* OK */
-No *deleteNoQ(No *raiz, Object *chave)
+Node *deleteNodeQ(Node *r, Object *key)
 {
-    No *aux;
+    Node *aux;
     int a;
-    /* deleta normalmente */
-    if (raiz == NULL)
-        return raiz;
 
-    if (chave->id == raiz->key->id)
+    if (r == NULL)
+        return r;
+
+    if (key->id == r->key->id)
     {                
-        if (raiz->left && raiz->right)
+        if (r->left && r->right)
         {
-            aux = menor(raiz->right);
-            raiz->key = aux->key;
-            raiz->right = deleteNoQ(raiz->right, raiz->key);
+            aux = leftmost(r->right);
+            r->key = aux->key;
+            r->right = deleteNodeQ(r->right, r->key);
         }
         else
         {
-            aux = raiz;
-            raiz = (raiz->left ? raiz->left : raiz->right);
+            aux = r;
+            r = (r->left ? r->left : r->right);
             free(aux);
         }        
     }
-    else if (chave->id < raiz->key->id)
+    else if (key->id < r->key->id)
     {
-        raiz->left = deleteNoQ(raiz->left, chave);
+        r->left = deleteNodeQ(r->left, key);
     }
     else
     {
-        raiz->right = deleteNoQ(raiz->right, chave);
+        r->right = deleteNodeQ(r->right, key);
     }
 
-    if(raiz == NULL)
-        return raiz;
+    if(r == NULL)
+        return r;
 
-    a = getBalance(raiz);
+    a = getBalance(r);
     
-    if (a > 1 && getBalance(raiz->left) >= 0){
-        return rotacionaDir(raiz);    
+    if (a > 1 && getBalance(r->left) >= 0){
+        return rotateRight(r);    
     }
     else if (a > 1)
     {
-        raiz->left = rotacionaEsq(raiz->left);
-        return rotacionaDir(raiz);
+        r->left = rotateLeft(r->left);
+        return rotateRight(r);
     }
-    else if (a < -1 && getBalance(raiz->right) <= 0){
-        return rotacionaEsq(raiz);
+    else if (a < -1 && getBalance(r->right) <= 0){
+        return rotateLeft(r);
     }
     else if(a < -1)
     {
-        raiz->right = rotacionaDir(raiz->right);
-        return rotacionaEsq(raiz);
+        r->right = rotateRight(r->right);
+        return rotateLeft(r);
     }
 
-    return raiz;
+    return r;
 
 }
 
-Object * queryQ(No * raiz, int id){
-    if(!raiz)
+Object * queryQ(Node * r, int id){
+    if(!r)
         return NULL;
 
-    if(id < raiz->key->id)
-        return queryQ(raiz->left, id);
-    else if(id > raiz->key->id)
-        return queryQ(raiz->right, id);
+    if(id < r->key->id)
+        return queryQ(r->left, id);
+    else if(id > r->key->id)
+        return queryQ(r->right, id);
     
-    return raiz->key;
+    return r->key;
 }
 
-void printQ(char * prefix, int size, No * r, int b){
+void printQ(char * prefix, int size, Node * r, int b){
 	int i;
-    char * novo;
+    char * newprefix;
     if(prefix == NULL){
         prefix = malloc(sizeof(*prefix));
         prefix[0] = '\0';
@@ -153,28 +142,27 @@ void printQ(char * prefix, int size, No * r, int b){
             printf("└──" );
         printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));        
 		
-        novo = malloc((size + 4)*sizeof(*novo));
+        newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
-            novo[i] = prefix[i];
+            newprefix[i] = prefix[i];
         if(b)
-            novo[size - 1] = '|';
+            newprefix[size - 1] = '|';
         else
-            novo[size - 1] = ' ';
+            newprefix[size - 1] = ' ';
         for(i = size; i < size + 4; i++)
-            novo[i] = ' ';        
-        novo[size + 3] = '\0';
-		printQ(novo, size + 4, r->left, 1);
-        printQ(novo, size + 4, r->right, 0);
-        
+            newprefix[i] = ' ';        
+        newprefix[size + 3] = '\0';
+		printQ(newprefix, size + 4, r->left, 1);
+        printQ(newprefix, size + 4, r->right, 0);        
     }
     if(!b)
         free(prefix);
 }
 
-void removeAllQ(No * raiz){
-    if(!raiz)
+void removeAllQ(Node * r){
+    if(!r)
         return;
-    removeAllQ(raiz->left);
-    removeAllQ(raiz->right);    
-    free(raiz);
+    removeAllQ(r->left);
+    removeAllQ(r->right);    
+    free(r);
 }

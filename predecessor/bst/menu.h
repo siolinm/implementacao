@@ -1,9 +1,9 @@
-#include"tempo.h"
+#include"currentTime.h"
 #include"util.h"
 #include"queries.h"
 #include"avl.h"
 #include"pq.h"
-#include"certificados.h"
+#include"cert.h"
 #include"debug.h"
 #include<stdio.h>
 #include<bits/time.h>
@@ -11,50 +11,50 @@
 #ifndef _MENU_H
 #define _MENU_H
 
-/*
-    avanca no tempo 
+/* 
+    advance in time
 */
 void advance();
 
 /*
-    carrega os elementos de um arquivo que está no formato:
-    nº de elementos
-    coeficiente angular (espaço em branco) coeficiente linear (do primeiro elemento)
-    coeficiente angular (espaço em branco) coeficiente linear (do segundo elemento)
+loads the elements from a file in the following format:
+    number of elements
+    angular coefficient (whitespace) linear coefficient (of the first element)
+    angular coefficient (whitespace) linear coefficient (of the second element)
     .....
-    coeficiente angular (espaço em branco) coeficiente linear (do n-esimo elemento)
-*/
-void carregarArquivo();
+    angular coefficient (whitespace) linear coefficient (of the n-th element)
+ */
+void loadFile();
 
 /*
-    menu de opcoes
-*/
+    options menu
+ */
 int menu();
 
-/*
-    consulta quem e' o i-esimo elemento 
+/* 
+    queries for the i-th element in the list
 */
 void query();
 
 /*
-    altera a velocidade do i-esimo elemento para nova velocidade informada
+    changes the speed of the i-th element
 */
 void change();
 
 /*
-    insere elemento com velocidade v e valor inicial xt
+    returns the next event time
+*/
+double nextEvent();
+
+/*
+    inserts element with speed v and current value xt
 */
 void insert();
 
 /*
-    deleta elemento com id i
+    deletes element with id i
 */
 void delete();
-
-/*
-    Informa qual o prazo de vencimento do proximo certificado a vencer
-*/
-double proximoEvento();
 
 
 #endif
