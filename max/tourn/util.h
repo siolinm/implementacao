@@ -46,11 +46,6 @@ int * indT;
 int n;
 
 /*
-    maximum size supported by the vectors 
-*/
-int maxSize;
-
-/*
     allocates the necessary memory for n elements
 */
 void init(int m);

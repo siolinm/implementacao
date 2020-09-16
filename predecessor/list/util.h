@@ -11,12 +11,12 @@
 double * cert;
 
 /*
-    speed[i] is the i-th element's speed
+    speed[i] is the i-th element speed
 */
 double * speed;
 
 /*
-    x0[i] is the element's initial value
+    x0[i] is the i-th element initial value
 */
 double * x0;
 
@@ -37,12 +37,12 @@ int * naive;
 int * Q;
 
 /*
-    indQ[i] it's the position of the i-th certificate in the priority queue Q;
+    indQ[i] is the position of the i-th certificate in the priority queue Q;
 */
 int * indQ;
 
 /*
-    indS[i] it's the position of the i-th element in sorted
+    indS[i] is the position of the i-th element in sorted
 */
 int * indS;
 

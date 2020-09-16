@@ -12,10 +12,6 @@ void init(int m){
     indT = malloc((n + 1)*sizeof(*indT));
 }
 
-void resize(){
-    n++;
-}
-
 void destroy(){
     free(cert);
     free(tourn);
@@ -75,6 +71,6 @@ void swapTourn(int i, int j){
     int aux = tourn[i];
     tourn[i] = tourn[j];
     tourn[j] = aux;
-    indT[tourn[i]] = j;
-    indT[tourn[j]] = i; 
+    indT[tourn[j]] = j;
+    indT[tourn[i]] = i; 
 }

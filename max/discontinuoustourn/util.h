@@ -1,11 +1,8 @@
 #include<stdlib.h>
 #include<stdio.h>
-#include"currentTime.h"
-#include"debug.h"
 #ifndef _UTIL_H
 #define _UTIL_H
 #define max(a, b) ((a > b) ? a : b)
-/*priority queue initial size*/
 #define INITIAL_SIZE 100
 
 /*
@@ -15,12 +12,10 @@ typedef struct Object
 {
     int id;
     double speed;
-    double initv;
-    struct Object * next;
-    struct Object * prev;
+    double x0;    
     double certificate;
     int pqpos;
-    struct Node * node;
+    int lastMatch;
 } Object;
 
 /*
@@ -32,16 +27,16 @@ typedef struct Node
     struct Node * right;
     struct Object * key;
     int height;
-    int children;
 } Node;
 
 /*
-    total number of elements
+    tourn[1] is the maximum element
 */
-int n;
+Object ** tourn;
 
 /*
-    priority queue
+    priority queue that keeps the certificates 
+    the certificate with the earlier expiration time is in the first position
 */
 Object ** Q;
 
@@ -56,12 +51,22 @@ int lastID;
 Node * root;
 
 /*
-    avl tree root
+    total number of elements
 */
-Node * r;
+int n;
 
 /*
-    allocate all memory needed for m elements
+    maximum size supported by the vectors 
+*/
+int maxSize;
+
+/*
+    resizes the maximum size of tourn
+*/
+void resize();
+
+/*
+    allocates the necessary memory for n elements
 */
 void init(int m);
 
@@ -76,19 +81,19 @@ void destroy();
 void destroyObject(Object * obj);
 
 /*
-    swaps element i with element j in the avl tree and the linked list
+    returns the value of the element in the i-th position in tourn
 */
-void swapObjects(Object * i, Object * j);
+double value(int i);
 
 /*
-    value of object e
+    swaps the i-th element in tourn with the j-th element
 */
-double value(Object * e);
+void swapTourn(int i, int j);
 
 /*
-    prints the linked list (for debug)
+    prints tourn (for debug)
 */
-void printL();
+void printT(char * prefix, int size, int j, int b);
 
 typedef int Bool;
 

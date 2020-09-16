@@ -1,14 +1,14 @@
+#include"pq.h"
+#include"currentTime.h"
 #include"debug.h"
 #include"util.h"
-#include"currentTime.h"
-#include"pq.h"
 #ifndef _CERT_H
 #define _CERT_H
 
 /*
     Initializes all certificates
 */
-void initCert(Node * r);
+void initCert();
 
 /*
     Calculates the certtificate for the new object obj
@@ -29,7 +29,5 @@ void update(Object *obj);
     An event
 */
 void event();
-
-
 
 #endif
