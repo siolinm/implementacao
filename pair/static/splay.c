@@ -64,31 +64,52 @@ void rotateRight(Node * x){
 }
 
 Node * queryLow(Item * p, Node * start){
-    Node *x = start;
+    Node *x = start, *low;
+    low = NULL;
+    while(x){
+        /* I go down while the points are above or in the line */
+        while(x && checkLine(p, x->key, -0.5*PI_3) >= 0)
+            x = x->left;
+
+        /* x should now be the first point that i found below the line */
+        while(x && x->right && checkLine(p, x->right->key, -0.5*PI_3) == -1)
+            x = x->right;
+        
+        if(x){
+            low = x;
+            x = x->right;
+            if(!(x && checkLine(p, x->key, -0.5*PI_3) >= 0))
+                x = NULL;
+        }
+    }
     
-    /* I go down while the points are above the line */
-    while(x && checkLine(p, x->key, -0.5*PI_3) == 1)
-        x = x->left;
-
-    /* x should now be the first point that i found below the line */
-    while(x && x->right && checkLine(p, x->right->key, -0.5*PI_3) < 1)
-        x = x->right;
-
-    return x;
+    return low;
 }
 
 Node * queryUp(Item * p, Node * start){    
-    Node *x = start;
+    Node *x = start, *up;
+    up = NULL;
     
-    /* I go up while the points are below or in the line */
-    while(x && checkLine(p, x->key, 0.5*PI_3) < 1)
-        x = x->right;
+    while(x){
+        /* I go up while the points are below the line */
+        while(x && checkLine(p, x->key, 0.5*PI_3) == -1)
+            x = x->right;
+        
 
-    /* x should now be the first point that i found above the line */
-    while(x && x->left && checkLine(p, x->left->key, 0.5*PI_3) == 1)
-        x = x->left;
+        /* x should now be the first point that i found above or in the line */
+        /* I go down while the points are above or in the line*/
+        while(x && x->left && checkLine(p, x->left->key, 0.5*PI_3) >= 0)
+            x = x->left;
 
-    return x;
+        if(x){
+            up = x;
+            x = x->left;
+            if(!(x && checkLine(p, x->key, 0.5*PI_3) == -1))
+                x = NULL;            
+        }
+    }
+
+    return up;
 }
 
 Node * cands(Item * p){
