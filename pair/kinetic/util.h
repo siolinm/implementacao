@@ -1,5 +1,14 @@
+#include<stdlib.h>
+#include<math.h>
 #ifndef _UTIL_H
 #define _UTIL_H
+
+#define PI_3 acos(0.5)
+
+#define COS_PI_3 cos(PI_3)
+#define SIN_PI_3 sin(PI_3)
+#define SIN_NEG_PI_3 -SIN_PI_3 
+#define COS_NEG_PI_3 COS_PI_3
 
 enum Directions{
     UP = 0,
@@ -7,6 +16,7 @@ enum Directions{
     DOWN
 };
 
+/* TOURN_CERT + HORIZONTAL_CERT, TOURN_CERT + UP_CERT */
 enum Cert_types{
     /* 0-order event */
     HORIZONTAL_CERT = 0,
@@ -43,7 +53,22 @@ typedef struct Point{
     CandsNode * cands[3];
     HitsNode * hitsLow[3];
     HitsNode * hitsUp[3];
+    AVLNode * listPosition[3];
+    Point * prev[3];
+    Point * next[3];
+    Cert * cert[4];
 } Point;
+
+typedef Point Object;
+
+typedef struct AVLNode
+{
+    struct AVLNode * left;
+    struct AVLNode * right;
+    Object * key;
+    int children;
+    int height;
+} AVLNode;
 
 typedef struct CandsNode
 {
@@ -68,10 +93,29 @@ typedef struct TournObject{
 } TournObject;
 
 typedef struct PQObject{
-    Point * p;    
+    Point * p;
     int certType;
 } PQObject;
 
+/* priority queue */
+PQObject ** Q;
+
+/* kinetic tourn */
 TournObject ** tourn;
+
+/* current time */
+double now;
+
+/* initializes things */
+void init();
+
+/* get p x-coordinate in the specified direction */
+double getX(Point * p, int direction);
+
+/* get p y-coordinate in the specified direction */
+double getY(Point * p, int direction);
+
+/* returns cert type based on direction */
+int certType(int direction);
 
 #endif
