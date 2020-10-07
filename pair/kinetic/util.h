@@ -11,8 +11,11 @@
 #define COS_NEG_PI_3 COS_PI_3
 
 enum Directions{
+    /* +60º rotation */
     UP = 0,
+    /* +0º rotation */
     HORIZONTAL,
+    /* -60º rotation */
     DOWN
 };
 
@@ -57,6 +60,7 @@ typedef struct Point{
     Point * prev[3];
     Point * next[3];
     Cert * cert[4];
+    int lastMatch[3];
 } Point;
 
 typedef Point Object;
@@ -75,6 +79,7 @@ typedef struct CandsNode
     CandsNode * left;
     CandsNode * right;
     CandsNode * parent;
+    Point * key;    
     /* points to the leftmost point in the node subtrees */
     CandsNode * leftmost;
 } CandsNode;
@@ -84,6 +89,7 @@ typedef struct HitsNode
     HitsNode * left;
     HitsNode * right;
     HitsNode * parent;
+    Point * key;
 } HitsNode;
 
 typedef struct TournObject{
@@ -106,14 +112,20 @@ TournObject ** tourn;
 /* current time */
 double now;
 
+/* number of elements */
+int n;
+
 /* initializes things */
-void init();
+void init(int m);
 
 /* get p x-coordinate in the specified direction */
 double getX(Point * p, int direction);
 
 /* get p y-coordinate in the specified direction */
 double getY(Point * p, int direction);
+
+/* Calculates the distance between points a and b for direction direction*/
+double distance(Point * a, Point * b, int direction);
 
 /* returns cert type based on direction */
 int certType(int direction);

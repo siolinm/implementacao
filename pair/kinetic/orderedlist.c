@@ -15,10 +15,11 @@ void listInit(){
 }
 
 void listInsert(Point * a, int dir){
+    PQObject * obj = malloc(sizeof(*obj));
     int i = certType(dir);
     listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);    
-    newCert(a, i);
-    insertPQ(a, i);
+    // newCert(a, i);
+    insertPQ(obj);
     update(a->next[dir]->cert[i]);
 }
 
