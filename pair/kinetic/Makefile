@@ -1,5 +1,5 @@
 CFLAGS = -Wall -ansi -g -pedantic -Wno-unused-result
-OBJS   = cands.o cert.o hits.o menu.o orderedlist.o pq.o tourn.o util.o
+OBJS   = cands.o cert.o hits.o menu.o orderedlist.o pq.o tourn.o util.o dictionary.o
 LIBS   = -lm
 
 kineticpair: $(OBJS)

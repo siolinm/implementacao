@@ -17,6 +17,8 @@ void listInit(){
 void listInsert(Point * a, int dir){
     PQObject * obj = malloc(sizeof(*obj));
     int i = certType(dir);
+    obj->p = a;
+    obj->certType = i;
     listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);    
     // newCert(a, i);
     insertPQ(obj);
@@ -25,10 +27,11 @@ void listInsert(Point * a, int dir){
 
 void listDelete(Point * a, int dir){
     int i = certType(dir);
+    PQObject * aux = Q[a->cert[i]->pqpos];
     Point * next;
     next = a->next[dir];
     listRoot[dir] = deleteAVLNode(listRoot[dir], a, dir);
-    deletePQ(a, i);
+    deletePQ(aux);
     update(next->cert[i]);
 }
 

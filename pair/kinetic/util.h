@@ -51,15 +51,18 @@ typedef struct Cert{
 
 typedef struct Point{
     int id;
-    Coordinate x0;
-    Vector speed;
-    CandsNode * cands[3];
-    HitsNode * hitsLow[3];
-    HitsNode * hitsUp[3];
-    AVLNode * listPosition[3];
-    Point * prev[3];
-    Point * next[3];
-    Cert * cert[4];
+    struct Coordinate x0;
+    struct Vector speed;
+    /* root of cands tree of the point */
+    struct CandsNode * candsRoot[3];
+    /* node where the point is in a cands tree */
+    struct CandsNode * cands[3];
+    struct HitsNode * hitsLow[3];
+    struct HitsNode * hitsUp[3];
+    struct AVLNode * listPosition[3];
+    struct Point * prev[3];
+    struct Point * next[3];
+    struct Cert * cert[4];
     int lastMatch[3];
 } Point;
 
@@ -76,19 +79,19 @@ typedef struct AVLNode
 
 typedef struct CandsNode
 {
-    CandsNode * left;
-    CandsNode * right;
-    CandsNode * parent;
-    Point * key;    
+    struct CandsNode * left;
+    struct CandsNode * right;
+    struct CandsNode * parent;
+    struct Point * key;    
     /* points to the leftmost point in the node subtrees */
-    CandsNode * leftmost;
+    struct CandsNode * leftmost;
 } CandsNode;
 
 typedef struct HitsNode
 {
-    HitsNode * left;
-    HitsNode * right;
-    HitsNode * parent;
+    struct HitsNode * left;
+    struct HitsNode * right;
+    struct HitsNode * parent;
     Point * key;
 } HitsNode;
 
@@ -109,14 +112,22 @@ PQObject ** Q;
 /* kinetic tourn */
 TournObject ** tourn;
 
+/* where points will be at first */
+Point ** initial;
+
 /* current time */
 double now;
 
 /* number of elements */
 int n;
 
+/* lastID available */
+int lastID;
+
 /* initializes things */
 void init(int m);
+
+void initialInsert(Point * p);
 
 /* get p x-coordinate in the specified direction */
 double getX(Point * p, int direction);
@@ -129,5 +140,12 @@ double distance(Point * a, Point * b, int direction);
 
 /* returns cert type based on direction */
 int certType(int direction);
+
+/*
+    Returns 1 if point c is to the left of the 
+    parallel line to the x-axis that passes through point c rotated by theta (counterclockwise)
+    0 if point c is in that line and -1 if point c is to the right of that line
+*/
+int checkLine(Point * a, Point * c, double theta);
 
 #endif

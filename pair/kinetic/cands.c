@@ -1,6 +1,6 @@
 #include"cands.h"
 
-#define minimum(a, b) (getXCoordinate(a) > getXCoordinate(b) ? b : a)
+#define minimum(a, b, dir) (getX(a, dir) > getX(b, dir) ? b : a)
 
 CandsNode * createCandsNode(Item * key){
     CandsNode * new = malloc(sizeof(*new));
@@ -10,7 +10,23 @@ CandsNode * createCandsNode(Item * key){
     return new;
 }
 
-void rotateLeft(CandsNode * x){
+CandsNode * initCands(Item * p){
+    return createCandsNode(p);
+}
+
+
+/* attachs the joinRoot subtree to tree with root root */
+CandsNode * joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
+
+}
+
+/* searchs for up/low(p) in the tree with root root and returns a subtree containing all nodes above/beside*/
+CandsNode * cutCands(CandsNode * root, Item * p, int uplow, int dir){
+
+}
+
+#warning adjust leftmost on rotation
+void rotateLeftCands(CandsNode * x){
     CandsNode * aux, *parent;
     
     parent = x->parent;
@@ -35,7 +51,7 @@ void rotateLeft(CandsNode * x){
 
 }
 
-void rotateRight(CandsNode * x){
+void rotateRightCands(CandsNode * x){
     CandsNode * aux, *parent;
     
     parent = x->parent;
@@ -57,113 +73,14 @@ void rotateRight(CandsNode * x){
         else
             parent->right = aux;
     }
-    else
-        root = aux;
 }
 
-CandsNode * queryLow(Item * p, CandsNode * start){
-    CandsNode *x = start, *low;
-    low = NULL;
-    while(x){
-        /* I go down while the points are above or in the line */
-        while(x && checkLine(p, x->key, -0.5*PI_3) >= 0)
-            x = x->left;
-
-        /* x should now be the first point that i found below the line */
-        while(x && x->right && checkLine(p, x->right->key, -0.5*PI_3) == -1)
-            x = x->right;
-        
-        if(x){
-            low = x;
-            x = x->right;
-            if(!(x && checkLine(p, x->key, -0.5*PI_3) >= 0))
-                x = NULL;
-        }
-    }
-    
-    return low;
-}
-
-CandsNode * queryUp(Item * p, CandsNode * start){    
-    CandsNode *x = start, *up;
-    up = NULL;
-    
-    while(x){
-        /* I go up while the points are below the line */
-        while(x && checkLine(p, x->key, 0.5*PI_3) == -1)
-            x = x->right;
-        
-
-        /* x should now be the first point that i found above or in the line */
-        /* I go down while the points are above or in the line*/
-        while(x && x->left && checkLine(p, x->left->key, 0.5*PI_3) >= 0)
-            x = x->left;
-
-        if(x){
-            up = x;
-            x = x->left;
-            if(!(x && checkLine(p, x->key, 0.5*PI_3) == -1))
-                x = NULL;            
-        }
-    }
-
-    return up;
-}
-
-CandsNode * cands(Item * p){
-    CandsNode * x, *lowCandsNode, *lcandsRoot;
-    int low = 0;
-    if(!root)
-        return NULL;
-    x = queryLow(p, root);
-
-    if(x){
-        low = 1;
-        splay(x);
-        lowCandsNode = x;
-    }
-
-    if(!low){
-        x = queryUp(p, root);
-    }
-    else{
-        x = queryUp(p, root->right);
-        if(root->right)
-            root->right->parent = NULL;
-    }
-
-    if(x){
-        splay(x);        
-        lcandsRoot = x->left;
-        x->left = NULL;
-        if(low){
-            root = lowCandsNode;
-            root->right = x;
-            x->parent = root;
-        }
-    }
-    else{
-        if(low){
-            lcandsRoot = root->right;
-            root->right = NULL;
-        }
-        else{
-            lcandsRoot = root;
-            root = NULL;
-        }
-    }
-
-    return lcandsRoot;
-}
-
-
-CandsNode * insertCand(CandsNode * root, Item * key, int direction){
+CandsNode * insertCands(CandsNode * root, Item * key, int direction){
     CandsNode * new = createCandsNode(key);
     CandsNode * parent = root, *x;
     
     root = insertCandR(root, new, direction);
     splayCand(new);
-
 
     return root;
 }
@@ -172,7 +89,7 @@ CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
     if(!root)
         return no;
 
-    if(compare(root->key, no)){
+    if(compare(root->key, no->key, dir)){
         root->left = insertCandR(root->left, no, dir);
         root->left->parent = root;
     }
@@ -181,64 +98,81 @@ CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
         root->right->parent = root;
     }
 
+    CandsNode * leftmost;
+    if(root->left && root->right){
+        leftmost = minimum(root->left->key, root->right->key, dir);
+    }
+    else if(root->left){
+        leftmost = minimum(root->left->leftmost->key, root->left->key, dir);
+    }
+    else if(root->right){
+        leftmost = minimum(root->right->leftmost->key, root->right->key, dir);        
+    }
+    else
+    {
+        leftmost = root;
+    }
+    
+    root->leftmost = leftmost;
+
     return root;
 }
 
-void splayCand(CandsNode * x){
+void splayCands(CandsNode * x){
     while(x && x->parent){
         /*
             l or r case
         */
         if(!x->parent->parent){
             if(x->parent->left == x)
-                rotateRight(x->parent);
+                rotateRightCands(x->parent);
             else
-                rotateLeft(x->parent);
+                rotateLeftCands(x->parent);
         }
         else{
             if(x->parent->left == x){
                 /* rr case*/
                 if(x->parent->parent->left == x->parent){
-                    rotateRight(x->parent->parent);
-                    rotateRight(x->parent);
+                    rotateRightCands(x->parent->parent);
+                    rotateRightCands(x->parent);
                 }
                 else{
                     /* rl case */
-                    rotateRight(x->parent);
-                    rotateLeft(x->parent);
+                    rotateRightCands(x->parent);
+                    rotateLeftCands(x->parent);
                 }
             }
             else{
                 /* lr case */
                 if(x->parent->parent->left == x->parent){
-                    rotateLeft(x->parent);
-                    rotateRight(x->parent);
+                    rotateLeftCands(x->parent);
+                    rotateRightCands(x->parent);
                 }
                 else{
                     /* ll case */
-                    rotateLeft(x->parent->parent);
-                    rotateLeft(x->parent);
+                    rotateLeftCands(x->parent->parent);
+                    rotateLeftCands(x->parent);
                 }
             }
         }
     }
 }
 
-int compare(Item * a, Item * b){
-    if(getYCoordinate(a) > getYCoordinate(b))
+int compareCands(Item * a, Item * b, int dir){
+    if(getY(a, dir) > getY(b, dir))
         return 1;
     return 0;
 }
 
-void freeAll(CandsNode * r){
+void freeAllCands(CandsNode * r){
     if(r != NULL){
-        freeAll(r->left);
-        freeAll(r->right);        
+        freeAllCands(r->left);
+        freeAllCands(r->right);
         free(r);
-    }
-    root = NULL;
+    }    
 }
 
+/*
 void print(char * prefix, int size, CandsNode * r, int b){
 	int i;
     char * new;
@@ -261,7 +195,7 @@ void print(char * prefix, int size, CandsNode * r, int b){
         }
 		printf("\n");
         new = malloc((size + 4)*sizeof(*new));
-        for(i = 0; i < size; i++)
+        for(i = 0; root = NULL;i < size; i++)
             new[i] = prefix[i];
         if(b)
             new[size - 1] = '|';
@@ -277,3 +211,4 @@ void print(char * prefix, int size, CandsNode * r, int b){
     if(!b)
         free(prefix);
 }
+*/

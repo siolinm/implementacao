@@ -1,13 +1,19 @@
 #include"util.h"
-#ifndef _CANDS_H
-#define _CANDS_H
+#include"heapsort.h"
+#include"cands.h"
+#include"hits.h"
+
+#ifndef _MAXIMA_H
+#define _MAXIMA_H
 
 typedef Point Item;
+
+CandsNode * maximaRoot;
 
 /*
     Inserts key in the splay tree
 */
-CandsNode * insertCands(CandsNode * root, Item * key, int direction);
+void insertCands(Item * key);
 
 /*
     Splays node x
@@ -38,10 +44,5 @@ int compareCands(Item * a, Item * b, int dir);
     Deallocate all memory used in the splay tree
 */
 void freeAllCands(CandsNode * r);
-
-/*
-    Prints the splay tree (for debug)
-*/
-/*void print(char * prefix, int size, CandsNode * r, int b);*/
 
 #endif
