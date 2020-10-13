@@ -1,12 +1,27 @@
 #include"cands.h"
 
-#define minimum(a, b, dir) (getX(a, dir) > getX(b, dir) ? b : a)
+#warning ajustar todas as funcoes de cands e Hits por conta da cabeca
+
+void updateMinimumCands(CandsNode * a, int dir){
+    a->leftmost = minimumCands(a->left, a->right, dir);
+    a->leftmost = minimumCands(a->leftmost, a, dir);
+}
+
+CandsNode * minimumCands(CandsNode * a, CandsNode * b, int dir){
+    if(b == NULL)
+        return a;
+    else if(a == NULL)
+        return b;
+    
+    return (getX(a->leftmost->key, dir) > getX(b->leftmost->key, dir) ? b->leftmost : a->leftmost);
+}
 
 CandsNode * createCandsNode(Item * key){
     CandsNode * new = malloc(sizeof(*new));
     new->left = new->right = NULL;
     new->parent = NULL;
     new->key = key;
+    new->leftmost = new;
     return new;
 }
 
@@ -14,14 +29,150 @@ CandsNode * initCands(Item * p){
     return createCandsNode(p);
 }
 
+Point * queryCands(Item * q, int dir){
+    CandsNode * p = NULL;
+    p = q->cands[dir];
 
-/* attachs the joinRoot subtree to tree with root root */
-CandsNode * joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
+    while(p != NULL && p->parent != p->parent->parent)
+        p = p->parent->parent;
 
+    if(p){
+        p->key->candsRoot[dir] = q->cands[dir];
+        splayCands(q->cands[dir]);
+        return p->key;
+    }
+
+    return NULL;
 }
 
-/* searchs for up/low(p) in the tree with root root and returns a subtree containing all nodes above/beside*/
-CandsNode * cutCands(CandsNode * root, Item * p, int uplow, int dir){
+CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
+    double angle;
+    CandsNode *up, *y, *x;
+    up = y = NULL;
+    x = root->parent;
+    
+    if(dir == HORIZONTAL){
+        angle = 0;
+    }
+    else if(dir == UP){
+        angle = PI_3;
+    }
+    else if(dir == DOWN){
+        angle = -PI_3;
+    }
+
+    if(order == UP){
+        angle -= PI_3/2;
+    }
+    else if(order == DOWN){
+        angle += PI_3/2;
+    }
+    
+    while(x != NULL){
+        y = x;
+
+        if(checkLine(p, x->key, angle) == -1){
+            x = x->right;
+        }
+        else{
+            up = x;
+            x = x->left;
+        }
+    }
+
+    if(y != NULL){
+        root->parent->parent = NULL;
+        splayCands(y);
+        root->parent = y;
+    }
+
+    return up;
+}
+
+CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir){
+    double angle;
+    CandsNode *low, *y, *x;
+    low = y = NULL;
+    x = root->parent;    
+    if(dir == HORIZONTAL){
+        angle = 0;
+    }
+    else if(dir == UP){
+        angle = PI_3;
+    }
+    else if(dir == DOWN){
+        angle = -PI_3;
+    }
+
+    if(order == UP){
+        angle -= PI_3/2;
+    }
+    else if(order == DOWN){
+        angle += PI_3/2;
+    }
+    
+    while(x != NULL){
+        y = x;
+
+        if(checkLine(p, x->key, angle) <= 0){
+            x = x->left;
+        }
+        else{
+            low = x;
+            x = x->right;
+        }
+    }
+
+    if(y != NULL){
+        root->parent->parent = NULL;
+        splayCands(y);
+        root->parent = y;
+    }
+
+    return low;
+}
+
+/* 
+ * searchs for up/low(p) in the tree with root root and 
+ * returns a subtree containing all nodes above/below
+ * 
+ */
+CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int dir){
+    CandsNode *r;
+    r =  root->parent;
+    root->parent = NULL;
+    r->parent = NULL;
+    if(low != NULL){
+        splayCands(low);        
+        root->parent = low;
+        r = low->right;
+        r->parent = NULL;
+        updateMinimumCands(low, dir);
+    }
+
+    if(up != NULL){
+        splayCands(up);
+        root->parent = up;
+        r = up->left;
+        r->parent = NULL;
+
+        updateMinimumCands(up, dir);
+    }
+
+    if(up != NULL && low != NULL){
+        low->right = up;
+        up->parent = low;
+        root->parent = low;
+
+        updateMinimumCands(low, dir);
+    }
+
+    return r;
+}
+
+
+/* attachs the joinRoot subtree to tree with root root */
+void joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
 
 }
 
@@ -75,14 +226,23 @@ void rotateRightCands(CandsNode * x){
     }
 }
 
-CandsNode * insertCands(CandsNode * root, Item * key, int direction){
+void deleteCands(CandsNode * root, Item * key, int direction){
+
+}
+
+CandsNode * deleteCandsR(CandsNode * root, Item * key, int direction){
+
+}
+
+void insertCands(CandsNode * root, Item * key, int direction){
     CandsNode * new = createCandsNode(key);
     CandsNode * parent = root, *x;
     
-    root = insertCandR(root, new, direction);
-    splayCand(new);
-
-    return root;
+    root->parent = insertCandR(root->parent, new, direction);
+    root->parent->parent = NULL;
+    splayCands(new);
+    root->parent = new;
+    new->parent = root;
 }
 
 CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
@@ -99,27 +259,18 @@ CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
     }
 
     CandsNode * leftmost;
-    if(root->left && root->right){
-        leftmost = minimum(root->left->key, root->right->key, dir);
-    }
-    else if(root->left){
-        leftmost = minimum(root->left->leftmost->key, root->left->key, dir);
-    }
-    else if(root->right){
-        leftmost = minimum(root->right->leftmost->key, root->right->key, dir);        
-    }
-    else
-    {
-        leftmost = root;
-    }
+    
+    leftmost = minimumCands(root->left->leftmost, root->right->leftmost, dir);
+    leftmost = minimumCands(leftmost, root, dir);
     
     root->leftmost = leftmost;
 
     return root;
 }
 
+#warning refazer essa funcao
 void splayCands(CandsNode * x){
-    while(x && x->parent){
+    while(x && x->parent && x->parent != x->parent->parent){
         /*
             l or r case
         */

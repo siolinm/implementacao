@@ -7,7 +7,22 @@ typedef Point Item;
 /*
     Inserts key in the splay tree
 */
-CandsNode * insertCands(CandsNode * root, Item * key, int direction);
+void insertCands(CandsNode * root, Item * key, int direction);
+
+void deleteCands(CandsNode * root, Item * key, int direction);
+
+CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir);
+
+CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir);
+
+CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int dir);
+
+void joinCands(CandsNode * root, CandsNode * joinRoot, int dir);
+
+/*
+
+*/
+Point * queryCands(Item * q, int dir);
 
 /*
     Splays node x

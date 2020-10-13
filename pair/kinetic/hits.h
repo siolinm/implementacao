@@ -7,7 +7,14 @@ typedef Point Item;
 /*
     Inserts key in the splay tree
 */
-void insertHits(Item * key);
+void insertHits(CandsNode * root, Item * key, int dir);
+
+/*
+
+*/
+void deleteHits(HitsNode * root, Item * key, int direction);
+
+HitsNode * deleteHitsR(HitsNode * root, Item * key, int direction);
 
 /*
     Splays node x
@@ -38,6 +45,10 @@ int compareHits(Item * a, Item * b, int dir);
     Deallocate all memory used in the splay tree
 */
 void freeAllHits(HitsNode * r);
+
+Item * queryHitsLow(Item * q, int dir);
+
+Item * queryHitsUp(Item * q, int dir);
 
 /*
     Prints the splay tree (for debug)

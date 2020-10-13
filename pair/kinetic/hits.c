@@ -14,6 +14,116 @@ HitsNode * initHits(Item * p){
     return createHitsNode(p);
 }
 
+CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
+    double angle;
+    CandsNode *up, *y, *x;
+    up = y = NULL;
+    x = root->parent;
+    
+    if(dir == HORIZONTAL){
+        angle = 0;
+    }
+    else if(dir == UP){
+        angle = PI_3;
+    }
+    else if(dir == DOWN){
+        angle = -PI_3;
+    }
+
+    if(order == UP){
+        angle -= PI_3/2;
+    }
+    else if(order == DOWN){
+        angle += PI_3/2;
+    }
+    
+    while(x != NULL){
+        y = x;
+
+        if(checkLine(p, x->key, angle) == -1){
+            x = x->right;
+        }
+        else{
+            up = x;
+            x = x->left;
+        }
+    }
+
+    if(y != NULL){
+        root->parent->parent = NULL;
+        splayCands(y);
+        root->parent = y;
+    }
+
+    return up;
+}
+
+CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir){
+    double angle;
+    CandsNode *low, *y, *x;
+    low = y = NULL;
+    x = root->parent;    
+    if(dir == HORIZONTAL){
+        angle = 0;
+    }
+    else if(dir == UP){
+        angle = PI_3;
+    }
+    else if(dir == DOWN){
+        angle = -PI_3;
+    }
+
+    if(order == UP){
+        angle -= PI_3/2;
+    }
+    else if(order == DOWN){
+        angle += PI_3/2;
+    }
+    
+    while(x != NULL){
+        y = x;
+
+        if(checkLine(p, x->key, angle) <= 0){
+            x = x->left;
+        }
+        else{
+            low = x;
+            x = x->right;
+        }
+    }
+
+    if(y != NULL){
+        root->parent->parent = NULL;
+        splayCands(y);
+        root->parent = y;
+    }
+
+    return low;
+}
+
+Item * queryHitsLow(Item * q, int dir){
+    HitsNode * p = NULL;
+    p = q->hitsLow[dir];
+
+    while(p != NULL && p->parent != p->parent->parent)
+        p = p->parent->parent;
+
+    if(p) return p->key;
+
+    return NULL;
+}
+
+Item * queryHitsUp(Item * q, int dir){
+    HitsNode * p = NULL;
+    p = q->hitsUp[dir];
+
+    while(p != NULL && p->parent != p->parent->parent)
+        p = p->parent->parent;
+
+    if(p) return p->key;
+
+    return NULL;
+}
 
 /* attachs the joinRoot subtree to tree with root root */
 HitsNode * joinHits(HitsNode * root, HitsNode * joinRoot, int dir){
@@ -80,14 +190,23 @@ void rotateRightHits(HitsNode * x){
     }
 }
 
-HitsNode * insertHits(HitsNode * root, Item * key, int direction){
+void deleteHits(HitsNode * root, Item * key, int direction){
+
+}
+
+HitsNode * deleteHitsR(HitsNode * root, Item * key, int direction){
+
+}
+
+void insertHits(HitsNode * root, Item * key, int direction){
     HitsNode * new = createHitsNode(key);
     HitsNode * parent = root, *x;
     
-    root = insertCandR(root, new, direction);
+    root->parent = insertCandR(root, new, direction);
+    root->parent->parent = NULL;
     splayHits(new);
-
-    return root;
+    root->parent = new;
+    new->parent = root;
 }
 
 HitsNode * insertHitsR(HitsNode * root, HitsNode * no, int dir){

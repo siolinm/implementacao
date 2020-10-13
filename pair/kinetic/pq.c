@@ -45,6 +45,10 @@ PQObject * minPQ(){
     return Q[1];
 }
 
+double valueMinPQ(){
+    return valuePQ(1);
+}
+
 double valuePQ(int i){    
     return Q[i]->p->cert[Q[i]->certType]->value;
 }

@@ -1,0 +1,1 @@
+Uma troca nas 3 ordens ao mesmo tempo, ponto p e q com mesmo y e há uma troca horizontal, +60 e -60 ao mesmo tempo. Pensar se algo pode dar errado.

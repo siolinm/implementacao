@@ -10,6 +10,8 @@
 #define SIN_NEG_PI_3 -SIN_PI_3 
 #define COS_NEG_PI_3 COS_PI_3
 
+#define EPS 0.000001
+
 enum Directions{
     /* +60º rotation */
     UP = 0,
@@ -57,8 +59,12 @@ typedef struct Point{
     struct CandsNode * candsRoot[3];
     /* node where the point is in a cands tree */
     struct CandsNode * cands[3];
+    /* node where the point is in a hitsLow tree */
     struct HitsNode * hitsLow[3];
+    /* node where the point is in a hitsUp tree */
     struct HitsNode * hitsUp[3];
+    struct HitsNode * hitsLowRoot[3];
+    struct HitsNode * hitsUpRoot[3];
     struct AVLNode * listPosition[3];
     struct Point * prev[3];
     struct Point * next[3];
@@ -134,6 +140,18 @@ double getX(Point * p, int direction);
 
 /* get p y-coordinate in the specified direction */
 double getY(Point * p, int direction);
+
+/* get p x0-coordinate in the specified direction */
+double getX0(Point * p, int direction);
+
+/* get p y0-coordinate in the specified direction */
+double getY0(Point * p, int direction);
+
+/* get p speed first component in the specified direction */
+double getVx(Point * p, int direction);
+
+/* get p speed second component in the specified direction */
+double getVy(Point * p, int direction);
 
 /* Calculates the distance between points a and b for direction direction*/
 double distance(Point * a, Point * b, int direction);

@@ -1,44 +1,32 @@
 #include"maxima.h"
 
-#define minimum(a, b, dir) (getX(a, dir) > getX(b, dir) ? b : a)
-
 void initMaxima(int dir){
-    maximaRoot = NULL;
-}
-
-CandsNode * queryUp(CandsNode * root, int dir){
-
-}
-
-CandsNode * queryLow(CandsNode * root, int dir){
-
-}
-
-/* searchs for up/low(p) in the tree with root root and returns a subtree containing all nodes above/beside*/
-CandsNode * extractCands(CandsNode * root, CandsNode * up, CandsNode * low, int dir){
-    /* atualizar maximaRoot */
-}
-
-void attachCands(CandsNode * candsRoot, Item * p){
-
+    maximaRoot = malloc(sizeof(*maximaRoot));
+    maximaRoot->parent = NULL;
+    maximaRoot->key = NULL;
+    maximaRoot->left = maximaRoot->right = NULL;
+    maximaRoot->leftmost = NULL;
 }
 
 void initializeCandsHits(int dir){
     int i;
     CandsNode * up, * low;
     initMaxima(dir);
-    Point * p;    
+    Point * p;
     heapsort(initial, dir);
-    for(i = 0; i < n; i++){
+    for(i = n; i >= 1; i--){
         p = initial[i];
-        up = queryUp(maximaRoot, dir);
-        low = queryLow(maximaRoot, dir);
+        low = queryPredecessorCands(maximaRoot, p, UP, dir);
+        up = querySuccessorCands(maximaRoot, p, DOWN, dir);
 
-        insertHits(up);
-        insertHits(low);
-
-        maximaRoot = insertCands(p);
+        /* inserts up(p) in HitsUp(p) */
+        insertHits(p->hitsUpRoot[dir], up, dir);
+        /* inserts low(p) in HitsLow(p) */
+        insertHits(p->hitsLowRoot[dir], low, dir);
+        /* stores Cands(p) */
+        p->candsRoot[dir]->parent = extractCands(maximaRoot, low, up, dir);
+        insertCands(maximaRoot, p, dir);
     }
 
-    freAll(maximaRoot);
+    freeAllCands(maximaRoot);
 }
