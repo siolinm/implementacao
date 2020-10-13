@@ -1,6 +1,6 @@
 #include"tourn.h"
 
-int compare(int i, int j){
+int compareTourn(int i, int j){
     double a, b;
     a = distance(tourn[i]->p, tourn[i]->lcandp, tourn[i]->direction);
     b = distance(tourn[j]->p, tourn[j]->lcandp, tourn[j]->direction);
@@ -13,7 +13,7 @@ void initTourn(){
     int dir;
 
     while(i > 1){
-        if(compare(i, i - 1)){
+        if(compareTourn(i, i - 1)){
             tourn[i/2] = tourn[i];
             dir = tourn[i-1]->direction;
             tourn[i - 1]->p->lastMatch[dir] = i - 1;
@@ -62,7 +62,7 @@ void insertTourn(TournObject * obj, int dir){
     
     k = i - 1;
 
-    while(i > 1 && compare(i, k)){
+    while(i > 1 && compareTourn(i, k)){
         tourn[i/2] = tourn[i];
         dir = tourn[k]->p->lastMatch[dir];
         tourn[k]->p->lastMatch[dir] = k;
@@ -126,7 +126,7 @@ void deleteTourn(TournObject * obj){
         Goes up fixing matches, j is the winner and k is the loser of the match
     */
     while(j > 1){
-        if(!compare(j, k)){
+        if(!compareTourn(j, k)){
             i = k;
             k = j;
             j = i;

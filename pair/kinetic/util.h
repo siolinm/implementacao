@@ -23,10 +23,10 @@ enum Directions{
 
 /* TOURN_CERT + HORIZONTAL_CERT, TOURN_CERT + UP_CERT */
 enum Cert_types{
-    /* 0-order event */
-    HORIZONTAL_CERT = 0,
     /* +60-order event */
-    UP_CERT,
+    UP_CERT = 0,
+    /* 0-order event */
+    HORIZONTAL_CERT,
     /* -60-order event */
     DOWN_CERT,
     /* kinetic tourn event */
@@ -68,7 +68,7 @@ typedef struct Point{
     struct AVLNode * listPosition[3];
     struct Point * prev[3];
     struct Point * next[3];
-    struct Cert * cert[4];
+    struct Cert * cert[6];
     int lastMatch[3];
 } Point;
 

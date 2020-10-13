@@ -20,9 +20,8 @@ void listInsert(Point * a, int dir){
     obj->p = a;
     obj->certType = i;
     listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);    
-    // newCert(a, i);
-    insertPQ(obj);
-    update(a->next[dir]->cert[i]);
+    // newCert(a, i);    
+    updateListCert(a->next[dir]);
 }
 
 void listDelete(Point * a, int dir){
@@ -32,7 +31,7 @@ void listDelete(Point * a, int dir){
     next = a->next[dir];
     listRoot[dir] = deleteAVLNode(listRoot[dir], a, dir);
     deletePQ(aux);
-    update(next->cert[i]);
+    updateListCert(next);
 }
 
 /* OK */

@@ -14,9 +14,9 @@ HitsNode * initHits(Item * p){
     return createHitsNode(p);
 }
 
-CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
+HitsNode * querySuccessorHits(HitsNode * root, Item * p, int order, int dir){
     double angle;
-    CandsNode *up, *y, *x;
+    HitsNode *up, *y, *x;
     up = y = NULL;
     x = root->parent;
     
@@ -51,16 +51,16 @@ CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
 
     if(y != NULL){
         root->parent->parent = NULL;
-        splayCands(y);
+        splayHits(y);
         root->parent = y;
     }
 
     return up;
 }
 
-CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir){
+HitsNode * queryPredecessorHits(HitsNode * root, Item * p, int order, int dir){
     double angle;
-    CandsNode *low, *y, *x;
+    HitsNode *low, *y, *x;
     low = y = NULL;
     x = root->parent;    
     if(dir == HORIZONTAL){
@@ -94,7 +94,7 @@ CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir
 
     if(y != NULL){
         root->parent->parent = NULL;
-        splayCands(y);
+        splayHits(y);
         root->parent = y;
     }
 

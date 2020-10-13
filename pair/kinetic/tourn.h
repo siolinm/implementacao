@@ -21,4 +21,6 @@ void insertTourn(TournObject * obj, int dir);
     deletes obj of tourn
 */
 void deleteTourn(TournObject * obj);
+
+int compareTourn(int i, int j);
 #endif

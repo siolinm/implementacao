@@ -10,11 +10,8 @@ void initCertTourn(int dir){
     /* initializes tourn certificates */
     for(i = 2*tournElem - 1; i >= n; i--){
         a = tourn[i];
-        
-        if(a->p->lastMatch[dir] != 1)
-            newCertTourn(a);
-        else
-            a->p->cert[TOURN_CERT + dir] = INFINITE;
+                
+        newCertTourn(a);
     }
 }
 
@@ -131,23 +128,119 @@ double expireTourn(TournObject * a, TournObject * b){
     }
 }
 
-double expireList(){
+double expireList(Point *a, Point * b, int dir){
+    if(b == NULL)
+        return INFINITE;
 
+    double aspeed, bspeed;
+    aspeed = getVx(a, dir); 
+    bspeed = getVx(b, dir);
+
+    if(aspeed - bspeed >= 0)
+        return INFINITE;
+
+    return (getX0(a, dir) - getX0(b, dir))/(bspeed - aspeed);
 }
 
 void newCertTourn(TournObject * obj){
-    
+    int i, dir;
+    Cert * newCert = malloc(sizeof(*newCert));
+    PQObject * pq = malloc(sizeof(*pq));
+
+    dir = obj->direction;
+    obj->p->cert[TOURN_CERT + dir] = newCert;
+    i = obj->p->lastMatch[dir];
+
+    if(i == 1){
+        newCert->value = INFINITE;
+    }
+    else{
+        newCert->value = expireTourn(tourn[i/2], tourn[i]);
+    }
+
+    pq->certType = TOURN_CERT + dir;
+    pq->p = obj->p;
+
+    insertPQ(pq);
 }
 
-void newCertList(int dir){
+void newCertList(Point *p, int dir){
+    if(p == NULL)
+        return;
+    Cert * cert = malloc(sizeof(*cert));
+    PQObject * pq = malloc(sizeof(*pq));
 
+    p->cert[dir] = cert;
+    p->cert[dir]->value = expireList(p, p->prev[dir], dir);
+
+    if(dir == HORIZONTAL)
+        pq->certType = HORIZONTAL_CERT;
+    else if(dir == UP)
+        pq->certType = UP_CERT;
+    else if(dir == DOWN)
+        pq->certType = DOWN_CERT;
+    
+    pq->p = p;    
+
+    insertPQ(pq);
 }
 
 void updateTournCert(TournObject * a){
-    
+    int i, dir;
+    Cert * cert = a->p->cert[TOURN_CERT + dir];
+
+    dir = a->direction;
+    i = a->p->lastMatch[dir];
+
+    if(i == 1){
+        cert->value = INFINITE;
+        updatePQ(Q[cert->pqpos], cert->value);
+        return;
+    }
+
+    cert->value = expireTourn(tourn[i/2], tourn[i]);
+
+    updatePQ(Q[cert->pqpos], cert->value);
 }
 
-void updateListCert(){
+void updateListCert(Point * p, int dir){
+    if(p == NULL)
+        return;
+    
+    int certType;
+
+    if(dir == HORIZONTAL)
+        certType = HORIZONTAL_CERT;
+    else if(dir == UP)
+        certType = UP_CERT;
+    else if(dir == DOWN)
+        certType = DOWN_CERT;
+
+    Cert * cert = p->cert[certType];
+    
+    updatePQ(Q[cert->pqpos], expireList(p, p->prev[dir], dir));
+}
+
+void tournEvent(){
+    PQObject * aux = minPQ();
+    int dir, j, k;
+    dir = aux->certType - TOURN_CERT;
+
+    j = aux->p->lastMatch[dir];
+    k = 2*(j/2) + !(j % 2);
+    
+    while(j > 1 && compareTourn(j, k)){
+        tourn[j/2] = tourn[j];
+        k = 2*(j/2) + !(j % 2);
+        tourn[k]->p->lastMatch[dir] = k;
+        updateTournCert(tourn[k]);
+        
+        j = j/2;
+        k = 2*(j/2) + !(j % 2);
+    }
+    
+    tourn[j]->p->lastMatch[dir] = j;
+    updateTournCert(tourn[j]);
 
 }
 
@@ -156,6 +249,7 @@ void listEvent(){
     Point * p, * q;
     int dir, eventType;
     p = aux->p;
+
     if(aux->certType == HORIZONTAL_CERT){
         eventType = HORIZONTAL;
     }
@@ -177,6 +271,7 @@ void listEvent(){
         horizontalEvent(p, q, HORIZONTAL);
     }
     else if(eventType == UP){
+        /* p must be to the left of q */
         if(getX(p, HORIZONTAL) > getX(q, HORIZONTAL)){
             p = q;
             q = aux->p;
@@ -189,22 +284,47 @@ void listEvent(){
             p = q;
             q = aux->p;
         }
+
         downEvent(p, q, HORIZONTAL);
     }
 
-    /* treats list */
-}
+    AVLNode * aux;
+    Point * auxp;
+    dir = eventType;
+    p = aux->p;
+    q = p->prev[eventType];
+    
+    /* swap list nodes */
+    aux = p->listPosition[dir];
+    p->listPosition[dir] = q->listPosition[dir];
+    q->listPosition[dir] = aux;
 
-void tournEvent(){
+    /* swap linked list positions */
+    p->prev[dir] = q->prev[dir];
+    if(p->prev[dir])
+        p->prev[dir]->next[dir] = p;
 
+    q->next[dir] = p->next[dir];
+    if(q->next[dir])
+        q->next[dir]->prev[dir] = q;
+
+    p->next[dir] = q;
+    q->prev[dir] = p;
+
+    p = p->next[dir];
+    
+    updateListCert(p, dir);
+    updateListCert(p->prev[dir], dir);
+    updateListCert(p->next[dir], dir);    
 }
 
 /* horizontal-order event */
 void horizontalEvent(Point * p, Point * q, int dir){
     Point * t, *w;    
     if(q == queryHitsUp(p, dir)){ /* p is in HitsUp(q) */
-        t = querySuccessorCands(q->candsRoot[dir], p, dir);
+        t = querySuccessorCands(q->candsRoot[dir], p, DOWN, dir);
         joinCands(p->candsRoot[dir], extractCands(q->candsRoot[dir], NULL, t, dir), dir);
+        /*TODO: check if some lcand changed */
         if(t == NULL){
             t = queryHitsUp(q, dir);
         }
@@ -220,7 +340,7 @@ void horizontalEvent(Point * p, Point * q, int dir){
         insertHits(p->hitsLowRoot[dir], q, dir);
     }
     else if(p == queryHitsLow(q, dir)){ /* q is in HitsLow(p) */
-        t = queryPredecessorCands(p->candsRoot[dir], q, dir);
+        t = queryPredecessorCands(p->candsRoot[dir], q, UP, dir);
         joinCands(q->candsRoot[dir], extractCands(p->candsRoot[dir], t, NULL, dir), dir);
         if(t == NULL){
             t = queryHitsLow(p, dir);
@@ -245,7 +365,8 @@ void upEvent(Point * p, Point * q, int dir){
             deleteCands(v->candsRoot[dir], q, dir);
         insertCands(p->candsRoot[dir], q, dir);
         /* query for successor in horizontal order */
-        
+
+
     }
     else if(p == queryCands(q, dir)){
 
