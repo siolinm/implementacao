@@ -6,12 +6,10 @@
 #ifndef _MAXIMA_H
 #define _MAXIMA_H
 
-typedef Point Item;
-
 CandsNode * maximaRoot;
 
 void initMaxima(int dir);
 
-void initializeCandsHits(int dir);
+void initCandsHits(int dir);
 
 #endif

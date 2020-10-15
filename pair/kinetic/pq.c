@@ -2,14 +2,11 @@
 
 #define pqpos(obj) obj->p->cert[obj->certType]->pqpos
 
-void initPQ(){
-    int i;
+void initPQ(){    
     /* 3n from lists + 3n from tourn */    
-    pqMaxSize = 100;
+    pqMaxSize = 6*n;
 
-    for(i = pqSize/2; i >= 1; i--){
-        sieve(i, pqSize);
-    }
+    pqSize = 1;
 }
 
 void resizePQ(){
@@ -26,8 +23,7 @@ void resizePQ(){
     }
 }
 
-void insertPQ(PQObject * obj){
-    int i = obj->certType;
+void insertPQ(PQObject * obj){    
     resizePQ();
 
     Q[++pqSize] = obj;

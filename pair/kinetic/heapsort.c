@@ -9,7 +9,7 @@ int compare(Point **v, int i, int j, int dir){
 }
 
 void swapHeapsort(int i, int j, Point ** v){
-    Point **aux;
+    Point *aux;
     aux = v[i];
     v[i] = v[j];
     v[j] = aux;

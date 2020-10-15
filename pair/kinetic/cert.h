@@ -4,31 +4,30 @@
 #ifndef _CERT_H
 #define _CERT_H
 
-#define INFINITE 100000000
+void initCertTourn(int dir);
 
-/*
-    Initializes all certificates
-*/
-void initCert(int dir);
+double expireTourn(TournObject * a, TournObject * b);
 
-/*
-    Calculates the certtificate for the new object obj
-*/
-void newCert(Object * obj);
+double expireList(Point *a, Point * b, int dir);
 
-/*
-    Calculates the expiration time between elements a and b
-*/
-double expire(Object * a, Object * b);
+void newCertTourn(TournObject * obj);
 
-/*
-    updates the obj certificate
-*/
-void update(Object *obj);
+void newCertList(Point *p, int dir);
 
-/*
-    An event
-*/
+void updateTournCert(TournObject * a);
+
+void updateListCert(Point * p, int dir);
+
+void tournEvent();
+
+void listEvent();
+
+void horizontalEvent(Point * p, Point * q, int dir);
+
+void upEvent(Point * p, Point * q, int dir);
+
+void downEvent(Point * p, Point * q, int dir);
+
 void event();
 
 #endif

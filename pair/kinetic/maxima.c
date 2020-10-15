@@ -8,11 +8,11 @@ void initMaxima(int dir){
     maximaRoot->leftmost = NULL;
 }
 
-void initializeCandsHits(int dir){
+void initCandsHits(int dir){
     int i;
     CandsNode * up, * low;
-    initMaxima(dir);
     Point * p;
+    initMaxima(dir);
     heapsort(initial, dir);
     for(i = n; i >= 1; i--){
         p = initial[i];
@@ -20,9 +20,9 @@ void initializeCandsHits(int dir){
         up = querySuccessorCands(maximaRoot, p, DOWN, dir);
 
         /* inserts up(p) in HitsUp(p) */
-        insertHits(p->hitsUpRoot[dir], up, dir);
+        insertHits(p->hitsUpRoot[dir], up->key, dir, 1);
         /* inserts low(p) in HitsLow(p) */
-        insertHits(p->hitsLowRoot[dir], low, dir);
+        insertHits(p->hitsLowRoot[dir], low->key, dir, 0);
         /* stores Cands(p) */
         p->candsRoot[dir]->parent = extractCands(maximaRoot, low, up, dir);
         insertCands(maximaRoot, p, dir);

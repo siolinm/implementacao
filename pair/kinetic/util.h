@@ -2,6 +2,8 @@
 #include<math.h>
 #ifndef _UTIL_H
 #define _UTIL_H
+#define INFINITE 100000000
+
 
 #define PI_3 acos(0.5)
 
@@ -112,6 +114,8 @@ typedef struct PQObject{
     int certType;
 } PQObject;
 
+typedef Point Item;
+
 /* priority queue */
 PQObject ** Q;
 
@@ -129,11 +133,6 @@ int n;
 
 /* lastID available */
 int lastID;
-
-/* initializes things */
-void init(int m);
-
-void initialInsert(Point * p);
 
 /* get p x-coordinate in the specified direction */
 double getX(Point * p, int direction);
@@ -164,6 +163,8 @@ int certType(int direction);
     parallel line to the x-axis that passes through point c rotated by theta (counterclockwise)
     0 if point c is in that line and -1 if point c is to the right of that line
 */
-int checkLine(Point * a, Point * c, double theta);
+int checkLine(Point * a, Point * c, double theta, int dir);
+
+void destroy();
 
 #endif

@@ -2,14 +2,15 @@
 #ifndef _CANDS_H
 #define _CANDS_H
 
-typedef Point Item;
+void updateMinimumCands(CandsNode * a, int dir);
 
-/*
-    Inserts key in the splay tree
-*/
-void insertCands(CandsNode * root, Item * key, int direction);
+CandsNode * minimumCands(CandsNode * a, CandsNode * b, int dir);
 
-void deleteCands(CandsNode * root, Item * key, int direction);
+CandsNode * createCandsNode(Item * key, int dir);
+
+CandsNode * initCands(Item * p, int dir);
+
+Point * queryCands(Item * q, int dir);
 
 CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir);
 
@@ -19,44 +20,26 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
 
 void joinCands(CandsNode * root, CandsNode * joinRoot, int dir);
 
-/*
+void rotateLeftCands(CandsNode * x, int dir);
 
-*/
-Point * queryCands(Item * q, int dir);
+void rotateRightCands(CandsNode * x, int dir);
 
-/*
-    Splays node x
-*/
-void splayCands(CandsNode * x);
+void deleteCands(CandsNode * root, Item * key, int direction);
 
-/*
-    Rotates node x to the left, if x was the root the root is updated
-*/
-void rotateLeftCands(CandsNode * x);
+void swapCands(CandsNode *a, CandsNode * b, int dir);
 
-/*
-    Rotates node x to the right, if x was the root the root is updated
-*/
-void rotateRightCands(CandsNode * x);
+CandsNode * successorCands(CandsNode * root);
 
-/*
-    Creates a new node with key key
-*/
-CandsNode * createCandsNode(Item * key);
+CandsNode * deleteCandsR(CandsNode * root, Item * key, CandsNode **parent, int dir);
 
-/*
-    Compares items (points) a and b, if b should be on the left subtree of a returns 1, otherwise returns 0
-*/
+void insertCands(CandsNode * root, Item * key, int direction);
+
+CandsNode * insertCandsR(CandsNode * root, CandsNode * no, int dir);
+
+void splayCands(CandsNode * x, int dir);
+
 int compareCands(Item * a, Item * b, int dir);
 
-/*
-    Deallocate all memory used in the splay tree
-*/
 void freeAllCands(CandsNode * r);
-
-/*
-    Prints the splay tree (for debug)
-*/
-/*void print(char * prefix, int size, CandsNode * r, int b);*/
 
 #endif

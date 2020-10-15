@@ -1,6 +1,34 @@
 #include"menu.h"
 #include"debug.h"
 
+void initialInsert(Point * p){
+    int i;
+    initial[lastID++] = p;
+
+    for(i = 0; i < 3; i++){        
+        p->cands[i] = NULL;
+        p->candsRoot[i] = initCands(p, i);
+        p->hitsLow[i] = NULL;
+        p->hitsUp[i] = NULL;
+        p->hitsLowRoot[i] = initHits(p, i);
+        p->hitsUpRoot[i] = initHits(p, i);
+        p->id = lastID - 1;
+        p->lastMatch[i] = -1;
+        p->listPosition[i] = NULL;
+        p->next[i] = NULL;
+        p->prev[i] = NULL;               
+    }
+}
+
+void init(int m){
+    initial[m] = initial[0];
+    listInit();
+    initPQ();
+    initCertTourn(HORIZONTAL);
+    initMaxima(HORIZONTAL);
+    initCandsHits(HORIZONTAL);
+}
+
 void loadFile(){
     FILE * file;
     Object * obj;
@@ -11,9 +39,11 @@ void loadFile(){
 
     file = fopen(filename, "r");
     fscanf(file, "%d\n", &n);
+    initial = malloc((n + 1)*sizeof(*initial));
+
     for(i = 1, j = 2*n - 1; i <= n; i++, j--){
         obj = malloc(sizeof(*obj));
-        fscanf(file, "%lf %lf", &(obj->x0.x), &(obj->x0.y), &(obj->speed.x), &(obj->speed.y));
+        fscanf(file, "%lf %lf %lf %lf", &(obj->x0.x), &(obj->x0.y), &(obj->speed.x), &(obj->speed.y));
         obj->id = lastID++;
         initialInsert(obj);
     }
@@ -22,10 +52,10 @@ void loadFile(){
     fclose(file);
 }
 
-int menu(){
+int main(){
     Coordinate p;
     Vector v;
-    double t, x;
+    double t;
     int j;
     char opt = 'x';
     while(opt != 's'){
@@ -66,7 +96,7 @@ int menu(){
             delete(j);
         }
         else if(opt == 'n') 
-            printf("now: %g\n", getTime());
+            printf("now: %g\n", now);
         else if(opt == 'l')
             loadFile();
         if(opt != 's'){            
@@ -84,21 +114,21 @@ double nextEvent(){
 }
 
 void advance(double t){        
-    if(t < getTime())
+    if(t < now)
         printf("Time earlier than current time\n");
     
     while(t >= nextEvent()){
-        setTime(nextEvent());
+        now = nextEvent();
         event();
     }
-    setTime(t);
+    now = t;
 }
 
 void change(int j, Vector v){
    
 }
 
-void insert(Point xt, Vector v){
+void insert(Coordinate xt, Vector v){
     
 }
 

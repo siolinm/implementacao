@@ -6,6 +6,8 @@
     https://www.youtube.com/watch?v=FzS0n_Z8lrk
 */
 
+#define max(a, b) (a > b ? a : b)
+
 void listInit(){
     int i;
 
@@ -20,8 +22,8 @@ void listInsert(Point * a, int dir){
     obj->p = a;
     obj->certType = i;
     listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);    
-    // newCert(a, i);    
-    updateListCert(a->next[dir]);
+    newCertList(a, dir);
+    updateListCert(a->next[dir], dir);
 }
 
 void listDelete(Point * a, int dir){
@@ -31,7 +33,7 @@ void listDelete(Point * a, int dir){
     next = a->next[dir];
     listRoot[dir] = deleteAVLNode(listRoot[dir], a, dir);
     deletePQ(aux);
-    updateListCert(next);
+    updateListCert(next, dir);
 }
 
 /* OK */
@@ -138,7 +140,7 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
     }
     else if(key->next == NULL && AVLCompare(key, r->key, dir)){
         key->next[dir] = r->key;
-        key->prev[dir] = r->key->prev;
+        key->prev[dir] = r->key->prev[dir];
         if(key->prev[dir])
             key->prev[dir]->next[dir] = key;
         r->key->prev[dir] = key;
@@ -326,7 +328,6 @@ void removeAll(AVLNode * r){
     if(!r)
         return;
     removeAll(r->left);
-    removeAll(r->right);
-    destroyObject(r->key);
+    removeAll(r->right);    
     free(r);
 }

@@ -23,4 +23,9 @@ void insertTourn(TournObject * obj, int dir);
 void deleteTourn(TournObject * obj);
 
 int compareTourn(int i, int j);
+
+void resizeTourn();
+
+
+
 #endif

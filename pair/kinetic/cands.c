@@ -1,7 +1,5 @@
 #include"cands.h"
 
-#warning ajustar todas as funcoes de cands e Hits por conta da cabeca
-
 void updateMinimumCands(CandsNode * a, int dir){
     a->leftmost = minimumCands(a->left, a->right, dir);
     a->leftmost = minimumCands(a->leftmost, a, dir);
@@ -16,29 +14,41 @@ CandsNode * minimumCands(CandsNode * a, CandsNode * b, int dir){
     return (getX(a->leftmost->key, dir) > getX(b->leftmost->key, dir) ? b->leftmost : a->leftmost);
 }
 
-CandsNode * createCandsNode(Item * key){
+CandsNode * createCandsNode(Item * key, int dir){
     CandsNode * new = malloc(sizeof(*new));
     new->left = new->right = NULL;
     new->parent = NULL;
     new->key = key;
     new->leftmost = new;
+    key->cands[dir] = new;
+
     return new;
 }
 
-CandsNode * initCands(Item * p){
-    return createCandsNode(p);
+CandsNode * initCands(Item * p, int dir){
+    CandsNode * new = malloc(sizeof(*new));
+    new->left = new->right = NULL;
+    new->parent = NULL;
+    new->key = p;
+    new->leftmost = NULL;    
+
+    return new;
 }
 
 Point * queryCands(Item * q, int dir){
     CandsNode * p = NULL;
-    p = q->cands[dir];
+    p = q->cands[dir];    
 
-    while(p != NULL && p->parent != p->parent->parent)
-        p = p->parent->parent;
-
+    while(p && p != p->parent->parent)
+        p = p->parent;
+    
     if(p){
-        p->key->candsRoot[dir] = q->cands[dir];
-        splayCands(q->cands[dir]);
+        p = p->parent;
+        p->key->candsRoot[dir]->parent->parent = NULL;
+        splayCands(q->cands[dir], dir);
+        p->key->candsRoot[dir]->parent = q->cands[dir];
+        q->cands[dir]->parent = p->key->candsRoot[dir];
+
         return p->key;
     }
 
@@ -46,20 +56,10 @@ Point * queryCands(Item * q, int dir){
 }
 
 CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
-    double angle;
+    double angle = 0;
     CandsNode *up, *y, *x;
     up = y = NULL;
     x = root->parent;
-    
-    if(dir == HORIZONTAL){
-        angle = 0;
-    }
-    else if(dir == UP){
-        angle = PI_3;
-    }
-    else if(dir == DOWN){
-        angle = -PI_3;
-    }
 
     if(order == UP){
         angle -= PI_3/2;
@@ -71,7 +71,7 @@ CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
     while(x != NULL){
         y = x;
 
-        if(checkLine(p, x->key, angle) == -1){
+        if(checkLine(p, x->key, angle, dir) == -1){
             x = x->right;
         }
         else{
@@ -82,27 +82,19 @@ CandsNode * querySuccessorCands(CandsNode * root, Item * p, int order, int dir){
 
     if(y != NULL){
         root->parent->parent = NULL;
-        splayCands(y);
+        splayCands(y, dir);
         root->parent = y;
+        y->parent = root;
     }
 
     return up;
 }
 
 CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir){
-    double angle;
+    double angle = 0;
     CandsNode *low, *y, *x;
     low = y = NULL;
-    x = root->parent;    
-    if(dir == HORIZONTAL){
-        angle = 0;
-    }
-    else if(dir == UP){
-        angle = PI_3;
-    }
-    else if(dir == DOWN){
-        angle = -PI_3;
-    }
+    x = root->parent;
 
     if(order == UP){
         angle -= PI_3/2;
@@ -114,7 +106,7 @@ CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir
     while(x != NULL){
         y = x;
 
-        if(checkLine(p, x->key, angle) <= 0){
+        if(checkLine(p, x->key, angle, dir) <= 0){
             x = x->left;
         }
         else{
@@ -125,8 +117,9 @@ CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir
 
     if(y != NULL){
         root->parent->parent = NULL;
-        splayCands(y);
+        splayCands(y, dir);
         root->parent = y;
+        y->parent = root;
     }
 
     return low;
@@ -139,22 +132,29 @@ CandsNode * queryPredecessorCands(CandsNode * root, Item * p, int order, int dir
  */
 CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int dir){
     CandsNode *r;
+
     r =  root->parent;
     root->parent = NULL;
     r->parent = NULL;
+
     if(low != NULL){
-        splayCands(low);        
+        splayCands(low, dir);        
         root->parent = low;
+        low->parent = root;
         r = low->right;
         r->parent = NULL;
+        low->right = NULL;
+
         updateMinimumCands(low, dir);
     }
 
     if(up != NULL){
-        splayCands(up);
+        splayCands(up, dir);
         root->parent = up;
+        up->parent = root;
         r = up->left;
         r->parent = NULL;
+        up->left = NULL;
 
         updateMinimumCands(up, dir);
     }
@@ -173,15 +173,36 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
 
 /* attachs the joinRoot subtree to tree with root root */
 void joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
-
+    CandsNode * aux = root->parent;
+    if(joinRoot == NULL)
+        return;
+    root->parent = NULL;
+    aux->parent = NULL;
+    if(compareCands(aux->key, joinRoot->key, dir)){
+        while(aux->left)
+            aux = aux->left;
+        splayCands(aux, dir);
+        aux->left = joinRoot;
+        joinRoot->parent = aux;
+    }
+    else{
+        while(aux->right)
+            aux = aux->right;
+        splayCands(aux, dir);
+        aux->right = joinRoot;
+        joinRoot->parent = aux;
+    }
+    updateMinimumCands(aux, dir);
+    root->parent = aux;
+    aux->parent = root;
 }
 
-#warning adjust leftmost on rotation
-void rotateLeftCands(CandsNode * x){
+void rotateLeftCands(CandsNode * x, int dir){
     CandsNode * aux, *parent;
     
     parent = x->parent;
     aux = x->right;
+
     if(!aux)
         return;
 
@@ -198,11 +219,13 @@ void rotateLeftCands(CandsNode * x){
             parent->left = aux;
         else
             parent->right = aux;
-    }    
+    }
 
+    updateMinimumCands(x, dir);
+    updateMinimumCands(aux, dir);
 }
 
-void rotateRightCands(CandsNode * x){
+void rotateRightCands(CandsNode * x, int dir){
     CandsNode * aux, *parent;
     
     parent = x->parent;
@@ -224,43 +247,139 @@ void rotateRightCands(CandsNode * x){
         else
             parent->right = aux;
     }
+
+    updateMinimumCands(x, dir);
+    updateMinimumCands(aux, dir);
 }
 
 void deleteCands(CandsNode * root, Item * key, int direction){
-
+    CandsNode * parent;
+    
+    root->parent->parent = NULL;
+    root->parent = deleteCandsR(root->parent, key, &parent, direction);
+    splayCands(parent, direction);
+    root->parent = parent;
+    parent->parent = root;
 }
 
-CandsNode * deleteCandsR(CandsNode * root, Item * key, int direction){
+void swapCands(CandsNode *a, CandsNode * b, int dir){
+    CandsNode * aux;
+    aux = a->left;
+    a->left = b->left;
+    b->left = aux;
+    
+    aux = a->right;
+    a->right = b->right;
+    b->right = aux;
 
+    aux = a->parent;
+    if(aux){
+        if(a == aux->left)
+            aux->left = b;        
+        else
+            aux->right = b;
+    }
+    if(b->parent){
+        if(b == b->parent->left)
+            b->parent->left = a;        
+        else
+            b->parent->right = a;
+    }
+    a->parent = b->parent;
+    b->parent = aux;
+
+    updateMinimumCands(a, dir);
+    updateMinimumCands(b, dir);
+}
+
+CandsNode * successorCands(CandsNode * root){
+    while (root->left){
+        root = root->left;
+    }
+
+    return root;    
+}
+
+CandsNode * deleteCandsR(CandsNode * root, Item * key, CandsNode **parent, int dir){
+    CandsNode * aux;
+
+    if(root->key == key){
+        if(root->left && root->right){
+            aux = successorCands(root->right);
+            swapCands(root, aux, dir);
+            aux->right = deleteCandsR(aux->right, key, parent, dir);
+
+            root = aux;
+        }
+        else{
+            *parent = root->parent;
+            aux = (root->left ? root->left : root->right);
+            
+            if(aux) aux->parent = aux->parent->parent;
+            
+            if(root->parent){
+                if(root->parent->left == root)
+                    root->parent->left = aux;
+                else
+                    root->parent->right = aux;
+            }
+
+            root->key->cands[dir] = NULL;
+            free(root);
+
+            root = aux;
+        }
+    }
+    else if(compareCands(root->key, key, dir)){
+        root->left = deleteCandsR(root->left, key, parent, dir);        
+        if(root->left)
+            root->left->parent = root;
+    }
+    else{
+        root->right = deleteCandsR(root->right, key, parent, dir);
+        if(root->right)
+            root->right->parent = root;
+    }
+
+    if(root){
+        CandsNode * leftmost;
+        
+        leftmost = minimumCands(root->left, root->right, dir);
+        leftmost = minimumCands(leftmost, root, dir);
+        
+        root->leftmost = leftmost;
+    }
+
+    return root;
 }
 
 void insertCands(CandsNode * root, Item * key, int direction){
-    CandsNode * new = createCandsNode(key);
-    CandsNode * parent = root, *x;
+    CandsNode * new = createCandsNode(key, direction);    
     
-    root->parent = insertCandR(root->parent, new, direction);
     root->parent->parent = NULL;
-    splayCands(new);
+    root->parent = insertCandsR(root->parent, new, direction);
+
+    splayCands(new, direction);
     root->parent = new;
     new->parent = root;
 }
 
-CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
+CandsNode * insertCandsR(CandsNode * root, CandsNode * no, int dir){
+    CandsNode * leftmost;
     if(!root)
         return no;
 
-    if(compare(root->key, no->key, dir)){
-        root->left = insertCandR(root->left, no, dir);
+    if(compareCands(root->key, no->key, dir)){
+        root->left = insertCandsR(root->left, no, dir);
         root->left->parent = root;
     }
     else{
-        root->right = insertCandR(root->right, no, dir);
+        root->right = insertCandsR(root->right, no, dir);
         root->right->parent = root;
     }
 
-    CandsNode * leftmost;
     
-    leftmost = minimumCands(root->left->leftmost, root->right->leftmost, dir);
+    leftmost = minimumCands(root->left, root->right, dir);
     leftmost = minimumCands(leftmost, root, dir);
     
     root->leftmost = leftmost;
@@ -268,41 +387,40 @@ CandsNode * insertCandR(CandsNode * root, CandsNode * no, int dir){
     return root;
 }
 
-#warning refazer essa funcao
-void splayCands(CandsNode * x){
-    while(x && x->parent && x->parent != x->parent->parent){
+void splayCands(CandsNode * x, int dir){
+    while(x && x->parent){
         /*
             l or r case
         */
         if(!x->parent->parent){
             if(x->parent->left == x)
-                rotateRightCands(x->parent);
+                rotateRightCands(x->parent, dir);
             else
-                rotateLeftCands(x->parent);
+                rotateLeftCands(x->parent, dir);
         }
         else{
             if(x->parent->left == x){
                 /* rr case*/
                 if(x->parent->parent->left == x->parent){
-                    rotateRightCands(x->parent->parent);
-                    rotateRightCands(x->parent);
+                    rotateRightCands(x->parent->parent, dir);
+                    rotateRightCands(x->parent, dir);
                 }
                 else{
                     /* rl case */
-                    rotateRightCands(x->parent);
-                    rotateLeftCands(x->parent);
+                    rotateRightCands(x->parent, dir);
+                    rotateLeftCands(x->parent, dir);
                 }
             }
             else{
                 /* lr case */
                 if(x->parent->parent->left == x->parent){
-                    rotateLeftCands(x->parent);
-                    rotateRightCands(x->parent);
+                    rotateLeftCands(x->parent, dir);
+                    rotateRightCands(x->parent, dir);
                 }
                 else{
                     /* ll case */
-                    rotateLeftCands(x->parent->parent);
-                    rotateLeftCands(x->parent);
+                    rotateLeftCands(x->parent->parent, dir);
+                    rotateLeftCands(x->parent, dir);
                 }
             }
         }

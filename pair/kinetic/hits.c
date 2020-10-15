@@ -1,114 +1,52 @@
-#include"cands.h"
+#include"hits.h"
 
-#define minimum(a, b, dir) (getX(a, dir) > getX(b, dir) ? b : a)
-
-HitsNode * createHitsNode(Item * key){
+HitsNode * createHitsNode(Item * key, int dir, int up){
     HitsNode * new = malloc(sizeof(*new));
     new->left = new->right = NULL;
     new->parent = NULL;
     new->key = key;
+
+    if(up)
+        key->hitsUp[dir] = new;
+    else
+        key->hitsLow[dir] = new;
+
     return new;
 }
 
-HitsNode * initHits(Item * p){
-    return createHitsNode(p);
+HitsNode * initHits(Item * p, int dir){
+    HitsNode * new = malloc(sizeof(*new));
+    new->left = new->right = NULL;
+    new->parent = NULL;
+    new->key = p;
+
+    return new;
 }
 
-HitsNode * querySuccessorHits(HitsNode * root, Item * p, int order, int dir){
-    double angle;
-    HitsNode *up, *y, *x;
-    up = y = NULL;
-    x = root->parent;
-    
-    if(dir == HORIZONTAL){
-        angle = 0;
-    }
-    else if(dir == UP){
-        angle = PI_3;
-    }
-    else if(dir == DOWN){
-        angle = -PI_3;
-    }
-
-    if(order == UP){
-        angle -= PI_3/2;
-    }
-    else if(order == DOWN){
-        angle += PI_3/2;
-    }
-    
-    while(x != NULL){
-        y = x;
-
-        if(checkLine(p, x->key, angle) == -1){
-            x = x->right;
-        }
-        else{
-            up = x;
-            x = x->left;
-        }
-    }
-
-    if(y != NULL){
-        root->parent->parent = NULL;
-        splayHits(y);
-        root->parent = y;
-    }
-
-    return up;
+HitsNode * querySuccessorHits(HitsNode * root, Item * p, int dir){
+    return NULL;
 }
 
-HitsNode * queryPredecessorHits(HitsNode * root, Item * p, int order, int dir){
-    double angle;
-    HitsNode *low, *y, *x;
-    low = y = NULL;
-    x = root->parent;    
-    if(dir == HORIZONTAL){
-        angle = 0;
-    }
-    else if(dir == UP){
-        angle = PI_3;
-    }
-    else if(dir == DOWN){
-        angle = -PI_3;
-    }
-
-    if(order == UP){
-        angle -= PI_3/2;
-    }
-    else if(order == DOWN){
-        angle += PI_3/2;
-    }
-    
-    while(x != NULL){
-        y = x;
-
-        if(checkLine(p, x->key, angle) <= 0){
-            x = x->left;
-        }
-        else{
-            low = x;
-            x = x->right;
-        }
-    }
-
-    if(y != NULL){
-        root->parent->parent = NULL;
-        splayHits(y);
-        root->parent = y;
-    }
-
-    return low;
+HitsNode * queryPredecessorHits(HitsNode * root, Item * p, int dir){
+    return NULL;
 }
 
 Item * queryHitsLow(Item * q, int dir){
     HitsNode * p = NULL;
-    p = q->hitsLow[dir];
+    p = q->hitsLow[dir];    
 
-    while(p != NULL && p->parent != p->parent->parent)
-        p = p->parent->parent;
+    while(p && p != p->parent->parent)
+        p = p->parent;
+    
+    if(p){
+        p = p->parent;
+        p->key->hitsLowRoot[dir]->parent->parent = NULL;
+        splayHits(q->hitsLow[dir]);
+        p->key->hitsLowRoot[dir]->parent = q->hitsLow[dir];
+        q->hitsLow[dir]->parent = p->key->hitsLowRoot[dir];
 
-    if(p) return p->key;
+        return p->key;
+    }
 
     return NULL;
 }
@@ -125,23 +63,6 @@ Item * queryHitsUp(Item * q, int dir){
     return NULL;
 }
 
-/* attachs the joinRoot subtree to tree with root root */
-HitsNode * joinHits(HitsNode * root, HitsNode * joinRoot, int dir){
-
-}
-
-/* if left = 1 searchs for the leftmost point t to the right of p 
- * in the tree with root root and returns a subtree 
- * containing all nodes to the left of t
- * 
- * if left = 0 searchs for the rightmost point v that doesn't hits
- * Dom(p) and returns a subtree containing all nodes to the right of v
- */
-HitsNode * cutHits(HitsNode * root, Item * p, int left, int dir){
-
-}
-
-#warning adjust leftmost on rotation
 void rotateLeftHits(HitsNode * x){
     HitsNode * aux, *parent;
     
@@ -190,20 +111,103 @@ void rotateRightHits(HitsNode * x){
     }
 }
 
-void deleteHits(HitsNode * root, Item * key, int direction){
+HitsNode * successorHits(HitsNode * root){
+    while (root->left){
+        root = root->left;
+    }
 
+    return root;
 }
 
-HitsNode * deleteHitsR(HitsNode * root, Item * key, int direction){
-
-}
-
-void insertHits(HitsNode * root, Item * key, int direction){
-    HitsNode * new = createHitsNode(key);
-    HitsNode * parent = root, *x;
+void swapHits(HitsNode *a, HitsNode * b, int dir){
+    HitsNode * aux;
+    aux = a->left;
+    a->left = b->left;
+    b->left = aux;
     
-    root->parent = insertCandR(root, new, direction);
+    aux = a->right;
+    a->right = b->right;
+    b->right = aux;
+
+    aux = a->parent;
+    if(aux){
+        if(a == aux->left)
+            aux->left = b;        
+        else
+            aux->right = b;
+    }
+    if(b->parent){
+        if(b == b->parent->left)
+            b->parent->left = a;
+        else
+            b->parent->right = a;
+    }
+    a->parent = b->parent;
+    b->parent = aux;    
+}
+
+void deleteHits(HitsNode * root, Item * key, int dir, int up){
+    HitsNode * parent;
+    
     root->parent->parent = NULL;
+    root->parent = deleteHitsR(root->parent, key, &parent, dir, up);
+    splayHits(parent);
+    root->parent = parent;
+    parent->parent = root;
+}
+
+HitsNode * deleteHitsR(HitsNode * root, Item * key, HitsNode **parent, int dir, int up){
+    HitsNode * aux;
+
+    if(root->key == key){
+        if(root->left && root->right){
+            aux = successorHits(root->right);
+            swapHits(root, aux, dir);
+            aux->right = deleteHitsR(aux->right, key, parent, dir, up);
+
+            root = aux;
+        }
+        else{
+            *parent = root->parent;
+            aux = (root->left ? root->left : root->right);
+            
+            if(aux) aux->parent = aux->parent->parent;
+            
+            if(root->parent){
+                if(root->parent->left == root)
+                    root->parent->left = aux;
+                else
+                    root->parent->right = aux;
+            }
+            if(up)
+                root->key->hitsUp[dir] = NULL;
+            else
+                root->key->hitsLow[dir] = NULL;
+
+            free(root);
+
+            root = aux;
+        }
+    }
+    else if(compareHits(root->key, key, dir)){
+        root->left = deleteHitsR(root->left, key, parent, dir, up);        
+        if(root->left)
+            root->left->parent = root;
+    }
+    else{
+        root->right = deleteHitsR(root->right, key, parent, dir, up);
+        if(root->right)
+            root->right->parent = root;
+    }
+
+    return root;
+}
+
+void insertHits(HitsNode * root, Item * key, int dir, int up){
+    HitsNode * new = createHitsNode(key, dir, up);    
+    
+    root->parent->parent = NULL;
+    root->parent = insertHitsR(root, new, dir);
     splayHits(new);
     root->parent = new;
     new->parent = root;
@@ -213,12 +217,12 @@ HitsNode * insertHitsR(HitsNode * root, HitsNode * no, int dir){
     if(!root)
         return no;
 
-    if(compare(root->key, no->key, dir)){
-        root->left = insertCandR(root->left, no, dir);
+    if(compareHits(root->key, no->key, dir)){
+        root->left = insertHitsR(root->left, no, dir);
         root->left->parent = root;
     }
     else{
-        root->right = insertCandR(root->right, no, dir);
+        root->right = insertHitsR(root->right, no, dir);
         root->right->parent = root;
     }
 
@@ -278,44 +282,3 @@ void freeAllHits(HitsNode * r){
         free(r);
     }    
 }
-
-/*
-void print(char * prefix, int size, HitsNode * r, int b){
-	int i;
-    char * new;
-    if(prefix == NULL){
-        prefix = malloc(sizeof(*prefix));
-        prefix[0] = '\0';
-    }
-    if(r != NULL)
-    {
-        for(i = 0; prefix[i] != '\0'; i++)
-            printf("%c", prefix[i]);
-
-        if(b) 
-            printf("├──"); 
-        else 
-            printf("└──" );
-        printf("(%g, %g)", r->key->x, r->key->y);
-        if(r->parent){
-            printf("'s parent: (%g, %g)", r->parent->key->x, r->parent->key->y);
-        }
-		printf("\n");
-        new = malloc((size + 4)*sizeof(*new));
-        for(i = 0; root = NULL;i < size; i++)
-            new[i] = prefix[i];
-        if(b)
-            new[size - 1] = '|';
-        else
-            new[size - 1] = ' ';
-        for(i = size; i < size + 4; i++)
-            new[i] = ' ';        
-        new[size + 3] = '\0';
-		print(new, size + 4, r->left, 1);
-        print(new, size + 4, r->right, 0);
-        
-    }
-    if(!b)
-        free(prefix);
-}
-*/

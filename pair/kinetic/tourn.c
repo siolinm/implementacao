@@ -8,10 +8,15 @@ int compareTourn(int i, int j){
 }
 
 void initTourn(){
-    tournElem = 3*n;
-    int i = 2*tournElem - 1;
+    int i;
     int dir;
-
+    tournElem = 3*n;
+    /*
+    for(i = n; i >= 1; i--){
+        tourn[n + i - 1] = initial[i];
+    }
+    */
+    i = 2*tournElem - 1;
     while(i > 1){
         if(compareTourn(i, i - 1)){
             tourn[i/2] = tourn[i];
@@ -39,7 +44,7 @@ void resizeTourn(){
     TournObject ** newTourn;
     newTourn = malloc((2*tournMaxSize + 1)*sizeof(*newTourn));
 
-    for (i = 1; i <= tournElem; i++){
+    for (i = 1; i <= 2*tournElem - 1; i++){
         newTourn[i] = tourn[i];
     }
 
@@ -49,7 +54,7 @@ void resizeTourn(){
 
 void insertTourn(TournObject * obj, int dir){
     int i, k;
-    int dir;
+    obj->direction = dir;
 
     if(2*tournElem + 1 == tournMaxSize)
         resizeTourn();
@@ -66,7 +71,7 @@ void insertTourn(TournObject * obj, int dir){
         tourn[i/2] = tourn[i];
         dir = tourn[k]->p->lastMatch[dir];
         tourn[k]->p->lastMatch[dir] = k;
-        update(tourn[k]);
+        updateTournCert(tourn[k]);
         
         i = i/2;
         k = 2*(i/2) + !(i % 2);
@@ -135,7 +140,7 @@ void deleteTourn(TournObject * obj){
         tourn[j/2] = tourn[j];
         dir = tourn[k]->direction;
         tourn[k]->p->lastMatch[dir] = k;
-        update(tourn[k]);
+        updateTournCert(tourn[k]);
         
         j = j/2;
         k = 2*(j/2) + !(j % 2);
@@ -143,5 +148,5 @@ void deleteTourn(TournObject * obj){
 
     dir = tourn[j]->direction;
     tourn[j]->p->lastMatch[dir] = j;
-    update(tourn[j]);
+    updateTournCert(tourn[j]);
 }

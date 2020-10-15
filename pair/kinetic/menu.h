@@ -3,6 +3,9 @@
 #include"tourn.h"
 #include"cert.h"
 #include"pq.h"
+#include"hits.h"
+#include"orderedlist.h"
+#include"maxima.h"
 #include"cands.h"
 #ifndef _MENU_H
 #define _MENU_H
@@ -21,11 +24,6 @@ loads the elements from a file in the following format:
     x0 y0 (whitespace) vx vy (of the n-th element)
  */
 void loadFile();
-
-/*
-    options menu
- */
-int menu();
 
 /* 
     queries for the element with maximum value
@@ -51,5 +49,10 @@ void delete(int i);
     returns the next event time
 */
 double nextEvent();
+
+/* initializes things */
+void init(int m);
+
+void initialInsert(Point * p);
 
 #endif
