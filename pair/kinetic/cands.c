@@ -134,15 +134,16 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
     CandsNode *r;
 
     r =  root->parent;
+    if(!r) return NULL;
     root->parent = NULL;
     r->parent = NULL;
 
     if(low != NULL){
         splayCands(low, dir);        
         root->parent = low;
-        low->parent = root;
+        low->parent = root;        
         r = low->right;
-        r->parent = NULL;
+        if(r) r->parent = NULL;
         low->right = NULL;
 
         updateMinimumCands(low, dir);
@@ -153,7 +154,7 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
         root->parent = up;
         up->parent = root;
         r = up->left;
-        r->parent = NULL;
+        if(r) r->parent = NULL;
         up->left = NULL;
 
         updateMinimumCands(up, dir);
@@ -174,8 +175,7 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
 /* attachs the joinRoot subtree to tree with root root */
 void joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
     CandsNode * aux = root->parent;
-    if(joinRoot == NULL)
-        return;
+    if(joinRoot == NULL) return;
     root->parent = NULL;
     aux->parent = NULL;
     if(compareCands(aux->key, joinRoot->key, dir)){
@@ -203,8 +203,7 @@ void rotateLeftCands(CandsNode * x, int dir){
     parent = x->parent;
     aux = x->right;
 
-    if(!aux)
-        return;
+    if(!aux) return;
 
     x->right = aux->left;
     if(aux->left)
@@ -230,8 +229,7 @@ void rotateRightCands(CandsNode * x, int dir){
     
     parent = x->parent;
     aux = x->left;
-    if(!aux)
-        return;
+    if(!aux) return;
 
     x->left = aux->right;
     if(aux->right)
@@ -255,7 +253,7 @@ void rotateRightCands(CandsNode * x, int dir){
 void deleteCands(CandsNode * root, Item * key, int direction){
     CandsNode * parent;
     
-    root->parent->parent = NULL;
+    if(root->parent) root->parent->parent = NULL;
     root->parent = deleteCandsR(root->parent, key, &parent, direction);
     splayCands(parent, direction);
     root->parent = parent;
@@ -355,8 +353,7 @@ CandsNode * deleteCandsR(CandsNode * root, Item * key, CandsNode **parent, int d
 
 void insertCands(CandsNode * root, Item * key, int direction){
     CandsNode * new = createCandsNode(key, direction);    
-    
-    root->parent->parent = NULL;
+    if(root->parent) root->parent->parent = NULL;
     root->parent = insertCandsR(root->parent, new, direction);
 
     splayCands(new, direction);

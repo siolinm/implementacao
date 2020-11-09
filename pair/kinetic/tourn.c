@@ -7,7 +7,7 @@ int compareTourn(int i, int j){
     return a < b;
 }
 
-void initTourn(){
+void buildTourn(){
     int i;
     int dir;
     tournElem = 3*n;
@@ -149,4 +149,169 @@ void deleteTourn(TournObject * obj){
     dir = tourn[j]->direction;
     tourn[j]->p->lastMatch[dir] = j;
     updateTournCert(tourn[j]);
+}
+
+void initCertTourn(int dir){
+    int i;
+    TournObject * a;    
+    /* initializes tourn certificates */
+    for(i = 2*tournElem - 1; i >= n; i--){
+        a = tourn[i];
+                
+        newCertTourn(a);
+    }
+}
+
+/* 
+ * assuming d(a, lcand(a)) <= d(b, lcand(b)) 
+ * 
+ * goal: t such that d(a, lcand(a)) >= d(b, lcand(b)) in [t, t + eps] eps > 0
+ * 
+ * (1)  (x(a) - x(lcand(a)))^2 + (y(a) - y(lcand(a)))^2 >= (x(b) - x(lcand(b)))^2 + (y(b) - y(lcand(b)))^2
+ * 
+ * x(a) = x_0(a) + t*speed(a).x
+ * y(a) = y_0(a) + t*speed(a).y
+ * 
+ * let c_1 = speed(a).x - speed(lcand(a)).x
+ * c_2 = x_0(a) - x_0(lcand(a))
+ * c_3 = speed(a).y - speed(lcand(a)).y
+ * c_4 = y_0(a) - y_0(lcand(a))
+ * 
+ * c_5, c_6, c_7 and c_8 are similar but to point b
+ * 
+ * Rewriting (1):
+ * 
+ * (tc_1 + c_2)^2 + (tc_3 + c_4)^2 >= (tc_5 + c_6)^2 + (tc_7 + c_8)^2
+ * ....
+ * t^2(c_1^2 + c_3^2 - c_5^2 - c_7^2) + 2t(c_1c_2 + c_3c_4 - c_5c_6 - c_7c_8) + c_2^2 + c_4^2 - c_6^2 - c_8^2 >= 0
+ * 
+ * m = (c_1^2 + c_3^2 - c_5^2 - c_7^2)
+ * n = 2(c_1c_2 + c_3c_4 - c_5c_6 - c_7c_8)
+ * o = c_2^2 + c_4^2 - c_6^2 - c_8^2
+ * 
+ * mt^2 + nt + o >= 0
+ * 
+ * Cases:
+ * if m > 0, then n^2 - 4mo must be > 0
+ * return is the bigger root
+ * 
+ * if m < 0 and n^2 - 4mo <= 0 return INF
+ * 
+ * if m < 0 and n^2 - 4mo > 0 return smaller root
+ * 
+ * if m = 0:
+ *      nt + o >= 0
+ * 
+ *      n > 0 return -o/n
+ * 
+ *      n < 0 return INF
+ *      
+ *      if n = 0:
+ *          o must be <= 0
+ *          return INF
+ * 
+ */
+double expireTourn(TournObject * a, TournObject * b){
+    int i;
+    TournObject * aux;
+    double c[9], m, n, o, delta, t1, t2;
+    if(a->lcandp == NULL || b->lcandp == NULL)
+        return INFINITE;
+    aux = a;
+    for(i = 0; i < 2; i++){
+        c[4*i + 1] = getVx(aux->p, aux->direction) - getVx(aux->lcandp, aux->direction);
+        c[4*i + 2] = getX0(aux->p, aux->direction) - getX0(aux->lcandp, aux->direction);
+        c[4*i + 3] = getVy(aux->p, aux->direction) - getVy(aux->lcandp, aux->direction);
+        c[4*i + 4] = getY0(aux->p, aux->direction) - getY0(aux->lcandp, aux->direction);
+        aux = b;
+    }
+
+    m = c[1]*c[1] + c[3]*c[3] - c[5]*c[5] - c[7]*c[7];
+    n = 2*(c[1]*c[2] + c[3]*c[4] - c[5]*c[6] - c[7]*c[8]);
+    o = c[2]*c[2] + c[4]*c[4] - c[6]*c[6] - c[8]*c[8];
+    delta = n*n - 4*m*o;
+
+    if(m > 0){
+        if(delta <= 0){
+            printf("Something gone wrong! Delta isn't positive\n");
+        }
+        else{
+            t1 = -n + sqrt(delta);
+            t1 = t1/2*m;
+            t2 = -n - sqrt(delta);
+            t2 = t2/2*m;
+
+            if(t1 < t2)
+                t1 = t2;
+        }
+    }
+    else if (m < 0){
+        if(delta <= 0)
+            return INFINITE;
+        
+        t1 = -n + sqrt(delta);
+        t1 = t1/2*m;
+        t2 = -n - sqrt(delta);
+        t2 = t2/2*m;
+
+        if(t1 > t2)
+            t1 = t2;
+    }
+    else{
+        if(n > 0){
+            t1 = -o/n;
+        }
+        else if(n < 0){
+            t1 = INFINITE;
+        }
+        else{
+            if(o > 0){
+                printf("Something gone wrong! o > 0\n");
+            }
+            else{
+                t1 = INFINITE;
+            }
+        }
+    }
+
+    return t1;
+}
+
+
+void newCertTourn(TournObject * obj){
+    int i, dir;
+    Cert * newCert = malloc(sizeof(*newCert));    
+
+    dir = obj->direction;
+    obj->p->cert[TOURN_CERT + dir] = newCert;
+    i = obj->p->lastMatch[dir];
+
+    if(i == 1){
+        newCert->value = INFINITE;
+    }
+    else{
+        newCert->value = expireTourn(tourn[i/2], tourn[i]);
+    }    
+
+    insertPQ(obj->p, TOURN_CERT + dir);
+}
+
+void updateTournCert(TournObject * a){
+    int i, dir;
+    Cert *cert;
+    dir = a->direction;
+    cert = a->p->cert[TOURN_CERT + dir];
+
+    dir = a->direction;
+    i = a->p->lastMatch[dir];
+
+    if(i == 1){
+        cert->value = INFINITE;
+        updatePQ(a->p, TOURN_CERT + dir, cert->value);
+        return;
+    }
+
+    cert->value = expireTourn(tourn[i/2], tourn[i]);
+
+    updatePQ(a->p, TOURN_CERT + dir, cert->value);
 }

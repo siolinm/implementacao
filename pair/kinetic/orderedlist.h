@@ -5,14 +5,31 @@
 
 AVLNode * listRoot[3];
 
-/* initializes the trees */
+/*
+    initializes the trees 
+*/
 void listInit();
 
-/* inserts point a into the list with direction dir */
+/*
+    inserts point a into the list with direction dir 
+*/
 void listInsert(Point * a, int dir);
 
-/* deletes point a from the list with direction dir */
+/* 
+    deletes point a from the list with direction dir 
+*/
 void listDelete(Point * a, int dir);
+
+/*
+    swapNodes
+*/
+void listSwap(Point * p, Point * q, int dir);
+
+void newCertList(Point *p, int dir);
+
+void updateListCert(Point * p, int dir);
+
+double expireList(Point *a, Point * b, int dir);
 
 /*
     returns the height of node a, -1 if NULL;

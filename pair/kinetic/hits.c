@@ -143,13 +143,13 @@ void swapHits(HitsNode *a, HitsNode * b, int dir){
             b->parent->right = a;
     }
     a->parent = b->parent;
-    b->parent = aux;    
+    b->parent = aux;
 }
 
 void deleteHits(HitsNode * root, Item * key, int dir, int up){
     HitsNode * parent;
     
-    root->parent->parent = NULL;
+    if(root->parent) root->parent->parent = NULL;
     root->parent = deleteHitsR(root->parent, key, &parent, dir, up);
     splayHits(parent);
     root->parent = parent;
@@ -206,8 +206,8 @@ HitsNode * deleteHitsR(HitsNode * root, Item * key, HitsNode **parent, int dir, 
 void insertHits(HitsNode * root, Item * key, int dir, int up){
     HitsNode * new = createHitsNode(key, dir, up);    
     
-    root->parent->parent = NULL;
-    root->parent = insertHitsR(root, new, dir);
+    if(root->parent) root->parent->parent = NULL;
+    root->parent = insertHitsR(root->parent, new, dir);
     splayHits(new);
     root->parent = new;
     new->parent = root;

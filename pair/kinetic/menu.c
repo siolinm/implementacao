@@ -1,33 +1,6 @@
 #include"menu.h"
 #include"debug.h"
-
-void initialInsert(Point * p){
-    int i;
-    initial[lastID++] = p;
-
-    for(i = 0; i < 3; i++){        
-        p->cands[i] = NULL;
-        p->candsRoot[i] = initCands(p, i);
-        p->hitsLow[i] = NULL;
-        p->hitsUp[i] = NULL;
-        p->hitsLowRoot[i] = initHits(p, i);
-        p->hitsUpRoot[i] = initHits(p, i);
-        p->id = lastID - 1;
-        p->lastMatch[i] = -1;
-        p->listPosition[i] = NULL;
-        p->next[i] = NULL;
-        p->prev[i] = NULL;               
-    }
-}
-
-void init(int m){
-    initial[m] = initial[0];
-    listInit();
-    initPQ();
-    initCertTourn(HORIZONTAL);
-    initMaxima(HORIZONTAL);
-    initCandsHits(HORIZONTAL);
-}
+#include"kds.h"
 
 void loadFile(){
     FILE * file;
@@ -35,19 +8,21 @@ void loadFile(){
     int i = 0, j;
     char filename[80];
     printf("Enter the file name: ");
-    scanf("%s", filename);
+    scanf("%s", filename);    
 
     file = fopen(filename, "r");
     fscanf(file, "%d\n", &n);
-    initial = malloc((n + 1)*sizeof(*initial));
+    initial = malloc((n + 1)*sizeof(*initial));    
+    
+    initKDS();    
 
     for(i = 1, j = 2*n - 1; i <= n; i++, j--){
         obj = malloc(sizeof(*obj));
-        fscanf(file, "%lf %lf %lf %lf", &(obj->x0.x), &(obj->x0.y), &(obj->speed.x), &(obj->speed.y));
-        obj->id = lastID++;
-        initialInsert(obj);
+        fscanf(file, "%lf %lf %lf %lf", &(obj->x0.x), &(obj->x0.y), &(obj->speed.x), &(obj->speed.y));        
+        initializePoint(obj);
     }
-    init(n);      
+
+    buildKDS();
     
     fclose(file);
 }
@@ -107,35 +82,4 @@ int main(){
     }
 
     return 0;
-}
-
-double nextEvent(){
-    return minPQ()->p->cert[minPQ()->certType]->value;
-}
-
-void advance(double t){        
-    if(t < now)
-        printf("Time earlier than current time\n");
-    
-    while(t >= nextEvent()){
-        now = nextEvent();
-        event();
-    }
-    now = t;
-}
-
-void change(int j, Vector v){
-   
-}
-
-void insert(Coordinate xt, Vector v){
-    
-}
-
-void delete(int i){
-
-}
-
-void query(){    
-
 }

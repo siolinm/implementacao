@@ -2,11 +2,11 @@
 
 #define pqpos(obj) obj->p->cert[obj->certType]->pqpos
 
-void initPQ(){    
+void initPQ(){
     /* 3n from lists + 3n from tourn */    
     pqMaxSize = 6*n;
-
-    pqSize = 1;
+    Q = malloc(pqMaxSize*sizeof(*Q));
+    pqSize = 0;
 }
 
 void resizePQ(){
@@ -23,18 +23,25 @@ void resizePQ(){
     }
 }
 
-void insertPQ(PQObject * obj){    
+void insertPQ(Point * p, int certType){    
+    PQObject * pq;
     resizePQ();
 
-    Q[++pqSize] = obj;
-    pqpos(obj) = pqSize;
-    updatePQ(obj, valuePQ(pqSize));
+    pq = malloc(sizeof(*pq));
+    pq->p = p;
+    pq->certType = certType;
+    
+    Q[++pqSize] = pq;
+    pqpos(pq) = pqSize;
+    updatePQ(pq->p, pq->certType, valuePQ(pqSize));
 }
 
-void deletePQ(PQObject * obj){
-    int i = pqpos(obj);
-    Q[i] = Q[pqSize--];
-    sieve(i, pqSize);
+void deletePQ(Point * p, int certType){
+    PQObject * obj = Q[p->cert[certType]->pqpos];
+
+    Q[pqpos(obj)] = Q[pqSize--];
+    swim(pqpos(obj));
+    sink(pqpos(obj), pqSize);
 }
 
 PQObject * minPQ(){
@@ -53,28 +60,30 @@ double valuePQObject(PQObject * obj){
     return obj->p->cert[obj->certType]->value;
 }
 
-void updatePQ(PQObject * obj, double t){
-    int p, j, type;
-    double x;
-    
-    type = obj->certType;
+void updatePQ(Point * p, int certType, double t){
+    PQObject * obj = Q[p->cert[certType]->pqpos];      
+           
+    p->cert[certType]->value = t;
 
-    j = pqpos(obj);
-    obj->p->cert[type]->value = t;
-
-    p = j;
-    x = valuePQ(j);
-    while(p/2 >= 1 && x < valuePQ(p/2)){
-        Q[p] = Q[p/2];
-        pqpos(Q[p/2]) = p;
-        p = p/2;
-    }
-    Q[p] = obj;
-    pqpos(obj) = p;
-    sieve(p, n);
+    swim(pqpos(obj));
+    sink(pqpos(obj), pqSize);
 }
 
-void sieve(int i, int m){
+void swim(int i){
+    PQObject * obj;
+    double x;
+    obj = Q[i];
+    x = valuePQ(i);
+    while(i/2 >= 1 && x < valuePQ(i/2)){
+        Q[i] = Q[i/2];
+        pqpos(Q[i/2]) = i;
+        i = i/2;
+    }
+    Q[i] = obj;
+    pqpos(obj) = i;
+}
+
+void sink(int i, int m){
     int s = 2*i, p = i;
     PQObject * x = Q[i];
     while(s <= m){

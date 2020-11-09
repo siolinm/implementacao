@@ -32,21 +32,23 @@ double valuePQObject(PQObject * obj);
 /*
     updates the PQObject c certificate to value t and adjusts Q
 */
-void updatePQ(PQObject * c, double t);
+void updatePQ(Point * p, int certType, double t);
 
 /*
     assegurates the heap property by "sieving" elements
 */
-void sieve(int i, int m);
+void sink(int i, int m);
+
+void swim(int i);
 
 /*
-    inserts object obj in the PQ
+    inserts point p with cert certType in the PQ
 */
-void insertPQ(PQObject * obj);
+void insertPQ(Point * p, int certType);
 
 /*
     deletes object obj from the PQ
 */
-void deletePQ(PQObject * obj);
+void deletePQ(Point * p, int certType);
 
 #endif

@@ -1,19 +1,9 @@
 #include<stdio.h>
-#include"util.h"
-#include"tourn.h"
-#include"cert.h"
-#include"pq.h"
-#include"hits.h"
-#include"orderedlist.h"
-#include"maxima.h"
-#include"cands.h"
+
 #ifndef _MENU_H
 #define _MENU_H
 
-/* 
-    advance in time
-*/
-void advance(double t);
+
 
 /*
 loads the elements from a file in the following format:
@@ -25,34 +15,6 @@ loads the elements from a file in the following format:
  */
 void loadFile();
 
-/* 
-    queries for the element with maximum value
-*/
-void query();
 
-/*
-    changes the speed of the i-th element
-*/
-void change(int j, Vector v);
-
-/*
-    inserts element with speed v and current value xt
-*/
-void insert(Coordinate xt, Vector v);
-
-/*
-    deletes element with id i
-*/
-void delete(int i);
-
-/*
-    returns the next event time
-*/
-double nextEvent();
-
-/* initializes things */
-void init(int m);
-
-void initialInsert(Point * p);
 
 #endif

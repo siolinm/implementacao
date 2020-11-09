@@ -20,13 +20,13 @@ void initCandsHits(int dir){
         up = querySuccessorCands(maximaRoot, p, DOWN, dir);
 
         /* inserts up(p) in HitsUp(p) */
-        insertHits(p->hitsUpRoot[dir], up->key, dir, 1);
+        if(up) insertHits(p->hitsUpRoot[dir], up->key, dir, 1);
         /* inserts low(p) in HitsLow(p) */
-        insertHits(p->hitsLowRoot[dir], low->key, dir, 0);
+        if(low) insertHits(p->hitsLowRoot[dir], low->key, dir, 0);
         /* stores Cands(p) */
         p->candsRoot[dir]->parent = extractCands(maximaRoot, low, up, dir);
         insertCands(maximaRoot, p, dir);
     }
 
-    freeAllCands(maximaRoot);
+    freeAllCands(maximaRoot);    
 }

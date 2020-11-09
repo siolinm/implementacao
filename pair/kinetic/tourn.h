@@ -8,9 +8,9 @@ int tournMaxSize;
 int tournElem;
 
 /*
-    Initializes the tourn
+    Builds the tourn
 */
-void initTourn();
+void buildTourn();
 
 /*
     inserts obj in tourn and updates all needed certificates
@@ -26,6 +26,12 @@ int compareTourn(int i, int j);
 
 void resizeTourn();
 
+void initCertTourn(int dir);
 
+double expireTourn(TournObject * a, TournObject * b);
+
+void newCertTourn(TournObject * obj);
+
+void updateTournCert(TournObject * a);
 
 #endif

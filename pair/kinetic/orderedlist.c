@@ -12,43 +12,100 @@ void listInit(){
     int i;
 
     for(i = 0; i < 3; i++)
-        listRoot[i] = NULL;
-    
+        listRoot[i] = NULL;    
 }
 
-void listInsert(Point * a, int dir){
-    PQObject * obj = malloc(sizeof(*obj));
-    int i = certType(dir);
-    obj->p = a;
-    obj->certType = i;
-    listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);    
+void listInsert(Point * a, int dir){    
+
+    listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);
+
     newCertList(a, dir);
     updateListCert(a->next[dir], dir);
 }
 
 void listDelete(Point * a, int dir){
-    int i = certType(dir);
-    PQObject * aux = Q[a->cert[i]->pqpos];
     Point * next;
+    int i;
+
+    i = certType(dir);    
     next = a->next[dir];
+
     listRoot[dir] = deleteAVLNode(listRoot[dir], a, dir);
-    deletePQ(aux);
+    
+    deletePQ(a, i);
     updateListCert(next, dir);
 }
 
-/* OK */
+void listSwap(Point * p, Point * q, int dir){
+    /* swap list nodes */
+    AVLNode * aux;
+    aux = p->listPosition[dir];
+    p->listPosition[dir] = q->listPosition[dir];
+    p->listPosition[dir]->key = p;
+    q->listPosition[dir] = aux;
+    q->listPosition[dir]->key = q;
+
+    /* swap linked list positions */
+    p->prev[dir] = q->prev[dir];
+    if(p->prev[dir])
+        p->prev[dir]->next[dir] = p;
+
+    q->next[dir] = p->next[dir];
+    if(q->next[dir])
+        q->next[dir]->prev[dir] = q;
+
+    p->next[dir] = q;
+    q->prev[dir] = p;
+
+}
+
+double expireList(Point *a, Point * b, int dir){
+    double aspeed, bspeed;
+    if(b == NULL)
+        return INFINITE;
+
+    aspeed = getVx(a, dir); 
+    bspeed = getVx(b, dir);
+
+    if(aspeed - bspeed >= 0)
+        return INFINITE;
+
+    return (getX0(a, dir) - getX0(b, dir))/(bspeed - aspeed);
+}
+
+void newCertList(Point *p, int dir){
+    Cert *cert;    
+
+    if(p == NULL) return;
+
+    cert = malloc(sizeof(*cert));
+
+    p->cert[dir] = cert;
+    p->cert[dir]->value = expireList(p, p->prev[dir], dir);
+
+    insertPQ(p, certType(dir));
+}
+
+void updateListCert(Point * p, int dir){    
+    int type;
+
+    if(p == NULL) return;
+
+    type = certType(dir);    
+    
+    updatePQ(p, type, expireList(p, p->prev[dir], dir));
+}
+
 int height(AVLNode *a)
 {
     return (a ? a->height : -1);
 }
 
-/* OK */
 void setHeight(AVLNode *a)
 {
     a->height = max(height(a->left), height(a->right)) + 1;
 }
 
-/* OK */
 AVLNode *newAVLNode(Object *key, int dir)
 {
     AVLNode *new = (AVLNode *)malloc(sizeof(AVLNode));
@@ -63,7 +120,6 @@ AVLNode *newAVLNode(Object *key, int dir)
     return new;
 }
 
-/* OK */
 AVLNode *rotateRight(AVLNode *no)
 {
     AVLNode *leftChild, *aux;
@@ -84,7 +140,6 @@ AVLNode *rotateRight(AVLNode *no)
     return leftChild;
 }
 
-/* OK */
 AVLNode *rotateLeft(AVLNode *no)
 {
     AVLNode *rightChild, *aux;
@@ -105,7 +160,6 @@ AVLNode *rotateLeft(AVLNode *no)
     return rightChild;
 }
 
-/* OK */
 int getBalance(AVLNode *no)
 {
     return (no ? (height(no->left) - height(no->right)) : 0);
@@ -116,7 +170,6 @@ int AVLCompare(Object * a, Object * b, int dir){
     return getX(a, dir) < getX(b, dir);
 }
 
-/* OK */
 AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
 {
     int a;
@@ -172,7 +225,6 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
     return r;
 }
 
-/* OK */
 AVLNode *leftmost(AVLNode *r)
 {
     while (r->left)
@@ -181,7 +233,6 @@ AVLNode *leftmost(AVLNode *r)
     return r;
 }
 
-/* OK */
 AVLNode *deleteAVLNode(AVLNode *r, Object *key, int dir)
 {
     AVLNode *aux;
@@ -257,6 +308,7 @@ Object * query_kth(AVLNode *r, int i){
     return query_kth(r->right, i);
 }
 
+/*
 void print(char * prefix, int size, AVLNode * r, int b){
 	int i;
     char * newprefix;
@@ -273,7 +325,7 @@ void print(char * prefix, int size, AVLNode * r, int b){
             printf("├──"); 
         else 
             printf("└──" );
-        /* printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key)); */
+        printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));
 		
         newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
@@ -292,6 +344,7 @@ void print(char * prefix, int size, AVLNode * r, int b){
     if(!b)
         free(prefix);
 }
+*/
 /*
 void printL(){
     AVLNode * aux;

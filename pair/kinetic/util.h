@@ -4,7 +4,6 @@
 #define _UTIL_H
 #define INFINITE 100000000
 
-
 #define PI_3 acos(0.5)
 
 #define COS_PI_3 cos(PI_3)
@@ -90,7 +89,7 @@ typedef struct CandsNode
     struct CandsNode * left;
     struct CandsNode * right;
     struct CandsNode * parent;
-    struct Point * key;    
+    struct Point * key;
     /* points to the leftmost point in the node subtrees */
     struct CandsNode * leftmost;
 } CandsNode;
