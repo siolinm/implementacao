@@ -34,6 +34,12 @@ enum Cert_types{
     TOURN_CERT
 };
 
+enum Splay_types{
+    CANDS_TREE = 0,
+    HITS_UP_TREE,
+    HITS_LOW_TREE
+};
+
 typedef struct Coordinate
 {
     double x;
@@ -54,8 +60,8 @@ typedef struct Cert{
 
 typedef struct Point{
     int id;
-    struct Coordinate x0;
-    struct Vector speed;
+    Coordinate x0;
+    Vector speed;
     /* root of cands tree of the point */
     struct CandsNode * candsRoot[3];
     /* node where the point is in a cands tree */
@@ -69,7 +75,7 @@ typedef struct Point{
     struct AVLNode * listPosition[3];
     struct Point * prev[3];
     struct Point * next[3];
-    struct Cert * cert[6];
+    Cert * cert[6];
     int lastMatch[3];
 } Point;
 
@@ -89,7 +95,7 @@ typedef struct CandsNode
     struct CandsNode * left;
     struct CandsNode * right;
     struct CandsNode * parent;
-    struct Point * key;
+    Point * key;
     /* points to the leftmost point in the node subtrees */
     struct CandsNode * leftmost;
 } CandsNode;

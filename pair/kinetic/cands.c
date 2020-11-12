@@ -30,7 +30,7 @@ CandsNode * initCands(Item * p, int dir){
     new->left = new->right = NULL;
     new->parent = NULL;
     new->key = p;
-    new->leftmost = NULL;    
+    new->leftmost = new;    
 
     return new;
 }
@@ -176,8 +176,10 @@ CandsNode * extractCands(CandsNode * root, CandsNode *low, CandsNode * up, int d
 void joinCands(CandsNode * root, CandsNode * joinRoot, int dir){
     CandsNode * aux = root->parent;
     if(joinRoot == NULL) return;
+
     root->parent = NULL;
     aux->parent = NULL;
+    
     if(compareCands(aux->key, joinRoot->key, dir)){
         while(aux->left)
             aux = aux->left;
