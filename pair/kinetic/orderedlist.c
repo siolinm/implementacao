@@ -56,7 +56,6 @@ void listSwap(Point * p, Point * q, int dir){
 
     p->next[dir] = q;
     q->prev[dir] = p;
-
 }
 
 double expireList(Point *a, Point * b, int dir){
@@ -184,14 +183,14 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
         r->right = insertAVLNode(r->right, key, dir);
     }
 
-    if(key->prev == NULL && !AVLCompare(key, r->key, dir)){
+    if(key->prev[dir] == NULL && !AVLCompare(key, r->key, dir)){
         key->prev[dir] = r->key;
         key->next[dir] = r->key->next[dir];
         if(key->next[dir])
             key->next[dir]->prev[dir] = key;
         r->key->next[dir] = key; 
     }
-    else if(key->next == NULL && AVLCompare(key, r->key, dir)){
+    else if(key->next[dir] == NULL && AVLCompare(key, r->key, dir)){
         key->next[dir] = r->key;
         key->prev[dir] = r->key->prev[dir];
         if(key->prev[dir])

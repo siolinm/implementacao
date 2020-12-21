@@ -1,4 +1,5 @@
 #include"maxima.h"
+#include"debug.h"
 
 void initMaxima(int dir){
     maximaRoot = malloc(sizeof(*maximaRoot));
@@ -10,23 +11,52 @@ void initMaxima(int dir){
 
 void initCandsHits(int dir){
     int i;
-    CandsNode * up, * low;
+    CandsNode * up, * low, *aux;
     Point * p;
+    
     initMaxima(dir);
     heapsort(initial, dir);
-    for(i = n; i >= 1; i--){
+
+    for(i = 1; i <= n; i++){
         p = initial[i];
-        low = queryPredecessorCands(maximaRoot, p, UP, dir);
-        up = querySuccessorCands(maximaRoot, p, DOWN, dir);
+        db(
+            printf("MAXIMA -- point %d\n", p->id); 
+            printS(maximaRoot, CANDS_TREE);
+        );
+        low = predecessorS(maximaRoot, p, CANDS_TREE, dir, UP);         
+        up = predecessorS(maximaRoot, p, CANDS_TREE, dir, DOWN); 
 
         /* inserts up(p) in HitsUp(p) */
-        if(up) insertHits(p->hitsUpRoot[dir], up->key, dir, 1);
+        db(if(up){
+            printf("Inserting %d in Hits_up(%d)\n", p->id, up->key->id);
+        });
+        if(up) insertS(up->key->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
         /* inserts low(p) in HitsLow(p) */
-        if(low) insertHits(p->hitsLowRoot[dir], low->key, dir, 0);
+        db(if(low){
+            printf("Inserting %d in Hits_low(%d)\n", p->id, low->key->id);
+        });
+        if(low) insertS(low->key->hitsLowRoot[dir], p, HITS_LOW_TREE, dir);
         /* stores Cands(p) */
-        p->candsRoot[dir]->parent = extractCands(maximaRoot, low, up, dir);
-        insertCands(maximaRoot, p, dir);
+        aux = (CandsNode *)extractS(maximaRoot, low, up, CANDS_TREE, dir);
+        db(
+            printf("Cands(%d) = \n", p->id);
+            printSR(aux, NULL, CANDS_TREE, 1, 0);
+        );
+        attach(p->candsRoot[dir], aux, CANDS_TREE, dir);
+        db(
+            printf("Inserting %d in MAXIMA\n", p->id);
+        );
+        insertS(maximaRoot, p, CANDS_TREE, dir);
+        /*
+            p->lcand[dir] = getLcand(p);
+            insertTourn(p, dir);
+        */
     }
+    db(
+        for(i = 1; i <= n; i++){            
+            printPoint(initial[i], dir);        
+        }
+    );
 
-    freeAllCands(maximaRoot);    
+    freeAllS(maximaRoot, CANDS_TREE);    
 }

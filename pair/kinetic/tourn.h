@@ -15,18 +15,18 @@ void buildTourn();
 /*
     inserts obj in tourn and updates all needed certificates
 */
-void insertTourn(TournObject * obj, int dir);
+void insertTourn(Point *p, int dir);
 
 /*
     deletes obj of tourn
 */
-void deleteTourn(TournObject * obj);
+void deleteTourn(Point *p, int dir);
 
 int compareTourn(int i, int j);
 
 void resizeTourn();
 
-void initCertTourn(int dir);
+void initCertTourn();
 
 double expireTourn(TournObject * a, TournObject * b);
 

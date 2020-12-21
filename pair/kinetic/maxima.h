@@ -1,7 +1,6 @@
 #include"util.h"
 #include"heapsort.h"
-#include"cands.h"
-#include"hits.h"
+#include"splay_tree.h"
 
 #ifndef _MAXIMA_H
 #define _MAXIMA_H

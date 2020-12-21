@@ -1,4 +1,5 @@
 #include"util.h"
+#include<stdio.h>
 #ifndef _SPLAY_H
 #define _SPLAY_H
 
@@ -69,5 +70,9 @@ void * getLeftmostS(void * x, int type);
 Point * getKeyS(void * x, int type);
 
 void updateLeftmost(void * x, int dir);
+
+void printS(void * root, int type);
+
+void printSR(void * root, char * prefix, int type, int size, int b);
 
 #endif

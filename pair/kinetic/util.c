@@ -1,11 +1,26 @@
 #include "util.h"
+#include"splay_tree.h"
 
 double getX(Point * p, int direction){
-    return getX0(p, direction) + now*getVx(p, direction);
+    double ret = 1;
+    
+    if(direction < 0){
+        direction = -direction;
+        ret = -ret;
+    }
+
+    return ret*(getX0(p, direction) + now*getVx(p, direction));
 }
 
 double getY(Point * p, int direction){
-    return getY0(p, direction) + now*getVy(p, direction);
+    double ret = 1;
+    
+    if(direction < 0){
+        direction = -direction;
+        ret = -ret;
+    }
+
+    return ret*(getY0(p, direction) + now*getVy(p, direction));
 }
 
 double getX0(Point * p, int direction){
@@ -92,6 +107,43 @@ int checkLine(Point * a, Point * c, double theta, int dir){
         x = 0;
 
     return (int)x;
+}
+
+void printPoint(Point * p, int dir){
+    Point * hlow, *hup, *cand;
+    printf("Direction: ");
+    if(dir == HORIZONTAL)
+        printf("HORIZONTAL");
+    else if(dir == UP)
+        printf("UP");
+    else
+        printf("DOWN");
+    
+    printf("\n");
+    printf("Point: %c\n", p->name);
+    printf("x0: (%g, %g), speed: (%g, %g)\n", p->x0.x, p->x0.y, p->speed.x, p->speed.y);
+    printf("Current position: (%g, %g)\n", getX(p, dir), getY(p, dir));
+    
+    cand = ownerS(p->cands[dir], CANDS_TREE, dir);
+    if(cand)
+        printf("%c is in Cands(%c)\n", p->name, cand->name);
+    hup = ownerS(p->hitsUp[dir], HITS_UP_TREE, dir);
+    if(hup)
+        printf("%c is in Hits_up(%c)\n", p->name, hup->name);
+    hlow = ownerS(p->hitsLow[dir], HITS_LOW_TREE, dir);
+    if(hlow)
+        printf("%c is in Hits_low(%c)\n", p->name, hlow->name);
+        
+    printf("Cands(%c) = \n", p->name);
+    printS(p->candsRoot[dir], CANDS_TREE);
+    printf("Hits_up(%c) = \n", p->name);
+    printS(p->hitsUpRoot[dir], HITS_UP_TREE);
+    printf("Hits_low(%c) = \n", p->name);
+    printS(p->hitsLowRoot[dir], HITS_LOW_TREE);
+    if(p->next[dir])
+        printf("Next: %c\n", p->next[dir]->name);
+    if(p->prev[dir])
+        printf("Prev: %c\n", p->prev[dir]->name);
 }
 
 void destroy(){

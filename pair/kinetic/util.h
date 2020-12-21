@@ -59,9 +59,11 @@ typedef struct Cert{
 } Cert;
 
 typedef struct Point{
+    char name; /* point's name */
     int id;
     Coordinate x0;
     Vector speed;
+    struct Point * lcand[3];
     /* root of cands tree of the point */
     struct CandsNode * candsRoot[3];
     /* node where the point is in a cands tree */
@@ -169,6 +171,10 @@ int certType(int direction);
     0 if point c is in that line and -1 if point c is to the right of that line
 */
 int checkLine(Point * a, Point * c, double theta, int dir);
+
+Point * getLcand(Point * p);
+
+void printPoint(Point * p, int dir);
 
 void destroy();
 

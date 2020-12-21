@@ -2,10 +2,8 @@
 #include"tourn.h"
 #include"event.h"
 #include"pq.h"
-#include"hits.h"
 #include"orderedlist.h"
 #include"maxima.h"
-#include"cands.h"
 #ifndef _KDS_H
 #define _KDS_H
 
@@ -47,7 +45,7 @@ void buildKDS();
 /*
     Initializes data for a point
 */
-void initializePoint(Point * p);
+void sendPoint(Point * p);
 
 /*
     returns the next event time

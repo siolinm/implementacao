@@ -1,7 +1,8 @@
 #include"splay_tree.h"
+#include"debug.h"
 
 void insertS(void * root, Point * a, int type, int dir){
-    void * new;    
+    void * new;
 
     new = createNodeS(a, type, dir);    
         
@@ -18,44 +19,44 @@ void deleteS(void * root, Point * a, int type, int dir){
     attach(root, parent, type, dir);
 }
 
-void splay(void * x, int type, int dir){    
+void splay(void * x, int type, int dir){
+    void * parent, *grandp;
+    
     while(x && getParentS(x, type)){
         /*
             l or r case
         */
-        if(!getParentS(getParentS(x, type), type)){
-            if(getLeftS(getParentS(x, type), type) == x)
-                rotateRightS(getParentS(x, type), type, dir);
+        parent = getParentS(x, type);
+        grandp = getParentS(parent, type);
+        if(!grandp){
+            if(getLeftS(parent, type) == x)
+                rotateRightS(parent, type, dir);
             else
-                rotateLeftS(getParentS(x, type), type, dir);
+                rotateLeftS(parent, type, dir);
         }
         else{
-            if(getLeftS(getParentS(x, type), type) == x){
+            if(getLeftS(parent, type) == x){
                 /* rr case*/
-                if(getLeftS(getParentS(getParentS(x, type), type), type) 
-                == getParentS(x, type)){
-                    rotateRightS(getParentS(getParentS(x, type), type), type, 
-                    dir);
-                    rotateRightS(getParentS(x, type), type, dir);
+                if(getLeftS(grandp, type) == parent){
+                    rotateRightS(grandp, type, dir);
+                    rotateRightS(parent, type, dir);
                 }
                 else{
                     /* rl case */
-                    rotateRightS(getParentS(x, type), type, dir);
-                    rotateLeftS(getParentS(x, type), type, dir);
+                    rotateRightS(parent, type, dir);
+                    rotateLeftS(parent, type, dir);
                 }
             }
             else{
                 /* lr case */
-                if(getLeftS(getParentS(getParentS(x, type), type), type) 
-                == getParentS(x, type)){
-                    rotateLeftS(getParentS(x, type), type, dir);
-                    rotateRightS(getParentS(x, type), type, dir);
+                if(getLeftS(grandp, type) == parent){
+                    rotateLeftS(parent, type, dir);
+                    rotateRightS(parent, type, dir);
                 }
                 else{
                     /* ll case */
-                    rotateLeftS(getParentS(getParentS(x, type), type), type, 
-                    dir);
-                    rotateLeftS(getParentS(x, type), type, dir);
+                    rotateLeftS(grandp, type, dir);
+                    rotateLeftS(parent, type, dir);
                 }
             }
         }
@@ -63,24 +64,47 @@ void splay(void * x, int type, int dir){
 }
 
 void * splitL(void *root, int type, int dir){
+    void * left;
     splay(root, type, dir);
-    return detach(getLeftS(root, type), type, dir);
+
+    left = getLeftS(root, type);
+
+    if(left){
+        setLeftS(root, NULL, type);
+        setParentS(left, NULL, type);
+    }
+
+    return left;
 }
 
 void * splitR(void * root, int type, int dir){
+    void * right;
     splay(root, type, dir);
-    return detach(getRightS(root, type), type, dir);
+
+    right = getRightS(root, type);
+
+    if(right){
+        setRightS(root, NULL, type);
+        setParentS(right, NULL, type);
+    }
+    
+    return right;
 }
 
 /* S < T */
 void * joinS(void * rootS, void * rootT, int type, int dir){
     void * aux = rootS;
+
+    if(aux == NULL)
+        return rootT;
     
-    while(getLeftS(aux, type) != NULL){
-        aux = getLeftS(aux, type);
+    while(getRightS(aux, type) != NULL){
+        aux = getRightS(aux, type);
     }
 
     splay(aux, type, dir);
+
+    /* TODO: if type == CANDS_TREE call update leftmost */
 
     setRightS(aux, rootT, type);
     setParentS(rootT, aux, type);
@@ -88,28 +112,31 @@ void * joinS(void * rootS, void * rootT, int type, int dir){
     return aux;
 }
 
-void * successorS(void * root, Item * p, int type, int dir, int order){
-    double angle = 0;
-    void *up, *y, *x;
-    up = y = NULL;
+void * successorS(void * root, Item * p, int type, int dir, int order){    
+    void *suc, *y, *x;
+    int where = 1;
+    suc = y = NULL;
     x = getParentS(root, type);
 
-    if(order == UP){
-        angle -= PI_3/2;
-    }
-    else if(order == DOWN){
-        angle += PI_3/2;
+    if(type == CANDS_TREE && order == DOWN){
+        where = 0;
     }
     
     while(x != NULL){
         y = x;
-
-        if(checkLine(p, getKeyS(x, type), angle, dir) == -1){
-            x = getRightS(x, type);
+        /* rounding errors */
+        if(getX(getKeyS(x, type), order) < getX(p, order)) {
+            if(where)
+                x = getRightS(x, type);            
+            else
+                x = getLeftS(x, type);
         }
         else{
-            up = x;
-            x = getLeftS(x, type);
+            suc = x;
+            if(where)
+                x = getLeftS(x, type);            
+            else
+                x = getRightS(x, type);
         }
     }
 
@@ -119,31 +146,34 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         attach(root, y, type, dir);        
     }
 
-    return up;
+    return suc;
 }
 
-void * predecessorS(void * root, Item * p, int type, int dir, int order){
-    double angle = 0;
-    void *low, *y, *x;
-    low = y = NULL;
+void * predecessorS(void * root, Item * p, int type, int dir, int order){    
+    void *pred, *y, *x;
+    int where = 1;
+    pred = y = NULL;
     x = getParentS(root, type);
-
-    if(order == UP){
-        angle -= PI_3/2;
-    }
-    else if(order == DOWN){
-        angle += PI_3/2;
-    }
     
+    if(type == CANDS_TREE && order == DOWN){
+        where = 0;
+    }
+
     while(x != NULL){
         y = x;
-
-        if(checkLine(p, getKeyS(x, type), angle, dir) <= 0){
-            x = getLeftS(x, type);
+        /* rounding errors */
+        if(getX(getKeyS(x, type), order) >= getX(p, order)) {
+            if(where)
+                x = getLeftS(x, type);            
+            else
+                x = getRightS(x, type);            
         }
         else{
-            low = x;            
-            x = getRightS(x, type);
+            pred = x;
+            if(where)
+                x = getRightS(x, type);            
+            else
+                x = getLeftS(x, type);
         }
     }
 
@@ -153,7 +183,7 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
         attach(root, y, type, dir);      
     }
 
-    return low;
+    return pred;
 }
 
 Point * ownerS(void * root, int type, int dir){
@@ -164,6 +194,7 @@ Point * ownerS(void * root, int type, int dir){
     }
 
     if(aux){
+        aux = getParentS(aux, type);
         detach(aux, type, dir);
         splay(root, type, dir);
         attach(aux, root, type, dir);
@@ -178,6 +209,7 @@ Point * ownerS(void * root, int type, int dir){
 
 void updateLeftmost(void * x, int dir){
     void * a, * b, *c, * left, * right;
+    a = b = c = NULL;
     left = getLeftS(x, CANDS_TREE);
     right = getRightS(x, CANDS_TREE);
     if(left)
@@ -319,18 +351,19 @@ void * createNodeS(Point * key, int type, int dir){
 }
 
 void * insertSR(void * root, void * node, int type, int dir){    
+    void * sub;
     if(!root)
-        return node;
+        return node;    
 
-    if(compareS(root, node, type, dir)){
-        setLeftS(root, insertSR(getLeftS(root, type), 
-        node, type, dir), type);
-        setParentS(getLeftS(root, type), root, type);        
+    if(compareS(getKeyS(root, type), getKeyS(node, type), type, dir)){
+        sub = insertSR(getLeftS(root, type), node, type, dir);
+        setLeftS(root, sub, type);
+        setParentS(sub, root, type);        
     }
     else{
-        setLeftS(root, insertSR(getLeftS(root, type), 
-        node, type, dir), type);
-        setParentS(getLeftS(root, type), root, type);
+        sub = insertSR(getRightS(root, type), node, type, dir);
+        setRightS(root, sub, type);
+        setParentS(sub, root, type);
     }
 
     if(type == CANDS_TREE)
@@ -341,29 +374,34 @@ void * insertSR(void * root, void * node, int type, int dir){
 
 void * extractS(void * root, void * low, void * up, int type, int dir){
     void * r = NULL;
-
+    db(
+        printf("extractS:: before extract\n");
+        printS(root, type);
+    );
     r = detach(root, type, dir);
     if(low != NULL){
         splay(low, type, dir);
-        attach(root, low, type, dir);
 
         r = splitR(low, type, dir);
         
         if(type == CANDS_TREE)
             updateLeftmost(low, dir);
+        if(!up)
+            attach(root, low, type, dir);
     }
 
     if(up != NULL){
         splay(up, type, dir);
-        attach(root, up, type, dir);
 
         r = splitL(up, type, dir);
 
         if(type == CANDS_TREE)
             updateLeftmost(up, dir);
+        attach(root, up, type, dir);
     }
 
     if(up != NULL && low != NULL){
+        detach(root, type, dir);
         attach(root, joinS(low, up, type, dir), type, dir);
 
         if(type == CANDS_TREE)
@@ -371,9 +409,13 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
         
     }
 
+    db(
+        printf("extractS:: after extract\n");
+        printS(root, type);
+    );
+
     return r;
 }
-
 
 void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
     void * aux = root;
@@ -439,10 +481,10 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
 
 int compareS(Point * a, Point * b, int type, int dir){
     if(type == CANDS_TREE){
-        return getY(a, dir) < getY(b, dir);
+        return getY(a, dir) >= getY(b, dir);
     }
     
-    return getX(a, dir) < getX(b, dir);    
+    return getX(a, dir) >= getX(b, dir);    
 }
 
 void swapS(void * roota, void * rootb, int type, int dir){
@@ -478,7 +520,11 @@ void swapS(void * roota, void * rootb, int type, int dir){
 }
 
 void * detach(void * root, int type, int dir){
-    void * aux = getParentS(root, type);
+    void * aux;
+
+    if(!root) return root;
+
+    aux = getParentS(root, type);
     if(aux)
         setParentS(aux, NULL, type);
     setParentS(root, NULL, type);
@@ -486,8 +532,8 @@ void * detach(void * root, int type, int dir){
 }
 
 void attach(void * roota, void * rootb, int type, int dir){
-    setParentS(roota, rootb, type);
-    setParentS(rootb, roota, type);
+    setParentS(roota, rootb, type);    
+    if(rootb) setParentS(rootb, roota, type);
 }
 
 void freeAllS(void * root, int type){
@@ -575,4 +621,57 @@ Point * getKeyS(void * x, int type){
 
 void * getLeftmostS(void * x, int type){
     return (void *)((CandsNode * )x)->leftmost;
+}
+
+void printS(void * root, int type){
+    printSR(getParentS(root, type), NULL, type, 1, 0);
+}
+
+void printSR(void * root, char * prefix, int type, int size, int b){
+    int i;
+    char * newprefix;
+    Point * key;
+    if(prefix == NULL){
+        prefix = malloc(sizeof(*prefix));
+        prefix[0] = '\0';
+    }
+    if(root != NULL)
+    {
+        for(i = 0; prefix[i] != '\0'; i++)
+            printf("%c", prefix[i]);
+
+        if(b) 
+            printf("├──"); 
+        else 
+            printf("└──");
+        key = getKeyS(root, type);
+        printf("%c: (%g, %g) + t*(%g, %g)", key->name, key->x0.x, key->x0.y, key->speed.x, key->speed.y);
+
+        if(type == CANDS_TREE){
+            printf(", leftmost: %c", ((CandsNode *)getLeftmostS(root, type))->key->name);
+        }
+        printf("\n");
+
+        newprefix = malloc((size + 4)*sizeof(*newprefix));
+        for(i = 0; i < size; i++)
+            newprefix[i] = prefix[i];
+        if(b)
+            newprefix[size - 1] = '|';
+        else
+            newprefix[size - 1] = ' ';
+        for(i = size; i < size + 4; i++)
+            newprefix[i] = ' ';        
+        newprefix[size + 3] = '\0';
+		printSR(getLeftS(root, type), newprefix, type, size + 4, 1);
+        printSR(getRightS(root, type), newprefix, type, size + 4, 0);        
+    }
+    else{
+        printf("%s", prefix);
+        if(b) 
+            printf("├── NULL\n"); 
+        else 
+            printf("└── NULL\n");
+    }
+    if(!b)
+        free(prefix);
 }

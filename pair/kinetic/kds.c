@@ -1,31 +1,35 @@
 #include "kds.h"
 
-void initializePoint(Point * p){
+void sendPoint(Point * p){
     int i;
     initial[lastID++] = p;
 
     p->id = lastID - 1;
     
-    for(i = 0; i < 3; i++){
+    for(i = 0; i < 3; i++){        
         p->cands[i] = NULL;
-        p->candsRoot[i] = initCands(p, i);
         p->hitsLow[i] = NULL;
         p->hitsUp[i] = NULL;
-        p->hitsLowRoot[i] = initHits(p, i);
-        p->hitsUpRoot[i] = initHits(p, i);
+
+        initS(p, CANDS_TREE, i);  
+        initS(p, HITS_LOW_TREE, i);
+        initS(p, HITS_UP_TREE, i);
+
         p->lastMatch[i] = -1;
+        /* */
         p->listPosition[i] = NULL;
         p->next[i] = NULL;
         p->prev[i] = NULL;
         listInsert(p, i);
-    }
-    
+    }    
 }
 
 void initKDS(){
+    initial = malloc((n + 1)*sizeof(*initial));
     lastID = 0;
     now = 0;
     listInit();
+    initPQ();
 }
 
 void buildKDS(){
@@ -33,7 +37,9 @@ void buildKDS(){
     initial[0] = NULL;
     initMaxima(HORIZONTAL);
     initCandsHits(HORIZONTAL);
-    initCertTourn(HORIZONTAL);
+    /* initCertTourn() */
+    /* buildTourn() */
+    free(initial);
 }
 
 double nextEvent(){

@@ -52,8 +52,12 @@ void resizeTourn(){
     tournMaxSize = 2*tournMaxSize;
 }
 
-void insertTourn(TournObject * obj, int dir){
+void insertTourn(Point * p, int dir){
     int i, k;
+    TournObject * obj;
+    obj = malloc(sizeof(*obj));
+    obj->p = p;
+    obj->lcandp = p->lcand[dir];
     obj->direction = dir;
 
     if(2*tournElem + 1 == tournMaxSize)
@@ -81,10 +85,9 @@ void insertTourn(TournObject * obj, int dir){
     tourn[i]->p->lastMatch[dir] = i;    
 }
 
-void deleteTourn(TournObject * obj){
-    int k, j, i, dir;
-    dir = obj->direction;
-    i = obj->p->lastMatch[dir];
+void deleteTourn(Point * p, int dir){
+    int k, j, i;
+    i = p->lastMatch[dir];
 
     /*
         Looks for the "first match" that obj played
@@ -151,7 +154,7 @@ void deleteTourn(TournObject * obj){
     updateTournCert(tourn[j]);
 }
 
-void initCertTourn(int dir){
+void initCertTourn(){
     int i;
     TournObject * a;    
     /* initializes tourn certificates */
@@ -162,6 +165,8 @@ void initCertTourn(int dir){
     }
 }
 
+
+/* TODO: rewrite this */
 /* 
  * assuming d(a, lcand(a)) <= d(b, lcand(b)) 
  * 
@@ -291,7 +296,7 @@ void newCertTourn(TournObject * obj){
     }
     else{
         newCert->value = expireTourn(tourn[i/2], tourn[i]);
-    }    
+    }
 
     insertPQ(obj->p, TOURN_CERT + dir);
 }
