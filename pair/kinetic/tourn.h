@@ -7,6 +7,16 @@ int tournMaxSize;
 
 int tournElem;
 
+void initTourn(int cap);
+
+void sendTourn(Point * p, int dir);
+
+void updateTourn(Point * p, int dir);
+
+void printTourn();
+
+void printT(char * prefix, int size, int j, int b);
+
 /*
     Builds the tourn
 */

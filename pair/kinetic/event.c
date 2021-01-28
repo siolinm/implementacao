@@ -16,6 +16,7 @@ void tournEvent(){
     while(j > 1 && compareTourn(j, k)){
         tourn[j/2] = tourn[j];
         k = 2*(j/2) + !(j % 2);
+        dir = tourn[k]->direction;
         tourn[k]->p->lastMatch[dir] = k;
         updateTournCert(tourn[k]);
         
@@ -23,13 +24,17 @@ void tournEvent(){
         k = 2*(j/2) + !(j % 2);
     }
     
+    dir = tourn[j]->direction;
     tourn[j]->p->lastMatch[dir] = j;
     updateTournCert(tourn[j]);
+    db(
+        printTourn();
+    );
 }
 
 void listEvent(){
     PQObject * aux = minPQ();
-    Point * p, * q;    
+    Point * p, * q;
     int dir, eventType;
     p = aux->p;
 
@@ -52,6 +57,8 @@ void listEvent(){
         }
 
         horizontalEvent(p, q, HORIZONTAL);
+        /* downEvent(p, q, UP); */
+        /* upEvent(q, p, DOWN); */
     }
     else if(eventType == UP){
         /* p must be to the left of q */
@@ -61,6 +68,8 @@ void listEvent(){
         }
 
         upEvent(p, q, HORIZONTAL);
+        /* horizontalEvent(q, p, UP); */
+        /* downEvent(p, q, DOWN) */
     }
     else if(eventType == DOWN){
         if(getX(p, HORIZONTAL) > getX(q, HORIZONTAL)){
@@ -69,6 +78,8 @@ void listEvent(){
         }
 
         downEvent(p, q, HORIZONTAL);
+        /* upEvent(p, q, UP); */
+        /* horizontalEvent(q, p, DOWN); */
     }
 
     dir = eventType;
@@ -88,9 +99,10 @@ void listEvent(){
 void horizontalEvent(Point * p, Point * q, int dir){
     Point * t, *w;
     CandsNode * up, *newCands, *low;
+    int change;
     if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */
         t = NULL;
-        up = (CandsNode *)predecessorS(q->candsRoot[dir], p, CANDS_TREE, dir, DOWN);
+        up = (CandsNode *)predecessorS(q->candsRoot[dir], p, CANDS_TREE, dir, UP);
         if(up != NULL)
             t = up->key;
         else
@@ -100,6 +112,8 @@ void horizontalEvent(Point * p, Point * q, int dir){
         newCands = joinS(detach(p->candsRoot[dir], CANDS_TREE, dir), newCands, CANDS_TREE, dir);
         attach(p->candsRoot[dir], newCands, CANDS_TREE, dir);
         /* check if some lcand changed */
+        change = updateLcand(p, dir);
+        if(change) updateTourn(p, dir);
         /* delete p from HitsUp(q) */
         deleteS(q->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
         /* insert p in HitsUp(t) (if t != NULL)*/
@@ -112,8 +126,8 @@ void horizontalEvent(Point * p, Point * q, int dir){
         insertS(p->hitsLowRoot[dir], q, HITS_LOW_TREE, dir);
     }
     else if(p == ownerS(q->hitsLow[dir], HITS_LOW_TREE, dir)){ /* q is in HitsLow(p) */
-        /* searching for low(q) in Cands(p) */        
-        low = (CandsNode *)predecessorS(p->candsRoot[dir], p, CANDS_TREE, dir, UP);
+        /* searching for low(q) in Cands(p) */
+        low = (CandsNode *)predecessorS(p->candsRoot[dir], p, CANDS_TREE, dir, DOWN);
         if(low != NULL)
             t = low->key;
         else
@@ -123,7 +137,8 @@ void horizontalEvent(Point * p, Point * q, int dir){
         newCands = joinS(detach(q->candsRoot[dir], CANDS_TREE, dir), newCands, CANDS_TREE, dir);
         attach(q->candsRoot[dir], newCands, CANDS_TREE, dir);
         /* check if some lcand changed */
-
+        change = updateLcand(q, dir);
+        if(change) updateTourn(q, dir);
         deleteS(p->hitsLowRoot[dir], q, HITS_LOW_TREE, dir);
         if(t != NULL)
             insertS(t->hitsLowRoot[dir], q, HITS_LOW_TREE, dir);
@@ -147,14 +162,20 @@ void horizontalEvent(Point * p, Point * q, int dir){
 void upEvent(Point * p, Point * q, int dir){    
     HitsNode * auxh, *newHits;
     Point * v, *t;
+    int change;
     if(q == ownerS(p->hitsLow[dir], HITS_LOW_TREE, dir)){ /* p is in HitsLow(q) */
         v = ownerS(q->cands[dir], CANDS_TREE, dir); /* search for q in Cands(v) */
-        if(v != NULL)
+        if(v != NULL){
             /* check if some lcand changed */
             deleteS(v->candsRoot[dir], q, CANDS_TREE, dir);
+            change = updateLcand(v, dir);
+            if(change) updateTourn(v, dir);
+        }
         
         /* check if some lcand changed */
         insertS(p->candsRoot[dir], q, CANDS_TREE, dir);
+        change = updateLcand(p, dir);
+        if(change) updateTourn(p, dir);
         
         auxh = (HitsNode *)successorS(q->hitsUpRoot[dir], p, HITS_UP_TREE, dir, HORIZONTAL);
         
@@ -181,7 +202,7 @@ void upEvent(Point * p, Point * q, int dir){
             deleteS(t->hitsLowRoot[dir], p, HITS_LOW_TREE, dir);
         insertS(q->hitsLowRoot[dir], p, HITS_LOW_TREE, dir);
 
-        auxh = (HitsNode *)predecessorS(p->hitsUpRoot[dir], q, HITS_UP_TREE, dir, DOWN);
+        auxh = (HitsNode *)predecessorS(p->hitsUpRoot[dir], q, HITS_UP_TREE, dir, UP);
 
         if(auxh != NULL)
             v = auxh->key;
@@ -194,23 +215,41 @@ void upEvent(Point * p, Point * q, int dir){
 
         /* check if some lcand changed */
         deleteS(p->candsRoot[dir], q, CANDS_TREE, dir);
-        if(v != NULL)
+        change = updateLcand(p, dir);
+        if(change) updateTourn(p, dir);
+        if(v != NULL){
             /* check if some lcand changed */
             insertS(v->candsRoot[dir], q, CANDS_TREE, dir);
+            change = updateLcand(v, dir);
+            if(change) updateTourn(v, dir);
+        }
     }
+
+    db(
+        printf("Printing point %c\n", p->name);
+        printPoint(p, dir);
+        printf("Printing point %c\n", q->name);
+        printPoint(q, dir);
+    );
 }
 
 /* -60-order event */
 void downEvent(Point * p, Point * q, int dir){    
     HitsNode * auxh, *newHits;
     Point * v, *t;
+    int change;
     if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */
         v = ownerS(q->cands[dir], CANDS_TREE, dir); /* search for q in Cands(v) */
-        /* check if some lcand changed */
-        if(v != NULL)
+        if(v != NULL){
+            /* check if some lcand changed */
             deleteS(v->candsRoot[dir], q, CANDS_TREE, dir);
+            change = updateLcand(v, dir);
+            if(change) updateTourn(v, dir);
+        }
         /* check if some lcand changed */
         insertS(p->candsRoot[dir], q, CANDS_TREE, dir);
+        change = updateLcand(p, dir);
+        if(change) updateTourn(p, dir);
         
         auxh = (HitsNode *)successorS(q->hitsLowRoot[dir], p, HITS_LOW_TREE, dir, HORIZONTAL);
         
@@ -237,7 +276,7 @@ void downEvent(Point * p, Point * q, int dir){
             deleteS(t->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
         insertS(q->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
 
-        auxh = (HitsNode *)predecessorS(p->hitsLowRoot[dir], q, HITS_LOW_TREE, dir, UP);
+        auxh = (HitsNode *)predecessorS(p->hitsLowRoot[dir], q, HITS_LOW_TREE, dir, DOWN);
 
         if(auxh != NULL)
             v = auxh->key;
@@ -249,9 +288,21 @@ void downEvent(Point * p, Point * q, int dir){
         attach(q->hitsLowRoot[dir], newHits, HITS_LOW_TREE, dir);
 
         deleteS(p->candsRoot[dir], q, CANDS_TREE, dir);
-        if(v != NULL)
+        change = updateLcand(p, dir);
+        if(change) updateTourn(p, dir);
+        if(v != NULL){
             insertS(v->candsRoot[dir], q, CANDS_TREE, dir);
+            change = updateLcand(v, dir);
+            if(change) updateTourn(v, dir);
+        }
     }
+
+    db(
+        printf("Printing point %c\n", p->name);
+        printPoint(p, dir);
+        printf("Printing point %c\n", q->name);
+        printPoint(q, dir);
+    );
 }
 
 /* 
@@ -262,7 +313,7 @@ void event(){
     while(valuePQ(1) == now){
         aux = minPQ();
         if(aux->certType >= TOURN_CERT){
-            /* tournEvent(); */
+            tournEvent();
         }
         else{
             listEvent();

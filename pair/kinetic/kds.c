@@ -10,6 +10,7 @@ void sendPoint(Point * p){
         p->cands[i] = NULL;
         p->hitsLow[i] = NULL;
         p->hitsUp[i] = NULL;
+        p->lcand[i] = NULL;
 
         initS(p, CANDS_TREE, i);  
         initS(p, HITS_LOW_TREE, i);
@@ -21,7 +22,7 @@ void sendPoint(Point * p){
         p->next[i] = NULL;
         p->prev[i] = NULL;
         listInsert(p, i);
-    }    
+    }
 }
 
 void initKDS(){
@@ -30,16 +31,20 @@ void initKDS(){
     now = 0;
     listInit();
     initPQ();
+    initTourn(n);
+    /* initTourn(3*n);*/
 }
 
 void buildKDS(){
+    int i;
     initial[n] = initial[0];
     initial[0] = NULL;
     initMaxima(HORIZONTAL);
     initCandsHits(HORIZONTAL);
-    /* initCertTourn() */
-    /* buildTourn() */
-    free(initial);
+    for(i = 1; i <= n; i++)
+        sendTourn(initial[i], HORIZONTAL);
+    buildTourn();
+    /* free(initial); */
 }
 
 double nextEvent(){
@@ -69,6 +74,12 @@ void delete(int i){
 
 }
 
-void query(){    
+void query(){
+    TournObject * a = tourn[1];
+    char name = (a->lcandp ? a->lcandp->name : '-');
+    printf("Closest pair: %c -- %c: %g\n", a->p->name, name, distance(a->p, a->lcandp, a->direction));
+}
 
+void freeKDS(){
+    free(initial);
 }

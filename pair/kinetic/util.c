@@ -146,6 +146,36 @@ void printPoint(Point * p, int dir){
         printf("Prev: %c\n", p->prev[dir]->name);
 }
 
+int updateLcand(Point * p, int dir){
+    Point * lcand = NULL;
+    int retval = 0;
+    
+    if(p->candsRoot[dir]->parent)
+        /* leftmost can't be NULL */
+        lcand = getKeyS(p->candsRoot[dir]->parent->leftmost, CANDS_TREE);
+    
+    if(p->lcand[dir] != lcand)
+        retval = 1;
+
+    p->lcand[dir] = lcand;
+
+    return retval;
+}
+
+int getDirection(int certType){
+    int retval;
+    if(certType == HORIZONTAL_CERT)
+        retval = HORIZONTAL;
+    else if(certType == UP_CERT)
+        retval = UP;
+    else if(certType == DOWN_CERT)
+        retval = DOWN;
+    else
+        retval = certType - TOURN_CERT;
+    
+    return retval;
+}
+
 void destroy(){
 
 }

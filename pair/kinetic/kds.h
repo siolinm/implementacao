@@ -43,6 +43,11 @@ void initKDS();
 void buildKDS();
 
 /*
+    free the kds
+*/
+void freeKDS();
+
+/*
     Initializes data for a point
 */
 void sendPoint(Point * p);

@@ -176,6 +176,10 @@ Point * getLcand(Point * p);
 
 void printPoint(Point * p, int dir);
 
+int updateLcand(Point * p, int dir);
+
+int getDirection(int certType);
+
 void destroy();
 
 #endif

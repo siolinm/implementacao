@@ -20,37 +20,36 @@ void initCandsHits(int dir){
     for(i = 1; i <= n; i++){
         p = initial[i];
         db(
-            printf("MAXIMA -- point %d\n", p->id); 
+            printf("MAXIMA -- point %c\n", p->name); 
             printS(maximaRoot, CANDS_TREE);
         );
-        low = predecessorS(maximaRoot, p, CANDS_TREE, dir, UP);         
-        up = predecessorS(maximaRoot, p, CANDS_TREE, dir, DOWN); 
+        low = predecessorS(maximaRoot, p, CANDS_TREE, dir, DOWN);         
+        up = predecessorS(maximaRoot, p, CANDS_TREE, dir, UP); 
 
         /* inserts up(p) in HitsUp(p) */
         db(if(up){
-            printf("Inserting %d in Hits_up(%d)\n", p->id, up->key->id);
+            printf("Inserting %c in Hits_up(%c)\n", p->name, up->key->name);
         });
         if(up) insertS(up->key->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
         /* inserts low(p) in HitsLow(p) */
         db(if(low){
-            printf("Inserting %d in Hits_low(%d)\n", p->id, low->key->id);
+            printf("Inserting %c in Hits_low(%c)\n", p->name, low->key->name);
         });
         if(low) insertS(low->key->hitsLowRoot[dir], p, HITS_LOW_TREE, dir);
         /* stores Cands(p) */
         aux = (CandsNode *)extractS(maximaRoot, low, up, CANDS_TREE, dir);
         db(
-            printf("Cands(%d) = \n", p->id);
+            printf("Cands(%c) = \n", p->name);
             printSR(aux, NULL, CANDS_TREE, 1, 0);
         );
         attach(p->candsRoot[dir], aux, CANDS_TREE, dir);
         db(
-            printf("Inserting %d in MAXIMA\n", p->id);
+            printf("Inserting %c in MAXIMA\n", p->name);
         );
         insertS(maximaRoot, p, CANDS_TREE, dir);
-        /*
-            p->lcand[dir] = getLcand(p);
-            insertTourn(p, dir);
-        */
+        
+        updateLcand(p, dir);               
+        
     }
     db(
         for(i = 1; i <= n; i++){            
@@ -58,5 +57,6 @@ void initCandsHits(int dir){
         }
     );
 
-    freeAllS(maximaRoot, CANDS_TREE);    
+    freeAllS(getParentS(maximaRoot, CANDS_TREE), CANDS_TREE);
+    free(maximaRoot);
 }

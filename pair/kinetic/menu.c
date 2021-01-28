@@ -77,6 +77,24 @@ int main(){
         if(opt != 's'){            
             db(
                 printf("Next event: %g\n", nextEvent());
+                j = minPQ()->certType;
+                if(j < TOURN_CERT)
+                    printf("Swap in order: ");
+                else{
+                    printTourn();
+                    printf("Tourn event: ");
+                }
+                
+                if(getDirection(j) == HORIZONTAL){
+                    printf("HORIZONTAL");
+                }
+                else if(getDirection(j) == UP){
+                    printf("UP");
+                }
+                else if(getDirection(j) == DOWN){
+                    printf("DOWN");
+                }
+                printf("\n");
             );
         }
     }
