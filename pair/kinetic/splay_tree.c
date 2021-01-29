@@ -121,27 +121,30 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
     x = getParentS(root, type);
 
     orientation = dir;
-    if(type == CANDS_TREE && order == UP){
-        mirror = 1;
-    }
+    
     if(dir == HORIZONTAL){
+        if(type == CANDS_TREE && order == UP){
+            mirror = 1;
+        }
         if(order == UP)
             orientation = DOWN;
         else if(order == DOWN)
             orientation = UP;   
     }
     else if(dir == UP){
-        /* TODO */
+        if(type == CANDS_TREE)
+            mirror = 1;
+        
         if(order == UP)
             orientation = HORIZONTAL;
         else if(order == DOWN)
-            orientation = 11111;
+            orientation = DOWN;
     }
     else{ /* dir = DOWN */
         if(order == UP)
-            orientation = 11111;
+            orientation = UP;
         else if(order == DOWN)
-            orientation = 11111;
+            orientation = HORIZONTAL;
     }
     
     while(x != NULL){
@@ -179,21 +182,30 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
     x = getParentS(root, type);
     
     orientation = dir;
+    
     if(dir == HORIZONTAL){
-        if(order == UP)
-            orientation = DOWN;
-        else if (order == DOWN)
-            orientation = UP;
-        
         if(type == CANDS_TREE && order == UP){
             mirror = 1;
         }
+        if(order == UP)
+            orientation = DOWN;
+        else if(order == DOWN)
+            orientation = UP;   
     }
     else if(dir == UP){
-
+        if(type == CANDS_TREE)
+            mirror = 1;
+        
+        if(order == UP)
+            orientation = HORIZONTAL;
+        else if(order == DOWN)
+            orientation = DOWN;
     }
     else{ /* dir = DOWN */
-
+        if(order == UP)
+            orientation = UP;
+        else if(order == DOWN)
+            orientation = HORIZONTAL;
     }
 
     while(x != NULL){
