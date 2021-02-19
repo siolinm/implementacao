@@ -5,6 +5,9 @@
 #include"splay_tree.h"
 #include<stdio.h>
 
+#define module(x) (x > 0 ? x : -x)
+#define max(a, b) (a > b ? a : b)
+
 void tournEvent(){
     PQObject * aux = minPQ();
     int dir, j, k;
@@ -12,6 +15,7 @@ void tournEvent(){
 
     j = aux->p->lastMatch[dir];
     k = 2*(j/2) + !(j % 2);
+    db(printf("Tourn event between %d and %d\n", j, k););
     
     while(j > 1 && compareTourn(j, k)){
         tourn[j/2] = tourn[j];
@@ -49,6 +53,8 @@ void listEvent(){
     }
 
     q = p->prev[eventType];
+
+    printf("Event between %c and %c\n", p->name, q->name);
     if(eventType == HORIZONTAL){
         /* q must be above p */
         if(getY(p, HORIZONTAL) > getY(q, HORIZONTAL)){
@@ -57,8 +63,8 @@ void listEvent(){
         }
 
         horizontalEvent(p, q, HORIZONTAL);
-        /* downEvent(p, q, UP); */
-        /* upEvent(q, p, DOWN); */
+        downEvent(p, q, UP);
+        upEvent(q, p, DOWN);
     }
     else if(eventType == UP){
         /* p must be to the left of q */
@@ -68,8 +74,8 @@ void listEvent(){
         }
 
         upEvent(p, q, HORIZONTAL);
-        /* horizontalEvent(q, p, UP); */
-        /* downEvent(p, q, DOWN) */
+        horizontalEvent(q, p, UP);
+        downEvent(p, q, DOWN);
     }
     else if(eventType == DOWN){
         if(getX(p, HORIZONTAL) > getX(q, HORIZONTAL)){
@@ -78,8 +84,8 @@ void listEvent(){
         }
 
         downEvent(p, q, HORIZONTAL);
-        /* upEvent(p, q, UP); */
-        /* horizontalEvent(q, p, DOWN); */
+        upEvent(p, q, UP);
+        horizontalEvent(p, q, DOWN);
     }
 
     dir = eventType;
@@ -92,15 +98,17 @@ void listEvent(){
     
     updateListCert(p, dir);
     updateListCert(p->prev[dir], dir);
-    updateListCert(p->next[dir], dir);    
+    updateListCert(p->next[dir], dir);
+
 }
 
 /* horizontal-order event */
 void horizontalEvent(Point * p, Point * q, int dir){
-    Point * t, *w;
+    Point * t, *w, *v;
     CandsNode * up, *newCands, *low;
+    double vxp, vxq, aux;
     int change;
-    if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */
+    if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */       
         t = NULL;
         up = (CandsNode *)predecessorS(q->candsRoot[dir], p, CANDS_TREE, dir, UP);
         if(up != NULL)
@@ -127,7 +135,7 @@ void horizontalEvent(Point * p, Point * q, int dir){
     }
     else if(p == ownerS(q->hitsLow[dir], HITS_LOW_TREE, dir)){ /* q is in HitsLow(p) */
         /* searching for low(q) in Cands(p) */
-        low = (CandsNode *)predecessorS(p->candsRoot[dir], p, CANDS_TREE, dir, DOWN);
+        low = (CandsNode *)predecessorS(p->candsRoot[dir], q, CANDS_TREE, dir, DOWN);
         if(low != NULL)
             t = low->key;
         else
@@ -150,12 +158,30 @@ void horizontalEvent(Point * p, Point * q, int dir){
         insertS(q->hitsUpRoot[dir], p, HITS_UP_TREE, dir);        
     }
 
-    db(
+    vxp = getVx(p, dir);
+    vxq = getVx(q, dir);
+
+    aux = max(module(vxp), module(vxq));
+
+    vxp -= aux;
+    vxq -= aux;
+
+    if(vxp < vxq) /* p is to the left */
+        v = ownerS(p->cands[dir], CANDS_TREE, dir);
+    else /* q is to the left */
+        v = ownerS(q->cands[dir], CANDS_TREE, dir);
+    
+    if(v != NULL){
+        change = updateLcand(v, dir);
+        if(change) updateTourn(v, dir);
+    }
+
+    /* db(
         printf("Printing point %c\n", p->name);
         printPoint(p, dir);
         printf("Printing point %c\n", q->name);
         printPoint(q, dir);
-    );
+    ); */
 }
 
 /* +60-order event */
@@ -318,5 +344,5 @@ void event(){
         else{
             listEvent();
         }
-    }
+    }   
 }

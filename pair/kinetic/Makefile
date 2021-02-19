@@ -1,4 +1,4 @@
-CFLAGS = -Wall -ansi -g3 -pedantic -Wno-unused-result # g3 remove qualquer otimização, remover essa flag depois
+CFLAGS = -Wall -g3 -pedantic -Wno-unused-result # g3 remove qualquer otimização, remover essa flag depois
 OBJS   = event.o menu.o orderedlist.o pq.o tourn.o util.o maxima.o heapsort.o kds.o splay_tree.o
 LIBS   = -lm
 
@@ -7,6 +7,9 @@ kineticpair: $(OBJS)
 
 %.o: %.c %.h debug.h util.h
 	gcc $(CFLAGS) -c $<
+
+random_points:
+	gcc $(CFLAGS) random_points.c -o random_points -lm
 
 clean:
 	rm *.o kineticpair *~

@@ -307,6 +307,20 @@ Object * query_kth(AVLNode *r, int i){
     return query_kth(r->right, i);
 }
 
+void printListR(AVLNode * r, int dir){
+    if(r != NULL){
+        printListR(r->left, dir);
+        printf(" - %g - %c", r->key->cert[dir]->value, r->key->name);
+        printListR(r->right, dir);
+    }
+}
+
+void printList(int dir){
+    printListR(listRoot[dir], dir);
+    printf("\n");
+}
+
+
 /*
 void print(char * prefix, int size, AVLNode * r, int b){
 	int i;

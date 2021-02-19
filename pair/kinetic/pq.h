@@ -51,4 +51,9 @@ void insertPQ(Point * p, int certType);
 */
 void deletePQ(Point * p, int certType);
 
+/*
+
+*/
+void printPQ();
+
 #endif

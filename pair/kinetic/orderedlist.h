@@ -92,4 +92,9 @@ void print(char * prefix, int size, AVLNode * r, int b);
 */
 void removeAll(AVLNode * r);
 
+/*
+
+*/
+void printList(int dir);
+
 #endif

@@ -1,6 +1,9 @@
 #include"splay_tree.h"
 #include"debug.h"
 
+#define module(x) (x > 0 ? x : -x)
+#define max(a, b) (a > b ? a : b)
+
 void insertS(void * root, Point * a, int type, int dir){
     void * new;
 
@@ -12,11 +15,18 @@ void insertS(void * root, Point * a, int type, int dir){
 }
 
 void deleteS(void * root, Point * a, int type, int dir){
-    void * parent;    
-        
+    void * parent;
+    
     deleteSR(detach(root, type, dir), a, &parent, type, dir);
     splay(parent, type, dir);
     attach(root, parent, type, dir);
+
+    if(type == CANDS_TREE)
+        a->cands[dir] = NULL;
+    else if(type == HITS_LOW_TREE)
+        a->hitsLow[dir] = NULL;
+    else
+        a->hitsUp[dir] = NULL;
 }
 
 void splay(void * x, int type, int dir){
@@ -105,7 +115,8 @@ void * joinS(void * rootS, void * rootT, int type, int dir){
     splay(aux, type, dir);
 
     setRightS(aux, rootT, type);
-    setParentS(rootT, aux, type);
+    if(rootT)
+        setParentS(rootT, aux, type);
     
     if(type == CANDS_TREE)
         updateLeftmost(aux, dir);
@@ -122,27 +133,24 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
 
     orientation = dir;
     
+    if(type == CANDS_TREE && order == UP){
+        mirror = 1;
+    }
     if(dir == HORIZONTAL){
-        if(type == CANDS_TREE && order == UP){
-            mirror = 1;
-        }
         if(order == UP)
             orientation = DOWN;
         else if(order == DOWN)
             orientation = UP;   
     }
     else if(dir == UP){
-        if(type == CANDS_TREE)
-            mirror = 1;
-        
         if(order == UP)
             orientation = HORIZONTAL;
         else if(order == DOWN)
-            orientation = DOWN;
+            orientation = -DOWN;
     }
     else{ /* dir = DOWN */
         if(order == UP)
-            orientation = UP;
+            orientation = -7;
         else if(order == DOWN)
             orientation = HORIZONTAL;
     }
@@ -183,27 +191,24 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
     
     orientation = dir;
     
+    if(type == CANDS_TREE && order == UP){
+        mirror = 1;
+    }
     if(dir == HORIZONTAL){
-        if(type == CANDS_TREE && order == UP){
-            mirror = 1;
-        }
         if(order == UP)
             orientation = DOWN;
         else if(order == DOWN)
             orientation = UP;   
     }
     else if(dir == UP){
-        if(type == CANDS_TREE)
-            mirror = 1;
-        
         if(order == UP)
             orientation = HORIZONTAL;
         else if(order == DOWN)
-            orientation = DOWN;
+            orientation = -DOWN;
     }
-    else{ /* dir = DOWN */
+    else{ /* dir = DOWN */       
         if(order == UP)
-            orientation = UP;
+            orientation = -7;
         else if(order == DOWN)
             orientation = HORIZONTAL;
     }
@@ -237,8 +242,13 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
 
 Point * ownerS(void * root, int type, int dir){
     void * aux = root;
+
+    if(aux && type == CANDS_TREE)
+        updateLeftmost(aux, dir);
     
     while(aux && aux != getParentS(getParentS(aux, type), type)){
+        if(type == CANDS_TREE)
+            updateLeftmost(aux, dir);
         aux = getParentS(aux, type);
     }
 
@@ -258,6 +268,7 @@ Point * ownerS(void * root, int type, int dir){
 
 void updateLeftmost(void * x, int dir){
     void * a, * b, *c, * left, * right;
+    double vxa, vxb, aux;
     a = b = c = NULL;
     left = getLeftS(x, CANDS_TREE);
     right = getRightS(x, CANDS_TREE);
@@ -270,8 +281,24 @@ void updateLeftmost(void * x, int dir){
         if(getX(getKeyS(a, CANDS_TREE), dir) < 
         getX(getKeyS(b, CANDS_TREE), dir))
             c = a;
+        else if(getX(getKeyS(a, CANDS_TREE), dir) == 
+        getX(getKeyS(b, CANDS_TREE), dir)){
+            vxa = getVx(getKeyS(a, CANDS_TREE), dir);
+            vxb = getVx(getKeyS(b, CANDS_TREE), dir);
+
+            aux = max(module(vxa), module(vxb));
+
+            vxa -= aux;
+            vxb -= aux;
+
+            if(vxa < vxb)
+                c = a;
+            else
+                c = b;
+        }
         else
             c = b;
+        
     }
     else if(a){
         c = a;
@@ -284,7 +311,19 @@ void updateLeftmost(void * x, int dir){
     if(c && getX(getKeyS(c, CANDS_TREE), dir) < 
         getX(getKeyS(x, CANDS_TREE), dir)){
         setLeftmostS(x, c, CANDS_TREE);
-    }    
+    }
+    else if(c && getX(getKeyS(c, CANDS_TREE), dir) ==
+    getX(getKeyS(x, CANDS_TREE), dir)){
+        vxa = getVx(getKeyS(c, CANDS_TREE), dir);
+        vxb = getVx(getKeyS(x, CANDS_TREE), dir);
+
+        aux = max(module(vxa), module(vxb));
+
+        vxa -= aux;
+        vxb -= aux;
+
+        if(vxa < vxb) setLeftmostS(x, c, CANDS_TREE);
+    }
 }
 
 void rotateLeftS(void * x, int type, int dir){
@@ -469,6 +508,12 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
 void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
     void * aux = root;
 
+    if(root == NULL){
+        printf("Point is not in this three\n");
+        return NULL;
+    }
+
+
     if(getKeyS(root, type) == a){
         if(getLeftS(root, type) && getRightS(root, type)){
             aux = getRightS(root, type);
@@ -486,8 +531,9 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
             aux = (getLeftS(root, type) ? getLeftS(root, type) 
             : getRightS(root, type));
             
-            if(aux) setParentS(aux, getParentS(getParentS(aux, type), 
-            type), type);
+            if(aux) setParentS(aux, *parent, type);
+
+            if(*parent == NULL) *parent = aux;
             
             if(getParentS(root, type)){
                 if(getLeftS(getParentS(root, type), type) == root)
@@ -585,25 +631,22 @@ void attach(void * roota, void * rootb, int type, int dir){
     if(rootb) setParentS(rootb, roota, type);
 }
 
-void freeAllS(void * root, int type){
+void freeAllS(void * root, int type, int dir){
     Point * p;
     int i;
     if(root){
-        freeAllS(getLeftS(root, type), type);
-        freeAllS(getRightS(root, type), type);
+        freeAllS(getLeftS(root, type), type, dir);
+        freeAllS(getRightS(root, type), type, dir);
         p = getKeyS(root, type);
         if(p != NULL){
-            if(type == CANDS_TREE){
-                for(i = 0; i < 3; i++)
-                    p->cands[i] = NULL;
+            if(type == CANDS_TREE){                
+                p->cands[dir] = NULL;
             }
-            else if(type == HITS_UP_TREE){
-                for(i = 0; i < 3; i++)
-                    p->hitsUp[i] = NULL;
+            else if(type == HITS_UP_TREE){                
+                p->hitsUp[dir] = NULL;
             }
-            else{
-                for(i = 0; i < 3; i++)
-                    p->hitsLow[i] = NULL;
+            else{                
+                p->hitsLow[dir] = NULL;
             }            
         }
         free(root);

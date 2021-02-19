@@ -41,7 +41,7 @@ int compareS(Point * a, Point * b, int type, int dir);
 
 void swapS(void * roota, void * rootb, int type, int dir);
 
-void freeAllS(void * root, int type);
+void freeAllS(void * root, int type, int dir);
 
 /* ---------------------------------------------- */
 

@@ -38,11 +38,15 @@ int main(){
         printf("(a)dvance\n");
         printf("(c)hange trajectory\n");
         printf("(d)elete\n");
+        db(printf("dra(w)\n"));
         printf("(i)nsert point\n");
         printf("(l)oad file\n");
         printf("(n)ow\n");
+        db(printf("next (e)vent\n"));
         printf("(q)uery\n");
+        db(printf("show in(f)o\n"));
         printf("(s)top\n");
+        printf("(t)est\n");
         printf("---------------      ---------------\n");
         printf(">>> ");
         scanf(" %c", &opt);
@@ -74,12 +78,22 @@ int main(){
             printf("now: %g\n", now);
         else if(opt == 'l')
             loadFile();
-        if(opt != 's'){            
+        db(
+        else if(opt == 'w')
+            draw();
+        else if(opt == 'f')
+            showInfo();
+        else if(opt == 'e')
+            advance(nextEvent());
+        else if(opt == 't')
+            test();
+        );
+        if(opt != 's'){
             db(
                 printf("Next event: %g\n", nextEvent());
                 j = minPQ()->certType;
-                if(j < TOURN_CERT)
-                    printf("Swap in order: ");
+                if(j < TOURN_CERT)         
+                    printf("Swap in order: ");                
                 else{
                     printTourn();
                     printf("Tourn event: ");

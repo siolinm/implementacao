@@ -61,12 +61,24 @@ double valuePQObject(PQObject * obj){
 }
 
 void updatePQ(Point * p, int certType, double t){
-    PQObject * obj = Q[p->cert[certType]->pqpos];      
-           
+    int b, i;
+    PQObject * obj = Q[p->cert[certType]->pqpos];  
     p->cert[certType]->value = t;
-
+    
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
+    for (i = 1; 2*i < pqSize; i++){        
+        if(valuePQ(2*i) < valuePQ(i)){
+            printf("Incorrect PQ\n");
+            exit(42);
+        }
+        if(2*i + 1 < pqSize){
+            if(valuePQ(2*i + 1) < valuePQ(i)){
+                printf("Incorrect PQ\n");
+                exit(42);
+            }
+        }
+    }    
 }
 
 void swim(int i){
@@ -99,3 +111,47 @@ void sink(int i, int m){
     Q[p] = x;
     pqpos(x) = p;
 }
+
+void printPQR(char * prefix, int size, int j, int b){
+    int i;
+    char * newprefix;    
+    
+    if(prefix == NULL){
+        prefix = malloc(sizeof(*prefix));
+        prefix[0] = '\0';
+    }
+    if(j <= pqSize)
+    {
+        for(i = 0; prefix[i] != '\0'; i++)
+            printf("%c", prefix[i]);
+
+        if(b) 
+            printf("├──"); 
+        else 
+            printf("└──" );        
+            
+        printf("%d: %g\n", j, valuePQ(j));
+		
+        newprefix = malloc((size + 4)*sizeof(*newprefix));
+        for(i = 0; i < size; i++)
+            newprefix[i] = prefix[i];
+        if(b)
+            newprefix[size - 1] = '|';
+        else
+            newprefix[size - 1] = ' ';
+        for(i = size; i < size + 4; i++)
+            newprefix[i] = ' ';
+        newprefix[size + 3] = '\0';
+		printPQR(newprefix, size + 4, 2*j, 1);
+        printPQR(newprefix, size + 4, 2*j + 1, 0);
+        
+    }
+    if(!b)
+        free(prefix);
+}
+
+void printPQ(){
+    printPQR(NULL, 1, 1, 0);
+}
+
+    

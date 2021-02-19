@@ -24,10 +24,10 @@ double getY(Point * p, int direction){
 }
 
 double getX0(Point * p, int direction){
-    double angle = 0;
+    double angle = PI_3;
 
-    if(direction == UP){
-        angle = PI_3;
+    if(direction == HORIZONTAL){
+        angle = 0;
     }
     else if(direction == DOWN){
         angle = -PI_3;
@@ -37,10 +37,10 @@ double getX0(Point * p, int direction){
 }
 
 double getY0(Point * p, int direction){
-    double angle = 0;
+    double angle = PI_3;
 
-    if(direction == UP){
-        angle = PI_3;
+    if(direction == HORIZONTAL){
+        angle = 0;
     }
     else if(direction == DOWN){
         angle = -PI_3;
@@ -50,10 +50,10 @@ double getY0(Point * p, int direction){
 }
 
 double getVx(Point * p, int direction){
-    double angle = 0;
+    double angle = PI_3;
 
-    if(direction == UP){
-        angle = PI_3;
+    if(direction == HORIZONTAL){
+        angle = 0;
     }
     else if(direction == DOWN){
         angle = -PI_3;
@@ -63,10 +63,10 @@ double getVx(Point * p, int direction){
 }
 
 double getVy(Point * p, int direction){
-    double angle = 0;
+    double angle = PI_3;
 
-    if(direction == UP){
-        angle = PI_3;
+    if(direction == HORIZONTAL){
+        angle = 0;
     }
     else if(direction == DOWN){
         angle = -PI_3;
