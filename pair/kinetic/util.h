@@ -11,7 +11,11 @@
 #define SIN_NEG_PI_3 -SIN_PI_3 
 #define COS_NEG_PI_3 COS_PI_3
 
-#define EPS 0.000001
+#define max(a, b) (a > b ? a : b)
+#define min(a, b) (a < b ? a : b)
+#define mod(x) (x > 0 ? x : -x)
+
+#define EPS 1e-15
 
 enum Directions{
     /* +60º rotation */

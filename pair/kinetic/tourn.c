@@ -1,13 +1,12 @@
 #include"tourn.h"
-#define max(a, b) (a > b ? a : b)
-#define min(a, b) (a < b ? a : b)
-
 static int last;
 
 int compareTourn(int i, int j){
     double a, b;
     a = distance(tourn[i]->p, tourn[i]->lcandp, tourn[i]->direction);
     b = distance(tourn[j]->p, tourn[j]->lcandp, tourn[j]->direction);
+    if(mod(a - b) <= EPS) /* they're equal */
+        return 1;
     return a <= b;
 }
 
@@ -30,7 +29,7 @@ void sendTourn(Point * p, int dir){
 
 void buildTourn(){
     int i;
-    int dir;    
+    int dir;
 
     i = 2*tournElem - 1;
     while(i > 1){
@@ -86,21 +85,21 @@ void insertTourn(Point * p, int dir){
 
     tourn[i] = obj;
     tourn[i - 1] = tourn[i/2];
-    
+
     k = i - 1;
 
     while(i > 1 && compareTourn(i, k)){
-        tourn[i/2] = tourn[i];       
+        tourn[i/2] = tourn[i];
         dir = tourn[k]->direction;
         tourn[k]->p->lastMatch[dir] = k;
         updateTournCert(tourn[k]);
-        
+
         i = i/2;
         k = 2*(i/2) + !(i % 2);
     }
-    
+
     dir = tourn[i]->direction;
-    tourn[i]->p->lastMatch[dir] = i;    
+    tourn[i]->p->lastMatch[dir] = i;
 }
 
 void deleteTourn(Point * p, int dir){
@@ -111,19 +110,19 @@ void deleteTourn(Point * p, int dir){
         Looks for the "first match" that obj played
     */
     j = i;
-    
+
     while(j < tournElem){
         if(tourn[j] == tourn[2*j])
             j = 2*j;
         else
-            j = 2*j + 1;           
+            j = 2*j + 1;
     }
-    
+
     k = 2*(j/2) + !(j % 2);
 
     /*
         Looks for a object to substitute the removed one.
-        The object that will substitute the removed object is 
+        The object that will substitute the removed object is
         the one who lost the match between the two last positions.
         If the object that is being removed is already at one of the two last positions
         remove the two last positions and make his brother go up
@@ -159,7 +158,7 @@ void deleteTourn(Point * p, int dir){
         dir = tourn[k]->direction;
         tourn[k]->p->lastMatch[dir] = k;
         updateTournCert(tourn[k]);
-        
+
         j = j/2;
         k = 2*(j/2) + !(j % 2);
     }
@@ -176,65 +175,64 @@ void updateTourn(Point * p, int dir){
 
 void initCertTourn(){
     int i;
-    TournObject * a;    
+    TournObject * a;
     /* initializes tourn certificates */
     for(i = 2*tournElem - 1; i >= tournElem; i--){
         a = tourn[i];
-                
+
         newCertTourn(a);
     }
 }
 
-
 /* TODO: rewrite this */
-/* 
- * assuming d(a, lcand(a)) <= d(b, lcand(b)) 
- * 
+/*
+ * assuming d(a, lcand(a)) <= d(b, lcand(b))
+ *
  * goal: t such that d(a, lcand(a)) >= d(b, lcand(b)) in [t, t + eps] eps > 0
- * 
+ *
  * (1)  (x(a) - x(lcand(a)))^2 + (y(a) - y(lcand(a)))^2 >= (x(b) - x(lcand(b)))^2 + (y(b) - y(lcand(b)))^2
- * 
+ *
  * x(a) = x_0(a) + t*speed(a).x
  * y(a) = y_0(a) + t*speed(a).y
- * 
+ *
  * let c_1 = speed(a).x - speed(lcand(a)).x
  * c_2 = x_0(a) - x_0(lcand(a))
  * c_3 = speed(a).y - speed(lcand(a)).y
  * c_4 = y_0(a) - y_0(lcand(a))
- * 
+ *
  * c_5, c_6, c_7 and c_8 are similar but to point b
- * 
+ *
  * Rewriting (1):
- * 
+ *
  * (tc_1 + c_2)^2 + (tc_3 + c_4)^2 >= (tc_5 + c_6)^2 + (tc_7 + c_8)^2
  * ....
  * t^2(c_1^2 + c_3^2 - c_5^2 - c_7^2) + 2t(c_1c_2 + c_3c_4 - c_5c_6 - c_7c_8) + c_2^2 + c_4^2 - c_6^2 - c_8^2 >= 0
- * 
+ *
  * m = (c_1^2 + c_3^2 - c_5^2 - c_7^2)
  * n = 2(c_1c_2 + c_3c_4 - c_5c_6 - c_7c_8)
  * o = c_2^2 + c_4^2 - c_6^2 - c_8^2
- * 
+ *
  * mt^2 + nt + o >= 0
- * 
+ *
  * Cases:
  * if m > 0, then n^2 - 4mo must be > 0
  * return is the bigger root
- * 
+ *
  * if m < 0 and n^2 - 4mo <= 0 return INF
- * 
+ *
  * if m < 0 and n^2 - 4mo > 0 return smaller root
- * 
+ *
  * if m = 0:
  *      nt + o >= 0
- * 
+ *
  *      n > 0 return -o/n
- * 
+ *
  *      n < 0 return INF
- *      
+ *
  *      if n = 0:
  *          o must be <= 0
  *          return INF
- * 
+ *
  */
 double expireTourn(TournObject * a, TournObject * b){
     int i;
@@ -244,10 +242,10 @@ double expireTourn(TournObject * a, TournObject * b){
         return INFINITE;
     aux = a;
     for(i = 0; i < 2; i++){
-        c[4*i + 1] = getVx(aux->p, HORIZONTAL) - getVx(aux->lcandp, HORIZONTAL);
-        c[4*i + 2] = getX0(aux->p, HORIZONTAL) - getX0(aux->lcandp, HORIZONTAL);
-        c[4*i + 3] = getVy(aux->p, HORIZONTAL) - getVy(aux->lcandp, HORIZONTAL);
-        c[4*i + 4] = getY0(aux->p, HORIZONTAL) - getY0(aux->lcandp, HORIZONTAL);
+        c[4*i + 1] = getVx(aux->p, aux->direction) - getVx(aux->lcandp, aux->direction);
+        c[4*i + 2] = getX0(aux->p, aux->direction) - getX0(aux->lcandp, aux->direction);
+        c[4*i + 3] = getVy(aux->p, aux->direction) - getVy(aux->lcandp, aux->direction);
+        c[4*i + 4] = getY0(aux->p, aux->direction) - getY0(aux->lcandp, aux->direction);
         aux = b;
     }
 
@@ -256,49 +254,49 @@ double expireTourn(TournObject * a, TournObject * b){
     o = c[2]*c[2] + c[4]*c[4] - c[6]*c[6] - c[8]*c[8];
     delta = n*n - 4*m*o;
 
-    if(m > 0){
-        if(delta <= 0){
+    if(m > EPS){
+        if(mod(delta) <= EPS){
             printf("Something gone wrong! Delta isn't positive\n");
             exit(0);
         }
         else{
             t1 = -n + sqrt(delta);
-            t1 = t1/2*m;
+            t1 = t1/(2*m);
             t2 = -n - sqrt(delta);
-            t2 = t2/2*m;            
-            
+            t2 = t2/(2*m);
+
             t1 = max(t1, t2);
-            if(t1 <= now)
-                return INFINITE;
+            /* if(t1 <= now)
+                return INFINITE; */
         }
     }
-    else if (m < 0){
-        if(delta <= 0)
+    else if (m < EPS){
+        if(mod(delta) <= EPS)
             return INFINITE;
-        
+
         t1 = -n + sqrt(delta);
-        t1 = t1/2*m;
+        t1 = t1/(2*m);
         t2 = -n - sqrt(delta);
-        t2 = t2/2*m;
-        
+        t2 = t2/(2*m);
+
         if(min(t1, t2) >= now)
             t1 = min(t1, t2);
         else
             return INFINITE;
     }
     else{
-        if(n > 0){
+        if(n > EPS){
             t1 = -o/n;
-            if(t1 <= now)
+            if(t1 < now)
                 return INFINITE;
-            
+
         }
-        else if(n < 0){
+        else if(n < EPS){
             t1 = INFINITE;
         }
         else{
-            if(o > 0){
-                printf("Something gone wrong! o > 0\n");
+            if(o > EPS){
+                printf("Something gone wrong! o > 0 %.16lf\n", o);
                 exit(0);
             }
             else{
@@ -312,7 +310,7 @@ double expireTourn(TournObject * a, TournObject * b){
 
 void newCertTourn(TournObject * obj){
     int i, dir;
-    Cert * newCert = malloc(sizeof(*newCert));    
+    Cert * newCert = malloc(sizeof(*newCert));
 
     dir = obj->direction;
     obj->p->cert[TOURN_CERT + dir] = newCert;
@@ -326,7 +324,7 @@ void newCertTourn(TournObject * obj){
     }
     else{
         newCert->value = expireTourn(tourn[i/2], tourn[i]);
-    }    
+    }
     insertPQ(obj->p, TOURN_CERT + dir);
 }
 
@@ -335,7 +333,7 @@ void updateTournCert(TournObject * a){
     Cert *cert;
     dir = a->direction;
     cert = a->p->cert[TOURN_CERT + dir];
-    
+
     i = a->p->lastMatch[dir];
 
     if(dir == 1 && a->p->name == 'h')
@@ -370,9 +368,9 @@ void printT(char * prefix, int size, int j, int b){
         for(i = 0; prefix[i] != '\0'; i++)
             printf("%c", prefix[i]);
 
-        if(b) 
-            printf("├──"); 
-        else 
+        if(b)
+            printf("├──");
+        else
             printf("└──" );
 
         if(tourn[j]->lcandp){
@@ -383,14 +381,14 @@ void printT(char * prefix, int size, int j, int b){
             lcand = '-';
             dist = 1/0.;
         }
-            
-        printf("%d: %c -- %c: (%g, %g) + t*(%g, %g), dist: %g, lastMatch: %d, dir: %d", 
+
+        printf("%d: %c -- %c: (%g, %g) + t*(%g, %g), dist: %g, lastMatch: %d, dir: %d",
         j,
-        tourn[j]->p->name, 
-        lcand, 
-        tourn[j]->p->x0.x, 
-        tourn[j]->p->x0.y, 
-        tourn[j]->p->speed.x, 
+        tourn[j]->p->name,
+        lcand,
+        tourn[j]->p->x0.x,
+        tourn[j]->p->x0.y,
+        tourn[j]->p->speed.x,
         tourn[j]->p->speed.y,
         dist,
         tourn[j]->p->lastMatch[tourn[j]->direction],
@@ -398,7 +396,7 @@ void printT(char * prefix, int size, int j, int b){
         );
 
         if(j == tourn[j]->p->lastMatch[tourn[j]->direction])
-            printf(", ev: %g", tourn[j]->p->cert[TOURN_CERT + tourn[j]->direction]->value);  
+            printf(", ev: %g", tourn[j]->p->cert[TOURN_CERT + tourn[j]->direction]->value);
         printf("\n");
         newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
@@ -412,7 +410,7 @@ void printT(char * prefix, int size, int j, int b){
         newprefix[size + 3] = '\0';
 		printT(newprefix, size + 4, 2*j, 1);
         printT(newprefix, size + 4, 2*j + 1, 0);
-        
+
     }
     if(!b)
         free(prefix);

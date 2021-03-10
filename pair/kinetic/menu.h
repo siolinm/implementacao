@@ -3,8 +3,6 @@
 #ifndef _MENU_H
 #define _MENU_H
 
-
-
 /*
 loads the elements from a file in the following format:
     number of elements
@@ -14,8 +12,6 @@ loads the elements from a file in the following format:
     x0 y0 (whitespace) vx vy (of the n-th element)
  */
 void loadFile();
-
-
 
 
 #endif

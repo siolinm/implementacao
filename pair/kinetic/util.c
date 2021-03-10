@@ -3,7 +3,7 @@
 
 double getX(Point * p, int direction){
     double ret = 1;
-    
+
     if(direction < 0){
         direction = -direction;
         ret = -ret;
@@ -14,7 +14,7 @@ double getX(Point * p, int direction){
 
 double getY(Point * p, int direction){
     double ret = 1;
-    
+
     if(direction < 0){
         direction = -direction;
         ret = -ret;
@@ -33,7 +33,7 @@ double getX0(Point * p, int direction){
         angle = -PI_3;
     }
 
-    return (p->x0.x)*cos(angle) + (p->x0.y)*sin(angle);    
+    return (p->x0.x)*cos(angle) + (p->x0.y)*sin(angle);
 }
 
 double getY0(Point * p, int direction){
@@ -80,7 +80,7 @@ double distance(Point * a, Point * b, int direction){
     if(a == NULL || b == NULL)
         return INFINITE;
     dx = (getX(a, direction) - getX(b, direction));
-    dy = (getY(a, direction) - getY(b, direction));    
+    dy = (getY(a, direction) - getY(b, direction));
     return sqrt(dx*dx + dy*dy);
 }
 
@@ -93,7 +93,7 @@ int certType(int direction){
     return HORIZONTAL_CERT;
 }
 
-int checkLine(Point * a, Point * c, double theta, int dir){    
+int checkLine(Point * a, Point * c, double theta, int dir){
     double x;
 
     x = (cos(theta))*(getY(c, dir) - getY(a, dir));
@@ -118,12 +118,12 @@ void printPoint(Point * p, int dir){
         printf("UP");
     else
         printf("DOWN");
-    
+
     printf("\n");
     printf("Point: %c\n", p->name);
     printf("x0: (%g, %g), speed: (%g, %g)\n", p->x0.x, p->x0.y, p->speed.x, p->speed.y);
     printf("Current position: (%g, %g)\n", getX(p, dir), getY(p, dir));
-    
+
     cand = ownerS(p->cands[dir], CANDS_TREE, dir);
     if(cand)
         printf("%c is in Cands(%c)\n", p->name, cand->name);
@@ -133,7 +133,7 @@ void printPoint(Point * p, int dir){
     hlow = ownerS(p->hitsLow[dir], HITS_LOW_TREE, dir);
     if(hlow)
         printf("%c is in Hits_low(%c)\n", p->name, hlow->name);
-        
+
     printf("Cands(%c) = \n", p->name);
     printS(p->candsRoot[dir], CANDS_TREE);
     printf("Hits_up(%c) = \n", p->name);
@@ -149,11 +149,11 @@ void printPoint(Point * p, int dir){
 int updateLcand(Point * p, int dir){
     Point * lcand = NULL;
     int retval = 0;
-    
+
     if(p->candsRoot[dir]->parent)
         /* leftmost can't be NULL */
         lcand = getKeyS(p->candsRoot[dir]->parent->leftmost, CANDS_TREE);
-    
+
     if(p->lcand[dir] != lcand)
         retval = 1;
 
@@ -172,7 +172,7 @@ int getDirection(int certType){
         retval = DOWN;
     else
         retval = certType - TOURN_CERT;
-    
+
     return retval;
 }
 

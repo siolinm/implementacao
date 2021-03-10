@@ -1,0 +1,2 @@
+- Bugs no torneio em h/d1.in, d/h0.in, d/h1.in
+- Bugs nos cones up e down

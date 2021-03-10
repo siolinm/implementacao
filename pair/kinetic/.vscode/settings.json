@@ -2,6 +2,9 @@
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "files.associations": {
-        "tourn.h": "c"
+        "tourn.h": "c",
+        "kds.h": "c",
+        "draw.h": "c",
+        "splay_tree.h": "c"
     }
 }

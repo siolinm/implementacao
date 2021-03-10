@@ -3,7 +3,7 @@
 #define pqpos(obj) obj->p->cert[obj->certType]->pqpos
 
 void initPQ(){
-    /* 3n from lists + 3n from tourn */    
+    /* 3n from lists + 3n from tourn */
     pqMaxSize = 6*n;
     Q = malloc(pqMaxSize*sizeof(*Q));
     pqSize = 0;
@@ -13,24 +13,24 @@ void resizePQ(){
     int i;
     if(pqSize + 1 == pqMaxSize){
         PQObject ** W = malloc(2*pqMaxSize*sizeof(*W));
-        
+
         for(i = 1; i <= pqSize; i++)
             W[i] = Q[i];
-        
+
         free(Q);
         Q = W;
         pqMaxSize = 2*pqMaxSize;
     }
 }
 
-void insertPQ(Point * p, int certType){    
+void insertPQ(Point * p, int certType){
     PQObject * pq;
     resizePQ();
 
     pq = malloc(sizeof(*pq));
     pq->p = p;
     pq->certType = certType;
-    
+
     Q[++pqSize] = pq;
     pqpos(pq) = pqSize;
     updatePQ(pq->p, pq->certType, valuePQ(pqSize));
@@ -52,7 +52,7 @@ double valueMinPQ(){
     return valuePQ(1);
 }
 
-double valuePQ(int i){    
+double valuePQ(int i){
     return Q[i]->p->cert[Q[i]->certType]->value;
 }
 
@@ -61,13 +61,13 @@ double valuePQObject(PQObject * obj){
 }
 
 void updatePQ(Point * p, int certType, double t){
-    int b, i;
-    PQObject * obj = Q[p->cert[certType]->pqpos];  
+    int i;
+    PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
-    
+
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
-    for (i = 1; 2*i < pqSize; i++){        
+    for (i = 1; 2*i < pqSize; i++){
         if(valuePQ(2*i) < valuePQ(i)){
             printf("Incorrect PQ\n");
             exit(42);
@@ -78,7 +78,7 @@ void updatePQ(Point * p, int certType, double t){
                 exit(42);
             }
         }
-    }    
+    }
 }
 
 void swim(int i){
@@ -99,13 +99,13 @@ void sink(int i, int m){
     int s = 2*i, p = i;
     PQObject * x = Q[i];
     while(s <= m){
-        if(s < m && valuePQ(s) > valuePQ(s + 1)) 
+        if(s < m && valuePQ(s) > valuePQ(s + 1))
             s += 1;
-        if(valuePQObject(x) < valuePQ(s)) 
+        if(valuePQObject(x) < valuePQ(s))
             break;
 
         Q[p] = Q[s];
-        pqpos(Q[p]) = p;        
+        pqpos(Q[p]) = p;
         p = s; s = 2*p;
     }
     Q[p] = x;
@@ -114,8 +114,8 @@ void sink(int i, int m){
 
 void printPQR(char * prefix, int size, int j, int b){
     int i;
-    char * newprefix;    
-    
+    char * newprefix;
+
     if(prefix == NULL){
         prefix = malloc(sizeof(*prefix));
         prefix[0] = '\0';
@@ -125,13 +125,13 @@ void printPQR(char * prefix, int size, int j, int b){
         for(i = 0; prefix[i] != '\0'; i++)
             printf("%c", prefix[i]);
 
-        if(b) 
-            printf("├──"); 
-        else 
-            printf("└──" );        
-            
+        if(b)
+            printf("├──");
+        else
+            printf("└──" );
+
         printf("%d: %g\n", j, valuePQ(j));
-		
+
         newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
             newprefix[i] = prefix[i];
@@ -144,7 +144,7 @@ void printPQR(char * prefix, int size, int j, int b){
         newprefix[size + 3] = '\0';
 		printPQR(newprefix, size + 4, 2*j, 1);
         printPQR(newprefix, size + 4, 2*j + 1, 0);
-        
+
     }
     if(!b)
         free(prefix);
@@ -154,4 +154,3 @@ void printPQ(){
     printPQR(NULL, 1, 1, 0);
 }
 
-    

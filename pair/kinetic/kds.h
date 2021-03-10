@@ -60,21 +60,6 @@ double nextEvent();
 /*
 
 */
-Vector getVector(int dir, int order);
-
-/*
-    
-*/
-void drawEdges(Point *p, int dir);
-
-/*
-    
-*/
-void draw();
-
-/*
-
-*/
 void showInfo();
 
 /*

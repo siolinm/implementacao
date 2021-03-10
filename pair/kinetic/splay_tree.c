@@ -7,19 +7,21 @@
 void insertS(void * root, Point * a, int type, int dir){
     void * new;
 
-    new = createNodeS(a, type, dir);    
-        
+    new = createNodeS(a, type, dir);
+
     insertSR(detach(root, type, dir), new, type, dir);
     splay(new, type, dir);
     attach(root, new, type, dir);
 }
 
 void deleteS(void * root, Point * a, int type, int dir){
-    void * parent;
-    
+    void * parent = NULL;
+
     deleteSR(detach(root, type, dir), a, &parent, type, dir);
-    splay(parent, type, dir);
-    attach(root, parent, type, dir);
+    if(parent != NULL){
+        splay(parent, type, dir);
+        attach(root, parent, type, dir);
+    }
 
     if(type == CANDS_TREE)
         a->cands[dir] = NULL;
@@ -31,7 +33,7 @@ void deleteS(void * root, Point * a, int type, int dir){
 
 void splay(void * x, int type, int dir){
     void * parent, *grandp;
-    
+
     while(x && getParentS(x, type)){
         /*
             l or r case
@@ -97,7 +99,7 @@ void * splitR(void * root, int type, int dir){
         setRightS(root, NULL, type);
         setParentS(right, NULL, type);
     }
-    
+
     return right;
 }
 
@@ -107,7 +109,7 @@ void * joinS(void * rootS, void * rootT, int type, int dir){
 
     if(aux == NULL)
         return rootT;
-    
+
     while(getRightS(aux, type) != NULL){
         aux = getRightS(aux, type);
     }
@@ -117,14 +119,14 @@ void * joinS(void * rootS, void * rootT, int type, int dir){
     setRightS(aux, rootT, type);
     if(rootT)
         setParentS(rootT, aux, type);
-    
+
     if(type == CANDS_TREE)
         updateLeftmost(aux, dir);
 
     return aux;
 }
 
-void * successorS(void * root, Item * p, int type, int dir, int order){    
+void * successorS(void * root, Item * p, int type, int dir, int order){
     void *suc, *y, *x;
     int mirror = 0;
     int orientation;
@@ -132,7 +134,7 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
     x = getParentS(root, type);
 
     orientation = dir;
-    
+
     if(type == CANDS_TREE && order == UP){
         mirror = 1;
     }
@@ -140,7 +142,7 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         if(order == UP)
             orientation = DOWN;
         else if(order == DOWN)
-            orientation = UP;   
+            orientation = UP;
     }
     else if(dir == UP){
         if(order == UP)
@@ -154,11 +156,11 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         else if(order == DOWN)
             orientation = HORIZONTAL;
     }
-    
+
     while(x != NULL){
         y = x;
         /* rounding errors */
-        if(getX(getKeyS(x, type), orientation) < getX(p, orientation)) {
+        if(getX(getKeyS(x, type), orientation) <= getX(p, orientation)) {
             if(!mirror)
                 x = getRightS(x, type);
             else
@@ -167,7 +169,7 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         else{
             suc = x;
             if(!mirror)
-                x = getLeftS(x, type);            
+                x = getLeftS(x, type);
             else
                 x = getRightS(x, type);
         }
@@ -176,21 +178,21 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
     if(y != NULL){
         detach(root, type, dir);
         splay(y, type, dir);
-        attach(root, y, type, dir);        
+        attach(root, y, type, dir);
     }
 
     return suc;
 }
 
-void * predecessorS(void * root, Item * p, int type, int dir, int order){    
+void * predecessorS(void * root, Item * p, int type, int dir, int order){
     void *pred, *y, *x;
     int orientation;
     int mirror = 0;
     pred = y = NULL;
     x = getParentS(root, type);
-    
+
     orientation = dir;
-    
+
     if(type == CANDS_TREE && order == UP){
         mirror = 1;
     }
@@ -198,7 +200,7 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
         if(order == UP)
             orientation = DOWN;
         else if(order == DOWN)
-            orientation = UP;   
+            orientation = UP;
     }
     else if(dir == UP){
         if(order == UP)
@@ -206,7 +208,7 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
         else if(order == DOWN)
             orientation = -DOWN;
     }
-    else{ /* dir = DOWN */       
+    else{ /* dir = DOWN */
         if(order == UP)
             orientation = -7;
         else if(order == DOWN)
@@ -216,16 +218,16 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
     while(x != NULL){
         y = x;
         /* rounding errors */
-        if(getX(getKeyS(x, type), orientation) >= getX(p, orientation)) {
+        if(getX(getKeyS(x, type), orientation) >= getX(p, orientation)){
             if(!mirror)
-                x = getLeftS(x, type);            
+                x = getLeftS(x, type);
             else
-                x = getRightS(x, type);            
+                x = getRightS(x, type);
         }
         else{
             pred = x;
             if(!mirror)
-                x = getRightS(x, type);            
+                x = getRightS(x, type);
             else
                 x = getLeftS(x, type);
         }
@@ -234,7 +236,7 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
     if(y != NULL){
         detach(root, type, dir);
         splay(y, type, dir);
-        attach(root, y, type, dir);      
+        attach(root, y, type, dir);
     }
 
     return pred;
@@ -245,7 +247,7 @@ Point * ownerS(void * root, int type, int dir){
 
     if(aux && type == CANDS_TREE)
         updateLeftmost(aux, dir);
-    
+
     while(aux && aux != getParentS(getParentS(aux, type), type)){
         if(type == CANDS_TREE)
             updateLeftmost(aux, dir);
@@ -276,12 +278,12 @@ void updateLeftmost(void * x, int dir){
         a = getLeftmostS(left, CANDS_TREE);
     if(right)
         b = getLeftmostS(right, CANDS_TREE);
-    
+
     if(a && b){
-        if(getX(getKeyS(a, CANDS_TREE), dir) < 
+        if(getX(getKeyS(a, CANDS_TREE), dir) <
         getX(getKeyS(b, CANDS_TREE), dir))
             c = a;
-        else if(getX(getKeyS(a, CANDS_TREE), dir) == 
+        else if(getX(getKeyS(a, CANDS_TREE), dir) ==
         getX(getKeyS(b, CANDS_TREE), dir)){
             vxa = getVx(getKeyS(a, CANDS_TREE), dir);
             vxb = getVx(getKeyS(b, CANDS_TREE), dir);
@@ -298,7 +300,7 @@ void updateLeftmost(void * x, int dir){
         }
         else
             c = b;
-        
+
     }
     else if(a){
         c = a;
@@ -308,7 +310,7 @@ void updateLeftmost(void * x, int dir){
     }
 
     setLeftmostS(x, x, CANDS_TREE);
-    if(c && getX(getKeyS(c, CANDS_TREE), dir) < 
+    if(c && getX(getKeyS(c, CANDS_TREE), dir) <
         getX(getKeyS(x, CANDS_TREE), dir)){
         setLeftmostS(x, c, CANDS_TREE);
     }
@@ -328,16 +330,16 @@ void updateLeftmost(void * x, int dir){
 
 void rotateLeftS(void * x, int type, int dir){
     void * aux, *parent;
-    
+
     parent = getParentS(x, type);
     aux = getRightS(x, type);
 
     if(!aux) return;
 
-    setRightS(x, getLeftS(aux, type), type);    
+    setRightS(x, getLeftS(aux, type), type);
     if(getLeftS(aux, type))
         setParentS(getLeftS(aux, type), x, type);
-    
+
     setLeftS(aux, x, type);
     setParentS(x, aux, type);
     setParentS(aux, parent, type);
@@ -357,16 +359,16 @@ void rotateLeftS(void * x, int type, int dir){
 
 void rotateRightS(void * x, int type, int dir){
     void * aux, *parent;
-    
+
     parent = getParentS(x, type);
     aux = getLeftS(x, type);
 
     if(!aux) return;
 
-    setLeftS(x, getRightS(aux, type), type);    
+    setLeftS(x, getRightS(aux, type), type);
     if(getRightS(aux, type))
         setParentS(getRightS(aux, type), x, type);
-    
+
     setRightS(aux, x, type);
     setParentS(x, aux, type);
     setParentS(aux, parent, type);
@@ -404,10 +406,10 @@ void initS(Point * p, int type, int dir){
     }
     else if(type == HITS_UP_TREE){
         p->hitsUpRoot[dir] = new;
-    } 
+    }
     else if(type == HITS_LOW_TREE){
         p->hitsLowRoot[dir] = new;
-    } 
+    }
 
 }
 
@@ -438,15 +440,15 @@ void * createNodeS(Point * key, int type, int dir){
     return new;
 }
 
-void * insertSR(void * root, void * node, int type, int dir){    
+void * insertSR(void * root, void * node, int type, int dir){
     void * sub;
     if(!root)
-        return node;    
+        return node;
 
     if(compareS(getKeyS(root, type), getKeyS(node, type), type, dir)){
         sub = insertSR(getLeftS(root, type), node, type, dir);
         setLeftS(root, sub, type);
-        setParentS(sub, root, type);        
+        setParentS(sub, root, type);
     }
     else{
         sub = insertSR(getRightS(root, type), node, type, dir);
@@ -471,7 +473,7 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
         splay(low, type, dir);
 
         r = splitR(low, type, dir);
-        
+
         if(type == CANDS_TREE)
             updateLeftmost(low, dir);
         if(!up)
@@ -494,7 +496,7 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
 
         if(type == CANDS_TREE)
             updateLeftmost(low, dir);
-        
+
     }
 
     db(
@@ -517,24 +519,22 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
     if(getKeyS(root, type) == a){
         if(getLeftS(root, type) && getRightS(root, type)){
             aux = getRightS(root, type);
-            while(getRightS(aux, type) != NULL){
-                aux = getRightS(aux, type);
+            while(getLeftS(aux, type) != NULL){
+                aux = getLeftS(aux, type);
             }
             swapS(root, aux, type, dir);
-            setRightS(aux, deleteSR(getRightS(aux, type), a, 
+            setRightS(root, deleteSR(getRightS(root, type), a,
             parent, type, dir), type);
-
-            root = aux;
         }
         else{
             *parent = getParentS(root, type);
-            aux = (getLeftS(root, type) ? getLeftS(root, type) 
+            aux = (getLeftS(root, type) ? getLeftS(root, type)
             : getRightS(root, type));
-            
+
             if(aux) setParentS(aux, *parent, type);
 
             if(*parent == NULL) *parent = aux;
-            
+
             if(getParentS(root, type)){
                 if(getLeftS(getParentS(root, type), type) == root)
                     setLeftS(getParentS(root, type), aux, type);
@@ -548,20 +548,20 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
                 a->hitsUp[dir] = NULL;
             else if(type == HITS_LOW_TREE)
                 a->hitsLow[dir] = NULL;
-            
+
             free(root);
 
             root = aux;
         }
     }
     else if(compareS(getKeyS(root, type), a, type, dir)){
-        setLeftS(root, deleteSR(getLeftS(root, type), a, 
+        setLeftS(root, deleteSR(getLeftS(root, type), a,
         parent, type, dir), type);
         if(getLeftS(root, type))
             setParentS(getLeftS(root, type), root, type);
     }
     else{
-        setRightS(root, deleteSR(getRightS(root, type), a, 
+        setRightS(root, deleteSR(getRightS(root, type), a,
         parent, type, dir), type);
         if(getRightS(root, type))
             setParentS(getRightS(root, type), root, type);
@@ -578,35 +578,52 @@ int compareS(Point * a, Point * b, int type, int dir){
     if(type == CANDS_TREE){
         return getY(a, dir) >= getY(b, dir);
     }
-    
-    return getX(a, dir) >= getX(b, dir);    
+
+    return getX(a, dir) >= getX(b, dir);
 }
 
 void swapS(void * roota, void * rootb, int type, int dir){
-    void * aux;
-    aux = getLeftS(roota, type);
+    Point * p, * q;
+    /* void * aux; */
+    p = getKeyS(roota, type);
+    q = getKeyS(rootb, type);
+    if(type == HITS_UP_TREE){
+        p->hitsUp[dir] = (HitsNode *)rootb;
+        q->hitsUp[dir] = (HitsNode *)roota;
+    }
+    else if(type == HITS_LOW_TREE){
+        p->hitsLow[dir] = (HitsNode *)rootb;
+        q->hitsLow[dir] = (HitsNode *)roota;
+    }
+    else{
+        p->cands[dir] = (CandsNode *)rootb;
+        q->cands[dir] = (CandsNode *)roota;
+    }
+    setKeyS(roota, q, type);
+    setKeyS(rootb, p, type);
+    /* aux = getLeftS(roota, type);
     setLeftS(roota, getLeftS(rootb, type), type);
     setLeftS(rootb, aux, type);
-        
-    aux = getRightS(roota, type);    
-    setRightS(roota, getRightS(rootb, type), type);    
+
+    aux = getRightS(roota, type);
+    setRightS(roota, getRightS(rootb, type), type);
     setRightS(rootb, aux, type);
-    
+
     aux = getParentS(roota, type);
     if(aux){
-        if(roota == getLeftS(aux, type))            
+        if(roota == getLeftS(aux, type))
             setLeftS(aux, rootb, type);
-        else            
+        else
             setRightS(aux, rootb, type);
     }
-    if(getParentS(rootb, type)){        
-        if(rootb == getLeftS(getParentS(rootb, type), type))            
-            setLeftS(getParentS(rootb, type), roota, type);         
+    if(getParentS(rootb, type)){
+        if(rootb == getLeftS(getParentS(rootb, type), type))
+            setLeftS(getParentS(rootb, type), roota, type);
         else
-            setRightS(getParentS(rootb, type), roota, type);            
+            setRightS(getParentS(rootb, type), roota, type);
     }
-    setParentS(roota, getParentS(rootb, type), type);    
-    setParentS(rootb, aux, type);
+    setParentS(roota, getParentS(rootb, type), type);
+    setParentS(rootb, aux, type); */
 
     if(type == CANDS_TREE){
         updateLeftmost(roota, dir);
@@ -627,27 +644,26 @@ void * detach(void * root, int type, int dir){
 }
 
 void attach(void * roota, void * rootb, int type, int dir){
-    setParentS(roota, rootb, type);    
+    setParentS(roota, rootb, type);
     if(rootb) setParentS(rootb, roota, type);
 }
 
 void freeAllS(void * root, int type, int dir){
     Point * p;
-    int i;
     if(root){
         freeAllS(getLeftS(root, type), type, dir);
         freeAllS(getRightS(root, type), type, dir);
         p = getKeyS(root, type);
         if(p != NULL){
-            if(type == CANDS_TREE){                
+            if(type == CANDS_TREE){
                 p->cands[dir] = NULL;
             }
-            else if(type == HITS_UP_TREE){                
+            else if(type == HITS_UP_TREE){
                 p->hitsUp[dir] = NULL;
             }
-            else{                
+            else{
                 p->hitsLow[dir] = NULL;
-            }            
+            }
         }
         free(root);
     }
@@ -689,7 +705,7 @@ void setKeyS(void * x, Point * y, int type){
     }
 }
 
-void setLeftmostS(void * x, void * y, int type){    
+void setLeftmostS(void * x, void * y, int type){
     ((CandsNode * )x)->leftmost = (CandsNode *)y;
 }
 
@@ -749,9 +765,9 @@ void printSR(void * root, char * prefix, int type, int size, int b){
         for(i = 0; prefix[i] != '\0'; i++)
             printf("%c", prefix[i]);
 
-        if(b) 
-            printf("├──"); 
-        else 
+        if(b)
+            printf("├──");
+        else
             printf("└──");
         key = getKeyS(root, type);
         printf("%c: (%g, %g) + t*(%g, %g)", key->name, key->x0.x, key->x0.y, key->speed.x, key->speed.y);
@@ -769,16 +785,16 @@ void printSR(void * root, char * prefix, int type, int size, int b){
         else
             newprefix[size - 1] = ' ';
         for(i = size; i < size + 4; i++)
-            newprefix[i] = ' ';        
+            newprefix[i] = ' ';
         newprefix[size + 3] = '\0';
 		printSR(getLeftS(root, type), newprefix, type, size + 4, 1);
-        printSR(getRightS(root, type), newprefix, type, size + 4, 0);        
+        printSR(getRightS(root, type), newprefix, type, size + 4, 0);
     }
     else{
         printf("%s", prefix);
-        if(b) 
-            printf("├── NULL\n"); 
-        else 
+        if(b)
+            printf("├── NULL\n");
+        else
             printf("└── NULL\n");
     }
     if(!b)

@@ -1,6 +1,7 @@
 #include"menu.h"
 #include"debug.h"
 #include"kds.h"
+#include"draw.h"
 
 void loadFile(){
     FILE * file;
@@ -8,12 +9,13 @@ void loadFile(){
     int i = 0, j;
     char filename[80];
     printf("Enter the file name: ");
-    scanf("%s", filename);    
+    scanf("%s", filename);
 
     file = fopen(filename, "r");
-    fscanf(file, "%d\n", &n);  
-    
-    initKDS();    
+    fscanf(file, "%d\n", &n);
+
+    drawInit();
+    initKDS();
 
     for(i = 1, j = 2*n - 1; i <= n; i++, j--){
         obj = malloc(sizeof(*obj));
@@ -23,7 +25,7 @@ void loadFile(){
     }
 
     buildKDS();
-    
+
     fclose(file);
 }
 
@@ -74,7 +76,7 @@ int main(){
             scanf("%d", &j);
             delete(j);
         }
-        else if(opt == 'n') 
+        else if(opt == 'n')
             printf("now: %g\n", now);
         else if(opt == 'l')
             loadFile();
@@ -92,13 +94,13 @@ int main(){
             db(
                 printf("Next event: %g\n", nextEvent());
                 j = minPQ()->certType;
-                if(j < TOURN_CERT)         
-                    printf("Swap in order: ");                
+                if(j < TOURN_CERT)
+                    printf("Swap in order: ");
                 else{
                     printTourn();
                     printf("Tourn event: ");
                 }
-                
+
                 if(getDirection(j) == HORIZONTAL){
                     printf("HORIZONTAL");
                 }
