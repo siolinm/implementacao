@@ -5,96 +5,138 @@
 
 AVLNode * listRoot[3];
 
-/*
-    initializes the trees 
-*/
+/*! Initializes the trees in every direction
+ *
+ */
 void listInit();
 
-/*
-    inserts point a into the list with direction dir 
-*/
+/*! Inserts the point a into the list with direction dir
+ * @param a the point to be inserted
+ * @param dir the direction considered
+ */
 void listInsert(Point * a, int dir);
 
-/* 
-    deletes point a from the list with direction dir 
-*/
+/*! Deletes point a from the list with direction dir
+ * @param a the point to be deleted
+ * @param dir the direction considered
+ */
 void listDelete(Point * a, int dir);
 
-/*
-    swapNodes
-*/
+/*! Swaps the points p and q in the AVL tree and in the linked list
+ * @param p one the points to be swaped
+ * @param q the other point to be swaped
+ * @param dir the direction considered
+ */
 void listSwap(Point * p, Point * q, int dir);
 
+/*! Creates a new certificate for the point p, considering the list for
+ * direction dir
+ * @param p the point that will have a new certificate
+ * @param dir the direction considered
+ */
 void newCertList(Point *p, int dir);
 
+/*! Updates the certificate for the point p, considering the list for
+ * direction dir
+ * @param p the point that will have his certificate updated
+ * @param dir the direction considered
+ */
 void updateListCert(Point * p, int dir);
 
+/*! Calculates the expiration time of the certificate between a and b
+ * considering the list in direction dir
+ * @param a one of the points
+ * @param b
+ * @param dir the direction considered
+ * @return the expiration time
+ */
 double expireList(Point *a, Point * b, int dir);
 
-/*
-    returns the height of node a, -1 if NULL;
-*/
+/*! Returns the height of node a, -1 if NULL;
+ * @param a an AVL node
+ * @return the height of a
+ */
 int height(AVLNode *a);
 
-/*
-    recalculates the node a height and sets its new value;
-*/
+/*! Recalculates the node a height and updates his height;
+ * @param a the node to have his height recalculated
+ */
 void setHeight(AVLNode *a);
 
-/*
-    returns a new node with key key;
-*/
-AVLNode *newAVLNode(Object *key, int direction);
+/*! Returns a new node with key key;
+ * @param key the key of the new node
+ * @param dir the direction considered
+ * @return the new node created
+ */
+AVLNode *newAVLNode(Object *key, int dir);
 
-/*
-    rotates the node to the right
-*/
+/*! Rotates the node to the right
+ * @param no the node to be rotated
+ * @return the root of the new subtree after the rotation
+ */
 AVLNode *rotateRight(AVLNode *no);
 
-/*
-    rotates the node to the left
-*/
+/*! Rotates the node to the left
+ * @param no the node to be rotated
+ * @return the root of the new subtree after the rotation
+ */
 AVLNode *rotateLeft(AVLNode *no);
 
-/*
-    returns the node's balance, which is height(node->left) - height(node->right)
-    0 if NULL
-*/
+/*! Returns the node's balance, which is height(node->left) -
+ *   height(node->right) 0 if NULL
+ * @param no the node whose balance will be calculated
+ * @return the balance of the node
+ */
 int getBalance(AVLNode *no);
 
-/*
-    recursively inserts node r with key key and adjusts the linked list, returning the new root
-*/
-AVLNode *insertAVLNode(AVLNode *r, Object *key, int direction);
+/*! Recursively inserts node r with key key and adjusts the linked list,
+ *   returning the new root
+ * @param r the root of the tree
+ * @param key the key to be inserted
+ * @param dir the direction considered
+ * @return the root of the subtree after the insertion
+ */
+AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir);
 
-/*
-    returns the leftmost in element in the subtree with root r
-*/
+/*! Calculates the leftmost in element in the subtree with root r
+ * @param r the root of the subtree considered
+ * @return the leftmost element in the subtree
+ */
 AVLNode *leftmost(AVLNode *r);
 
-/*
-    recusiverly deletes from the avl tree the node with key key, adjusting the linked list in the process, returning the new root
-*/
+/*! Recusiverly deletes from the avl tree the node with key key, adjusting the
+ * linked list in the process, returning the new root
+ * @param r the root of the subtree considered
+ * @param key the key to be deleted
+ * @param dir the direction considered
+ * @return the new root of the subtree after the deletion
+ */
 AVLNode *deleteAVLNode(AVLNode *r, Object *key, int dir);
 
-/*
-    queries for the k-th element in the avl tree
-*/
+/*! Queries for the k-th element in the avl tree
+ * @param r the root of the subtree considered
+ * @param i the i-th element being searched in the subtree
+ * @return the i-th element in the avl tree
+ */
 Object * query_kth(AVLNode *r, int i);
 
-/*
-    Prints the avl tree horizontally (for debug)
-*/
+/*! Prints the avl tree horizontally (for debug)
+ * @param prefix the blank spaces and symbols that will be printed
+ * @param size the size of the prefix
+ * @param r the root of the subtree being printed
+ * @param b boolean parameter that indicates we're on the right or the left of
+ * the subtree
+ */
 void print(char * prefix, int size, AVLNode * r, int b);
 
-/*
-   deallocates all memory used
-*/
+/*! Deallocates all memory used
+ * @param r the root of the subtree being deallocated
+ */
 void removeAll(AVLNode * r);
 
-/*
-
-*/
+/*! Prints the elements in the list order (for debug)
+ * @param dir the direction considered
+ */
 void printList(int dir);
 
 #endif

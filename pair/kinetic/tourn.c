@@ -5,9 +5,9 @@ int compareTourn(int i, int j){
     double a, b;
     a = distance(tourn[i]->p, tourn[i]->lcandp, tourn[i]->direction);
     b = distance(tourn[j]->p, tourn[j]->lcandp, tourn[j]->direction);
-    if(mod(a - b) <= EPS) /* they're equal */
+    if(mod(a - b) <= EPS) /* a = b */
         return 1;
-    return a <= b;
+    return a < b;
 }
 
 void initTourn(int cap){
@@ -266,11 +266,13 @@ double expireTourn(TournObject * a, TournObject * b){
             t2 = t2/(2*m);
 
             t1 = max(t1, t2);
+            if(t1 < -EPS)
+                return INFINITE;
             /* if(t1 <= now)
                 return INFINITE; */
         }
     }
-    else if (m < EPS){
+    else if (m < -EPS){
         if(mod(delta) <= EPS)
             return INFINITE;
 
@@ -279,7 +281,7 @@ double expireTourn(TournObject * a, TournObject * b){
         t2 = -n - sqrt(delta);
         t2 = t2/(2*m);
 
-        if(min(t1, t2) >= now)
+        if(min(t1, t2) > now + EPS)
             t1 = min(t1, t2);
         else
             return INFINITE;
@@ -287,11 +289,11 @@ double expireTourn(TournObject * a, TournObject * b){
     else{
         if(n > EPS){
             t1 = -o/n;
-            if(t1 < now)
+            if(t1 < now - EPS)
                 return INFINITE;
 
         }
-        else if(n < EPS){
+        else if(n < -EPS){
             t1 = INFINITE;
         }
         else{

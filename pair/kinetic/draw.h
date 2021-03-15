@@ -40,63 +40,166 @@
 #define ENTER_KEY 0xff0d
 #define ESC_KEY 0xff1b
 
+/* surface where things are drawn */
 cairo_surface_t *sfc;
+/* context used */
 cairo_t *ctx;
 
+/* 1 - draw, 0 - don't draw */
 int drawState;
+/* 1 - draw debug info, 0 - don't draw */
 int drawDebug;
+/* SCALE - how much scale space
+ * translate - how much translate space
+ * x_c - new x center of coordinate system
+ * y_c - new y center of coordinate system
+ */
 double SCALE, translate, x_c, y_c;
 
+/* rgb colors */
 typedef struct Color{
     double r, g, b;
 } Color;
 
+/* some predefined colors */
 Color red, green, blue, black, white, yellow;
 
+/* time to wait for screen to be refreshed */
 struct timespec ts;
 
+/*! Open an X11 window and create a cairo surface base on that window.
+ * @param x Width of window.
+ * @param y Height of window.
+ * @return Returns a pointer to a Xlib cairo surface.
+ */
 cairo_surface_t *cairo_create_x11_surface(int x, int y);
 
+/*! Closes cairo surface and X11 display
+ * @param sfc The surface to be closed.
+ */
 void cairo_close_x11_surface(cairo_surface_t *sfc);
 
+/*! Creates a new surface and context and initializes
+ *! important values
+ * @param x Width of window.
+ * @param y Height of window.
+ */
 void drawCreate(int x, int y);
 
+/*! Initializes the draw states.
+ *
+ */
 void drawInit();
 
+/*! Draws now value on the top left of the screen
+ *
+ */
 void drawTime();
 
+/*! Calculates the edges of Dom(p)
+ *
+ * @param p point whose edges are calculated
+ * @param dir direction of the edge (HORIZONTAL, DOWN or UP)
+ * @param edge the edge to be calculated (UP or DOWN)
+ * @return returns a coordinate (x, y) where (x(p), y(p)) -- (x, y)
+ * is the edge to be drawn
+ */
 Coordinate drawEdge(Point *p, int dir, int edge);
 
+/*! Draws all the points in blue
+ * @param sel this point will be drawn in green
+ * @param sel2 this point will be drawn in green
+ */
 void drawPoints(Point * sel, Point * sel2);
 
+/*! Draws the point in blue (without label)
+ * @param p point to be drawn
+ * @param color color to be used
+ */
 void drawPoint(Point * p, Color color);
 
+/*! Draws a line from p to q using color
+ * @param p one of the vertex of the line
+ * @param q the other vertex of the line
+ * @param color color to be used
+ */
 void drawLine(Point * p, Point * q, Color color);
 
+/*! Draws all the edges of the points with directiond dir
+ * @param dir the direction of the edges
+ */
 void drawEdges(int dir);
 
+/*! Draws next event time on the bottom left of the screen
+ *
+ */
 void drawNextEvent();
 
+/*! Checks all possible pair of points looking for the closest pair
+ *
+ */
 void drawTest();
 
+/*! Draws a green line between the closest pair of points
+ *
+ */
 void drawClosestPair();
 
+/*! Draws up(p) using the given color
+ * @param p the point whose up will be drawn
+ * @param dir the direction (UP, HORIZONTAL or DOWN)
+ * @param color color to be used
+ */
 void drawUp(Point * p, int dir, Color color);
 
+/*! Draws low(p) using the given color
+ * @param p the point whose low will be drawn
+ * @param dir the direction (UP, HORIZONTAL or DOWN)
+ * @param color color to be used
+ */
 void drawLow(Point * p, int dir, Color color);
 
+/*! Draws cands(p) using the given color
+ * @param p the point whose cands will be drawn
+ * @param dir the direction (UP, HORIZONTAL or DOWN)
+ * @param color color to be used
+ */
 void drawCands(Point * p, int dir, Color color);
 
+/*! Detects key presses and mouse clicks in the window
+ * @param sfc the surface selected
+ */
 int drawHandleXEvent(cairo_surface_t *sfc);
 
+/*! gets a unit vector of the edge in direction dir
+ * @param dir the direction (HORIZONTAL, UP or DOWN)
+ * @param order the edge (UP or DOWN)
+ */
 Vector getVector(int dir, int order);
 
+/*! draws everything in the screen
+ */
 void draw();
 
+/*! draws every "match" of the tournament
+ */
 void drawTourn();
 
+/*! draws some phases of events
+ * @param p point involved in the event
+ * @param q point involved in the event
+ * @param t point to be drawn
+ * @param root root of the tree to be drawn
+ * @param type type of the tree
+ * @param dir direction
+ */
 void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir);
 
+/*! draws every point in the tree with root
+ * @param root root of the tree
+ * @param type type of the tree
+ * @param color color to be used
+ */
 void drawPointsTree(void * root, int type, Color color);
 
 #endif

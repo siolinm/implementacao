@@ -103,7 +103,6 @@ void * splitR(void * root, int type, int dir){
     return right;
 }
 
-/* S < T */
 void * joinS(void * rootS, void * rootT, int type, int dir){
     void * aux = rootS;
 
@@ -576,10 +575,10 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
 
 int compareS(Point * a, Point * b, int type, int dir){
     if(type == CANDS_TREE){
-        return getY(a, dir) >= getY(b, dir);
+        return getY(a, dir) > getY(b, dir) + EPS;
     }
 
-    return getX(a, dir) >= getX(b, dir);
+    return getX(a, dir) > getX(b, dir) + EPS;
 }
 
 void swapS(void * roota, void * rootb, int type, int dir){

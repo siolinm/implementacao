@@ -8,14 +8,14 @@
 
 #define COS_PI_3 cos(PI_3)
 #define SIN_PI_3 sin(PI_3)
-#define SIN_NEG_PI_3 -SIN_PI_3 
+#define SIN_NEG_PI_3 -SIN_PI_3
 #define COS_NEG_PI_3 COS_PI_3
 
 #define max(a, b) (a > b ? a : b)
 #define min(a, b) (a < b ? a : b)
-#define mod(x) (x > 0 ? x : -x)
+#define mod(x) ((x) > 0 ? (x) : -(x))
 
-#define EPS 1e-15
+#define EPS 1e-8
 
 enum Directions{
     /* +60º rotation */
@@ -145,45 +145,90 @@ int n;
 /* lastID available */
 int lastID;
 
-/* get p x-coordinate in the specified direction */
-double getX(Point * p, int direction);
+/*! Get p x-coordinate in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the x-coordinate of the point in the specified direction
+ */
+double getX(Point * p, int dir);
 
-/* get p y-coordinate in the specified direction */
-double getY(Point * p, int direction);
+/*! Get p y-coordinate in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the y-coordinate of the point in the specified direction
+ */
+double getY(Point * p, int dir);
 
-/* get p x0-coordinate in the specified direction */
-double getX0(Point * p, int direction);
+/*! Get p x0-coordinate in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the x0-coordinate of the point in the specified direction
+ */
+double getX0(Point * p, int dir);
 
-/* get p y0-coordinate in the specified direction */
-double getY0(Point * p, int direction);
+/*! Get p y0-coordinate in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the y0-coordinate of the point in the specified direction
+ */
+double getY0(Point * p, int dir);
 
-/* get p speed first component in the specified direction */
-double getVx(Point * p, int direction);
+/*! Get p speed first component in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the speed first component of the point in the specified direction
+ */
+double getVx(Point * p, int dir);
 
-/* get p speed second component in the specified direction */
-double getVy(Point * p, int direction);
+/*! Get p speed second component in the specified direction
+ * @param p the given point
+ * @param dir the specified direction
+ * @return the speed first component of the point in the specified direction
+ */
+double getVy(Point * p, int dir);
 
-/* Calculates the distance between points a and b for direction direction*/
-double distance(Point * a, Point * b, int direction);
+/*! Calculates the distance between points a and b for the given direction
+ * @param a one of the points of the pair
+ * @param b the other point
+ * @param dir the given direction
+ * @return the distance between the two points
+ */
+double distance(Point * a, Point * b, int dir);
 
-/* returns cert type based on direction */
+/*! Returns cert type based on direction
+ * @param direction the given direction
+ * @return the certificate type
+ */
 int certType(int direction);
 
-/*
-    Returns 1 if point c is to the left of the 
-    parallel line to the x-axis that passes through point c rotated by theta (counterclockwise)
-    0 if point c is in that line and -1 if point c is to the right of that line
-*/
-int checkLine(Point * a, Point * c, double theta, int dir);
-
+/*! Returns lcand(p)
+ * @param p the point whose lcand will be returned
+ * @return lcand(p)
+ */
 Point * getLcand(Point * p);
 
-void printPoint(Point * p, int dir);
-
+/*! Updates lcand(p) and updates the pair p -- lcand(p) in tourn
+ * @param p the point whose lcand will be updated
+ * @param dir the direction specified
+ * @return 1 if lcand has been updated, 0 if lcand didn't change
+ */
 int updateLcand(Point * p, int dir);
 
+/*! Returns the direction based on the certificate type
+ * @param certType the certifica type
+ * @return the correspondent direction
+ */
 int getDirection(int certType);
 
+/*! Prints the point p info in the specified direction (for debug)
+ * @param p the given point
+ * @param dir the specified direction
+ */
+void printPoint(Point * p, int dir);
+
+/* Frees all memory
+ *
+ */
 void destroy();
 
 #endif

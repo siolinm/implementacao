@@ -13,18 +13,18 @@ void initCandsHits(int dir){
     int i;
     CandsNode * up, * low, *aux;
     Point * p;
-    
+
     initMaxima(dir);
     heapsort(initial, dir);
 
     for(i = 1; i <= n; i++){
         p = initial[i];
         db(
-            printf("MAXIMA -- point %c\n", p->name); 
+            printf("MAXIMA -- point %c\n", p->name);
             printS(maximaRoot, CANDS_TREE);
         );
-        low = predecessorS(maximaRoot, p, CANDS_TREE, dir, DOWN);         
-        up = predecessorS(maximaRoot, p, CANDS_TREE, dir, UP); 
+        low = predecessorS(maximaRoot, p, CANDS_TREE, dir, DOWN);
+        up = predecessorS(maximaRoot, p, CANDS_TREE, dir, UP);
 
         /* inserts up(p) in HitsUp(p) */
         db(if(up){
@@ -47,13 +47,13 @@ void initCandsHits(int dir){
             printf("Inserting %c in MAXIMA\n", p->name);
         );
         insertS(maximaRoot, p, CANDS_TREE, dir);
-        
-        updateLcand(p, dir);               
-        
+
+        updateLcand(p, dir);
+
     }
     db(
-        for(i = 1; i <= n; i++){            
-            printPoint(initial[i], dir);        
+        for(i = 1; i <= n; i++){
+            printPoint(initial[i], dir);
         }
     );
 

@@ -45,7 +45,6 @@ void buildKDS(){
     for(i = 1; i <= n; i++)
         sendTourn(initial[i], HORIZONTAL);
 
-
     initMaxima(UP);
     initCandsHits(UP);
     for(i = 1; i <= n; i++)
@@ -65,10 +64,10 @@ double nextEvent(){
 }
 
 void advance(double t){
-    if(t < now)
+    if(t < now + EPS)
         printf("Time earlier than current time\n");
 
-    while(t >= nextEvent()){
+    while(t >= nextEvent() - EPS){
         now = nextEvent();
         event();
     }
@@ -114,7 +113,7 @@ void test(){
     y = 2;
     for(i = 1; i <= n; i++)
         for(j = i + 1; j <= n; j++){
-            if(distance(initial[i], initial[j], HORIZONTAL) < dmin){
+            if(distance(initial[i], initial[j], HORIZONTAL) < dmin - EPS){
                 x = i;
                 y = j;
                 dmin = distance(initial[i], initial[j], HORIZONTAL);

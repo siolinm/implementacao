@@ -7,64 +7,66 @@
 #ifndef _KDS_H
 #define _KDS_H
 
-/* 
-    advance in time
-*/
+/*! Advance in time
+ * @param t the time to advance for
+ */
 void advance(double t);
 
-/* 
-    queries for the element with maximum value
-*/
+/*! Queries for the current closest pair in the set
+ *
+ */
 void query();
 
-/*
-    changes the speed of the i-th element
-*/
+/*! Changes the speed of the j-th element
+ * @param j the element that will have his speed changed
+ * @param v the new speed
+ */
 void change(int j, Vector v);
 
-/*
-    inserts element with speed v and current value xt
-*/
+/*! Inserts a new element with speed v and current value xt
+ * @param xt the current position
+ * @param v the speed
+ */
 void insert(Coordinate xt, Vector v);
 
-/*
-    deletes element with id i
-*/
+/*! Deletes element with id i
+ * @param i the id of the element
+ */
 void delete(int i);
 
-/*
-    initialize a KDS with m elements 
-*/
+/*! Initialize the KDS (initializes the structures and some variables initial values)
+ *
+ */
 void initKDS();
 
-/*
-    build the kds
-*/
+/*! Build the kds (builds the strucutures after the points have been received)
+ *
+ */
 void buildKDS();
 
-/*
-    free the kds
-*/
+/*! Deallocates all the memory
+ *
+ */
 void freeKDS();
 
-/*
-    Initializes data for a point
-*/
+/*! Initializes the attributes from the point
+ *
+ */
 void sendPoint(Point * p);
 
-/*
-    returns the next event time
-*/
+/*! Returns the next event time
+ *
+ */
 double nextEvent();
 
-/*
-
-*/
+/*! Show the data structures state (for debug)
+ *
+ */
 void showInfo();
 
-/*
-
-*/
+/*! Checks the closest pair by testing all the pairs of points (for debug)
+ *
+ */
 void test();
 
 #endif

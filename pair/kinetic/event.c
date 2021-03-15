@@ -87,11 +87,10 @@ void listEvent(){
             }
         }
     }
-    if((p->name == 'a' && q->name == 'q') || (p->name == 'q' && q->name == 'a'))
-        printf("Hello\n");
+
     if(eventType == HORIZONTAL){
         /* q must be above p */
-        if(getY(p, HORIZONTAL) >= getY(q, HORIZONTAL)){
+        if(getY(p, HORIZONTAL) - getY(q, HORIZONTAL) > EPS){ /* Y(p) > Y(q) */
             p = q;
             q = aux->p;
         }
@@ -102,7 +101,7 @@ void listEvent(){
     }
     else if(eventType == UP){
         /* p must be to the left of q */
-        if(getX(p, HORIZONTAL) > getX(q, HORIZONTAL)){
+        if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
             p = q;
             q = aux->p;
         }
@@ -111,7 +110,7 @@ void listEvent(){
         downEvent(p, q, DOWN);
     }
     else if(eventType == DOWN){
-        if(getX(p, HORIZONTAL) > getX(q, HORIZONTAL)){
+        if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
             p = q;
             q = aux->p;
         }
@@ -390,11 +389,11 @@ void event(){
     Point * p, *q, *r, *s;
     double a, b;
     int i;
-    while(valuePQ(1) == now){
+    while(mod(valuePQ(1) - now) <= EPS){
         aux = minPQ();
         if(aux->certType >= TOURN_CERT){
             tournEvent();
-            for(i = 2*tournElem - 1; i > 1; i -= 2){
+            db(for(i = 2*tournElem - 1; i > 1; i -= 2){
                 p = tourn[i]->p;
                 q = tourn[i]->lcandp;
                 r = tourn[i - 1]->p;
@@ -405,11 +404,11 @@ void event(){
                     printf("%d and %d\n", i, i-1);
                     exit(0);
                 }
-                else if(a < b && mod(a - b) > EPS && tourn[i/2] != tourn[i - 1]){
+                else if(a > b && mod(a - b) > EPS && tourn[i/2] != tourn[i - 1]){
                     printf("%d and %d\n", i, i-1);
                     exit(0);
                 }
-            }
+            });
         }
         else{
             listEvent();

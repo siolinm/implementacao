@@ -93,22 +93,6 @@ int certType(int direction){
     return HORIZONTAL_CERT;
 }
 
-int checkLine(Point * a, Point * c, double theta, int dir){
-    double x;
-
-    x = (cos(theta))*(getY(c, dir) - getY(a, dir));
-    x -= (sin(theta))*(getX(c, dir) - getX(a, dir));
-
-    if(x > EPS)
-        x = 1;
-    else if(x < -EPS)
-        x = -1;
-    else
-        x = 0;
-
-    return (int)x;
-}
-
 void printPoint(Point * p, int dir){
     Point * hlow, *hup, *cand;
     printf("Direction: ");

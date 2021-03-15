@@ -12,10 +12,10 @@ void listInit(){
     int i;
 
     for(i = 0; i < 3; i++)
-        listRoot[i] = NULL;    
+        listRoot[i] = NULL;
 }
 
-void listInsert(Point * a, int dir){    
+void listInsert(Point * a, int dir){
 
     listRoot[dir] = insertAVLNode(listRoot[dir], a, dir);
 
@@ -27,11 +27,11 @@ void listDelete(Point * a, int dir){
     Point * next;
     int i;
 
-    i = certType(dir);    
+    i = certType(dir);
     next = a->next[dir];
 
     listRoot[dir] = deleteAVLNode(listRoot[dir], a, dir);
-    
+
     deletePQ(a, i);
     updateListCert(next, dir);
 }
@@ -63,7 +63,7 @@ double expireList(Point *a, Point * b, int dir){
     if(b == NULL)
         return INFINITE;
 
-    aspeed = getVx(a, dir); 
+    aspeed = getVx(a, dir);
     bspeed = getVx(b, dir);
 
     if(aspeed - bspeed >= 0)
@@ -73,7 +73,7 @@ double expireList(Point *a, Point * b, int dir){
 }
 
 void newCertList(Point *p, int dir){
-    Cert *cert;    
+    Cert *cert;
 
     if(p == NULL) return;
 
@@ -85,13 +85,13 @@ void newCertList(Point *p, int dir){
     insertPQ(p, certType(dir));
 }
 
-void updateListCert(Point * p, int dir){    
+void updateListCert(Point * p, int dir){
     int type;
 
     if(p == NULL) return;
 
-    type = certType(dir);    
-    
+    type = certType(dir);
+
     updatePQ(p, type, expireList(p, p->prev[dir], dir));
 }
 
@@ -166,7 +166,7 @@ int getBalance(AVLNode *no)
 
 int AVLCompare(Object * a, Object * b, int dir){
     /* x(t) */
-    return getX(a, dir) < getX(b, dir);
+    return getX(a, dir) - getX(b, dir) < -EPS;
 }
 
 AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
@@ -188,7 +188,7 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
         key->next[dir] = r->key->next[dir];
         if(key->next[dir])
             key->next[dir]->prev[dir] = key;
-        r->key->next[dir] = key; 
+        r->key->next[dir] = key;
     }
     else if(key->next[dir] == NULL && AVLCompare(key, r->key, dir)){
         key->next[dir] = r->key;
@@ -197,7 +197,7 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
             key->prev[dir]->next[dir] = key;
         r->key->prev[dir] = key;
     }
-    
+
     setHeight(r);
 
     a = getBalance(r);
@@ -211,7 +211,7 @@ AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)
         return rotateRight(r);
     }
 
-    
+
     if (a < -1 && key > r->right->key)
         return rotateLeft(r);
 
@@ -236,7 +236,7 @@ AVLNode *deleteAVLNode(AVLNode *r, Object *key, int dir)
 {
     AVLNode *aux;
     int a;
-    
+
     if (r == NULL)
         return r;
 
@@ -275,9 +275,9 @@ AVLNode *deleteAVLNode(AVLNode *r, Object *key, int dir)
         return r;
 
     a = getBalance(r);
-    
+
     if (a > 1 && getBalance(r->left) >= 0){
-        return rotateRight(r);    
+        return rotateRight(r);
     }
     else if (a > 1)
     {
@@ -302,7 +302,7 @@ Object * query_kth(AVLNode *r, int i){
         return r->key;
 
     if(r->children < i)
-        return query_kth(r->left, i - r->children - 1);    
+        return query_kth(r->left, i - r->children - 1);
 
     return query_kth(r->right, i);
 }
@@ -335,11 +335,11 @@ void print(char * prefix, int size, AVLNode * r, int b){
             printf("%c", prefix[i]);
 
         if(b)
-            printf("├──"); 
-        else 
+            printf("├──");
+        else
             printf("└──" );
         printf("%d: %g*t + %g = %g\n", r->key->id, r->key->speed, r->key->initv, value(r->key));
-		
+
         newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
             newprefix[i] = prefix[i];
@@ -348,11 +348,11 @@ void print(char * prefix, int size, AVLNode * r, int b){
         else
             newprefix[size - 1] = ' ';
         for(i = size; i < size + 4; i++)
-            newprefix[i] = ' ';        
+            newprefix[i] = ' ';
         newprefix[size + 3] = '\0';
 		print(newprefix, size + 4, r->left, 1);
         print(newprefix, size + 4, r->right, 0);
-        
+
     }
     if(!b)
         free(prefix);
@@ -373,7 +373,7 @@ void printL(){
         else{
             lobj = obj;
             printf("\n");
-        }     
+        }
         obj = obj->next;
     }
     obj = lobj;
@@ -384,7 +384,7 @@ void printL(){
         else{
             lobj = obj;
             printf("\n");
-        }        
+        }
         obj = obj->prev;
     }
 }
@@ -394,6 +394,6 @@ void removeAll(AVLNode * r){
     if(!r)
         return;
     removeAll(r->left);
-    removeAll(r->right);    
+    removeAll(r->right);
     free(r);
 }

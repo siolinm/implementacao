@@ -9,6 +9,22 @@ void initPQ(){
     pqSize = 0;
 }
 
+int comparePQ(PQObject * x, PQObject * y){
+    int a;
+    if(mod(valuePQObject(x) - valuePQObject(y)) < EPS){
+        /* if x->value = y->value DOWN_CERT highest priority, then UP_CERT, then
+         * HORIZONTAL_CERT, then TOURN_CERT
+         */
+        if(y->certType >= TOURN_CERT && x->certType < TOURN_CERT)
+            return 1;
+        a = x->certType < HORIZONTAL_CERT;
+        a = a && y->certType != DOWN_CERT && x->certType != y->certType;
+        return a;
+    }
+
+    return valuePQObject(x) < valuePQObject(y);
+}
+
 void resizePQ(){
     int i;
     if(pqSize + 1 == pqMaxSize){
@@ -34,6 +50,7 @@ void insertPQ(Point * p, int certType){
     Q[++pqSize] = pq;
     pqpos(pq) = pqSize;
     updatePQ(pq->p, pq->certType, valuePQ(pqSize));
+    printPQ();
 }
 
 void deletePQ(Point * p, int certType){
@@ -65,28 +82,30 @@ void updatePQ(Point * p, int certType, double t){
     PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
 
+    if(obj->p->name == 'p' && obj->certType == TOURN_CERT + HORIZONTAL_CERT)
+        printf("Hello\n");
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
-    for (i = 1; 2*i < pqSize; i++){
-        if(valuePQ(2*i) < valuePQ(i)){
-            printf("Incorrect PQ\n");
-            exit(42);
-        }
-        if(2*i + 1 < pqSize){
-            if(valuePQ(2*i + 1) < valuePQ(i)){
+
+        for (i = 1; 2*i < pqSize; i++){
+            if(comparePQ(Q[2*i], Q[i])){
                 printf("Incorrect PQ\n");
                 exit(42);
             }
+            if(2*i + 1 < pqSize){
+                if(comparePQ(Q[2*i + 1], Q[i])){
+                    printf("Incorrect PQ\n");
+                    exit(42);
+                }
+            }
         }
-    }
+
 }
 
 void swim(int i){
     PQObject * obj;
-    double x;
     obj = Q[i];
-    x = valuePQ(i);
-    while(i/2 >= 1 && x < valuePQ(i/2)){
+    while(i/2 >= 1 && comparePQ(obj, Q[i/2])){
         Q[i] = Q[i/2];
         pqpos(Q[i/2]) = i;
         i = i/2;
@@ -99,9 +118,9 @@ void sink(int i, int m){
     int s = 2*i, p = i;
     PQObject * x = Q[i];
     while(s <= m){
-        if(s < m && valuePQ(s) > valuePQ(s + 1))
+        if(s < m && comparePQ(Q[s + 1], Q[s]))
             s += 1;
-        if(valuePQObject(x) < valuePQ(s))
+        if(comparePQ(x, Q[s]))
             break;
 
         Q[p] = Q[s];

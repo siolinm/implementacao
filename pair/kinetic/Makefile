@@ -12,4 +12,4 @@ random_points:
 	gcc $(CFLAGS) random_points.c -o random_points -lm
 
 clean:
-	rm *.o kineticpair *~
+	rm *.o kineticpair random_points *~
