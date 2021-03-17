@@ -17,7 +17,7 @@ int comparePQ(PQObject * x, PQObject * y){
          */
         if(y->certType >= TOURN_CERT && x->certType < TOURN_CERT)
             return 1;
-        a = x->certType < HORIZONTAL_CERT;
+        a = (x->certType == HORIZONTAL_CERT || x->certType == DOWN_CERT);
         a = a && y->certType != DOWN_CERT && x->certType != y->certType;
         return a;
     }
@@ -50,7 +50,6 @@ void insertPQ(Point * p, int certType){
     Q[++pqSize] = pq;
     pqpos(pq) = pqSize;
     updatePQ(pq->p, pq->certType, valuePQ(pqSize));
-    printPQ();
 }
 
 void deletePQ(Point * p, int certType){
@@ -82,8 +81,6 @@ void updatePQ(Point * p, int certType, double t){
     PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
 
-    if(obj->p->name == 'p' && obj->certType == TOURN_CERT + HORIZONTAL_CERT)
-        printf("Hello\n");
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
 

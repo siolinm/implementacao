@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include<math.h>
+#include"debug.h"
 #ifndef _UTIL_H
 #define _UTIL_H
 #define INFINITE 100000000
@@ -17,7 +18,7 @@
 
 #define EPS 1e-8
 
-enum Directions{
+enum directions{
     /* +60º rotation */
     UP = 0,
     /* +0º rotation */
@@ -27,7 +28,7 @@ enum Directions{
 };
 
 /* TOURN_CERT + HORIZONTAL_CERT, TOURN_CERT + UP_CERT */
-enum Cert_types{
+enum cert_types{
     /* +60-order event */
     UP_CERT = 0,
     /* 0-order event */
@@ -38,20 +39,18 @@ enum Cert_types{
     TOURN_CERT
 };
 
-enum Splay_types{
+enum splay_types{
     CANDS_TREE = 0,
     HITS_UP_TREE,
     HITS_LOW_TREE
 };
 
-typedef struct Coordinate
-{
+typedef struct Coordinate{
     double x;
     double y;
 } Coordinate;
 
-typedef struct Vector
-{
+typedef struct Vector{
     double x;
     double y;
 } Vector;
@@ -96,8 +95,7 @@ typedef struct AVLNode
     int height;
 } AVLNode;
 
-typedef struct CandsNode
-{
+typedef struct CandsNode{
     struct CandsNode * left;
     struct CandsNode * right;
     struct CandsNode * parent;
@@ -106,8 +104,7 @@ typedef struct CandsNode
     struct CandsNode * leftmost;
 } CandsNode;
 
-typedef struct HitsNode
-{
+typedef struct HitsNode{
     struct HitsNode * left;
     struct HitsNode * right;
     struct HitsNode * parent;
@@ -118,6 +115,7 @@ typedef struct TournObject{
     Point * p;
     Point * lcandp;
     int direction;
+    db(double a; double b; double c;)
 } TournObject;
 
 typedef struct PQObject{

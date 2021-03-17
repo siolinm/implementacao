@@ -1,16 +1,22 @@
-- [x] Documentação
-- [ ] Adicionar EPS em operações que envolvem tempo e distância (falta splay_tree.c)
-- [x] Desempate de eventos na fila de prioridade: DOWN -> HORIZONTAL -> UP
-- [ ] Desenhar lcandp na tela
-
-Bugs:
+Todo
 ===
 
-- [ ] No torneio em d/h0.in: par p -- c é duplicado em algum momento. Provável erro em: insertTourn ou deleteTourn.
-- [ ] Em d/h1.in os cones up estão completamente errados. Erro: no instante 0 p pertence à Cands(a) mas na lista p está à esquerda de a, como p continua se movendo para esquerda uma troca horizontal não é chamada e os devidos eventos não são atualizados.
-- [ ] Bugs nos cones em casos degenerados (pontos muito próximos)
+- [x] Documentação
+- [x] Adicionar EPS em operações que envolvem tempo e distância (falta splay_tree.c)
+- [x] Desempate de eventos na fila de prioridade: DOWN -> HORIZONTAL -> UP
+    - [x] checar
+- [x] Desenhar lcandp na tela
+- [x] Adicionar desenhos de debug para os eventos (com textos)
 
-Testes:
+Bugs
+===
+
+- [x] Bugs nos cones em casos degenerados (pontos muito próximos) h/h1.in, r/r1.in
+- [x] No torneio em d/h0.in: par p -- c é duplicado em algum momento. Provável erro em: insertTourn ou deleteTourn. Motivo: certificados de pares deletados no torneio não eram deletados, bem como certificados de pares inseridos.
+- [x] Em d/h1.in os cones up estão completamente errados. Erro: no instante 0 p pertence a Cands(a) mas na lista p está à esquerda de a, como p continua se movendo para esquerda, uma troca horizontal não é chamada e as estruturas não são atualizadas.
+  - [x] Solução: forçar eventos quando os pontos empatam. (comentar na reunião)
+
+Testes
 ====
 
 Horizontal

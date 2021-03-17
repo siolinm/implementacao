@@ -189,6 +189,8 @@ void drawEdges(int dir){
         cairo_move_to(ctx, a.x, a.y);
         cairo_line_to(ctx, b.x, b.y);
         cairo_stroke(ctx);
+
+        drawLcand(p, dir);
     }
 }
 
@@ -247,11 +249,11 @@ void drawTest(){
         r = initial[i];
         s = initial[j];
 
-        drawLine(p, q, green);
+        drawLine(p, q, green, SOLID);
 
         drawPoints(p, q);
 
-        drawLine(r, s, blue);
+        drawLine(r, s, blue, SOLID);
 
         drawPoint(r, red);
         drawPoint(s, red);
@@ -292,7 +294,6 @@ void drawPointsTree(void * root, int type, Color color){
 void drawNextEvent(){
     int j;
     char text[100], eventType[50], direct[50];
-    cairo_text_extents_t te;
     j = minPQ()->certType;
     if(j < TOURN_CERT)
         sprintf(eventType, "Swap in order: ");
@@ -310,30 +311,21 @@ void drawNextEvent(){
     }
     sprintf(text, "%s%s", eventType, direct);
 
-    cairo_set_source_rgb (ctx, white.r, white.g, white.b);
-    cairo_move_to(ctx, -WIDTH/2 + x_c + 5, -HEIGHT/2 + y_c + 10);
-    cairo_text_extents (ctx, text, &te);
-    cairo_show_text(ctx, text);
-    cairo_stroke(ctx);
+    drawText(text, BOTTOM_LEFT);
 }
 
 void drawClosestPair(){
     TournObject * x = tourn[1];
     Point *p, *q;
-    cairo_text_extents_t te;
     char text[100];
     p = x->p;
     q = x->lcandp;
 
     if(q != NULL){
-        drawLine(p, q, green);
+        drawLine(p, q, green, SOLID);
 
         sprintf(text, "Distance: %.3lf", distance(p, q, HORIZONTAL));
-        cairo_set_source_rgb (ctx, white.r, white.g, white.b);
-        cairo_move_to(ctx, WIDTH/2 + x_c - 160, HEIGHT/2 + y_c - 20);
-        cairo_text_extents (ctx, text, &te);
-        cairo_show_text(ctx, text);
-        cairo_stroke(ctx);
+        drawText(text, TOP_RIGHT);
     }
     else{
         fprintf(stderr, "Something gone wrong!!\n");
@@ -343,14 +335,9 @@ void drawClosestPair(){
 
 void drawTime(){
     char text[20];
-    cairo_text_extents_t te;
     sprintf(text, "Now: %.3lf", now);
 
-    cairo_set_source_rgb (ctx, white.r, white.g, white.b);
-    cairo_move_to(ctx, -WIDTH/2 + x_c + 5, HEIGHT/2 + y_c - 20);
-    cairo_text_extents (ctx, text, &te);
-    cairo_show_text(ctx, text);
-    cairo_stroke(ctx);
+    drawText(text, TOP_LEFT);
 }
 
 void drawPoint(Point * p, Color color){
@@ -365,8 +352,9 @@ void drawPoint(Point * p, Color color){
     cairo_stroke(ctx);
 }
 
-void drawLine(Point * p, Point * q, Color color){
+void drawLine(Point * p, Point * q, Color color, int style){
     Coordinate a, b;
+    double dashes[2] = {5, 2};
     a.x = getX(p, HORIZONTAL);
     a.y = getY(p, HORIZONTAL);
     a.x *= SCALE;
@@ -379,10 +367,75 @@ void drawLine(Point * p, Point * q, Color color){
 
     cairo_set_line_width (ctx, 2);
     cairo_set_source_rgb(ctx, color.r, color.g, color.b);
+    if(style == DASHED){
+        cairo_set_antialias(ctx,  CAIRO_ANTIALIAS_FAST);
+        cairo_set_dash(ctx, dashes, 1, 0);
+    }
     cairo_move_to(ctx, a.x, a.y);
     cairo_line_to(ctx, b.x, b.y);
     cairo_stroke(ctx);
     cairo_set_line_width (ctx, LINE_WIDTH);
+    cairo_set_dash(ctx, dashes, 0, 0);
+
+}
+
+void drawText(char * text, int pos){
+    Coordinate a;
+    double c = 30, d = 22.5;
+    cairo_text_extents_t te;
+    switch (pos){
+        case TOP_LEFT:
+            a.x = x_c - WIDTH/2 + c/2;
+            a.y = y_c + HEIGHT/2 - c;
+            break;
+        case TOP:
+            a.x = x_c - d*sizeof(text);
+            a.y = y_c + HEIGHT/2 - c;
+            break;
+        case TOP_RIGHT:
+            a.x = x_c + WIDTH/2 - d*sizeof(text);
+            a.y = y_c + HEIGHT/2 - c;
+            break;
+        case CENTER_LEFT:
+            a.x = x_c - WIDTH/2 + c/2;
+            a.y = y_c;
+            break;
+        case CENTER:
+            a.x = x_c - d*sizeof(text);
+            a.y = y_c;
+            break;
+        case CENTER_RIGHT:
+            a.x = x_c + WIDTH/2 - d*sizeof(text);
+            a.y = y_c;
+            break;
+        case BOTTOM_LEFT:
+            a.x = x_c - WIDTH/2 + c/2;
+            a.y = y_c - HEIGHT/2 + c/2;
+            break;
+        case BOTTOM:
+            a.x = x_c - d*sizeof(text);
+            a.y = y_c - HEIGHT/2 + c/2;
+            break;
+        case BOTTOM_RIGHT:
+            a.x = x_c + WIDTH/2 - d*sizeof(text);
+            a.y = y_c - HEIGHT/2 + c/2;
+            break;
+        default:
+            break;
+    }
+
+    cairo_set_source_rgb (ctx, white.r, white.g, white.b);
+    cairo_move_to(ctx, a.x, a.y);
+    cairo_text_extents (ctx, text, &te);
+    cairo_show_text(ctx, text);
+    cairo_stroke(ctx);
+}
+
+void drawLcand(Point * p, int dir){
+    Point * q;
+    q = p->lcand[dir];
+    if(q != NULL)
+        drawLine(p, q, yellow, DASHED);
 }
 
 void drawTourn(){
@@ -417,7 +470,7 @@ void drawTourn(){
             if(tourn[i/2] != x){
                 /* tourn is wrong */
                 if(s != NULL){
-                    drawLine(r, s, red);
+                    drawLine(r, s, red, SOLID);
                     drawPoint(s, red);
                 }
                 drawPoint(r, red);
@@ -425,7 +478,7 @@ void drawTourn(){
             }
             else{
                 if(q != NULL){
-                    drawLine(p, q, white);
+                    drawLine(p, q, white, SOLID);
                     drawPoint(q, white);
                 }
                 drawPoint(p, white);
@@ -434,7 +487,7 @@ void drawTourn(){
         else if(dist2 < dist1 && mod(dist1 - dist2) > EPS){
             if(tourn[i/2] != y){
                 if(q != NULL){
-                    drawLine(p, q, red);
+                    drawLine(p, q, red, SOLID);
                     drawPoint(q, red);
                 }
                 drawPoint(p, red);
@@ -442,7 +495,7 @@ void drawTourn(){
             }
             else{
                 if(s != NULL){
-                    drawLine(r, s, white);
+                    drawLine(r, s, white, SOLID);
                     drawPoint(s, white);
                 }
                 drawPoint(s, white);
@@ -505,9 +558,17 @@ void drawCands(Point * p, int dir, Color color){
     drawPointsTree(p->candsRoot[dir]->parent, CANDS_TREE, color);
 }
 
-void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir){
+void drawEvent(Point * p, Point * q, Point * t, void * root, int type,
+int dir, char * text, int eventType, int * skip){
     int c;
-    for(c = 1; c && drawDebug && drawState;){
+    char event[100];
+    if(eventType == HORIZONTAL)
+        sprintf(event, "Horizontal event");
+    else if(eventType == UP)
+        sprintf(event, "Up event");
+    else if(eventType == DOWN)
+        sprintf(event, "Down event");
+    for(c = 1; c && drawDebug && drawState && *skip;){
         cairo_push_group(ctx);
         cairo_set_source_rgb(ctx, black.r, black.g, black.b);
         cairo_paint(ctx);
@@ -516,11 +577,18 @@ void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir){
 
         drawPoints(p, q);
 
-        if(t != NULL){
-            drawPoint(t, red);
-        }
+        if(t != NULL)
+            drawPoint(t, yellow);
 
-        drawPointsTree(root, type, yellow);
+        drawPointsTree(root, type, white);
+
+        if(text != NULL)
+            drawText(text, BOTTOM);
+
+        if(eventType >= 0)
+            drawText(event, TOP_RIGHT);
+
+        drawTime();
 
         cairo_pop_group_to_source(ctx);
         cairo_paint(ctx);
@@ -529,6 +597,31 @@ void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir){
         switch(drawHandleXEvent(sfc)){
             case C_KEY:
                 c = 0;
+                break;
+            case S_KEY:
+                *skip = 0;
+                break;
+            case J_KEY:
+                x_c -= translate;
+                cairo_translate(ctx, translate, 0);
+                break;
+            case K_KEY:
+                y_c -= translate;
+                cairo_translate(ctx, 0, translate);
+                break;
+            case L_KEY:
+                x_c += translate;
+                cairo_translate(ctx, -translate, 0);
+                break;
+            case I_KEY:
+                y_c += translate;
+                cairo_translate(ctx, 0, -translate);
+                break;
+            case Z_KEY:
+                SCALE += 1;
+                break;
+            case X_KEY:
+                SCALE -= 1;
                 break;
             default:
                 break;

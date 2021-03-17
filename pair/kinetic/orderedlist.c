@@ -159,14 +159,25 @@ AVLNode *rotateLeft(AVLNode *no)
     return rightChild;
 }
 
-int getBalance(AVLNode *no)
-{
+int getBalance(AVLNode *no){
     return (no ? (height(no->left) - height(no->right)) : 0);
 }
 
 int AVLCompare(Object * a, Object * b, int dir){
     /* x(t) */
-    return getX(a, dir) - getX(b, dir) < -EPS;
+    double x, y, vxa, vxb, aux;
+    x = getX(a, dir);
+    y = getX(b, dir);
+    if(mod(x - y) < EPS){/* x = y */
+        vxa = getVx(a, dir);
+        vxb = getVx(b, dir);
+        aux = max(mod(vxa), mod(vxb));
+        vxa -= aux;
+        vxb -= aux;
+
+        return vxa > vxb + EPS;
+    }
+    return x - y < -EPS;
 }
 
 AVLNode *insertAVLNode(AVLNode *r, Object *key, int dir)

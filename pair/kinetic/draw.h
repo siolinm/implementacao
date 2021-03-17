@@ -61,6 +61,23 @@ typedef struct Color{
     double r, g, b;
 } Color;
 
+enum screen_positions{
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT,
+    CENTER_LEFT,
+    CENTER,
+    CENTER_RIGHT,
+    TOP_LEFT,
+    TOP,
+    TOP_RIGHT
+};
+
+enum line_style{
+    SOLID,
+    DASHED
+};
+
 /* some predefined colors */
 Color red, green, blue, black, white, yellow;
 
@@ -122,8 +139,15 @@ void drawPoint(Point * p, Color color);
  * @param p one of the vertex of the line
  * @param q the other vertex of the line
  * @param color color to be used
+ * @param style the style of the line
  */
-void drawLine(Point * p, Point * q, Color color);
+void drawLine(Point * p, Point * q, Color color, int style);
+
+/*! Draws the given text into the screen given position
+ * @param text the text to be drawn
+ * @param pos the position where the text goes
+ */
+void drawText(char * text, int pos);
 
 /*! Draws all the edges of the points with directiond dir
  * @param dir the direction of the edges
@@ -192,8 +216,11 @@ void drawTourn();
  * @param root root of the tree to be drawn
  * @param type type of the tree
  * @param dir direction
+ * @param text text to be drawn at the bottom
+ * @param eventType type of the event
  */
-void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir);
+void drawEvent(Point * p, Point * q, Point * t, void * root, int type,
+int dir, char * text, int eventType, int * skip);
 
 /*! draws every point in the tree with root
  * @param root root of the tree
@@ -201,5 +228,11 @@ void drawEvent(Point * p, Point * q, Point * t, void * root, int type, int dir);
  * @param color color to be used
  */
 void drawPointsTree(void * root, int type, Color color);
+
+/*! Draws a line between p and lcandp in the given direction
+ * @param p the given point
+ * @param dir the direction considered
+ */
+void drawLcand(Point * p, int dir);
 
 #endif

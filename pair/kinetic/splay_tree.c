@@ -159,7 +159,8 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
     while(x != NULL){
         y = x;
         /* rounding errors */
-        if(getX(getKeyS(x, type), orientation) <= getX(p, orientation)) {
+        /* x(q) <= x(p) */
+        if(getX(getKeyS(x, type), orientation) < getX(p, orientation) + EPS) {
             if(!mirror)
                 x = getRightS(x, type);
             else
@@ -217,7 +218,8 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
     while(x != NULL){
         y = x;
         /* rounding errors */
-        if(getX(getKeyS(x, type), orientation) >= getX(p, orientation)){
+        /* x(q) >= x(p) */
+        if(getX(getKeyS(x, type), orientation) > getX(p, orientation) - EPS){
             if(!mirror)
                 x = getLeftS(x, type);
             else

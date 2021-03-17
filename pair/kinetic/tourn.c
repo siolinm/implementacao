@@ -100,6 +100,7 @@ void insertTourn(Point * p, int dir){
 
     dir = tourn[i]->direction;
     tourn[i]->p->lastMatch[dir] = i;
+    newCertTourn(tourn[i]);
 }
 
 void deleteTourn(Point * p, int dir){
@@ -141,6 +142,8 @@ void deleteTourn(Point * p, int dir){
 
         tourn[2*tournElem - 1] = tourn[2*tournElem - 2] = NULL;
     }
+
+    deletePQ(p, TOURN_CERT + certType(dir));
 
     tournElem--;
 
@@ -254,6 +257,12 @@ double expireTourn(TournObject * a, TournObject * b){
     o = c[2]*c[2] + c[4]*c[4] - c[6]*c[6] - c[8]*c[8];
     delta = n*n - 4*m*o;
 
+    db(
+        b->a = m;
+        b->b = n;
+        b->c = o;
+    );
+
     if(m > EPS){
         if(mod(delta) <= EPS){
             printf("Something gone wrong! Delta isn't positive\n");
@@ -291,7 +300,6 @@ double expireTourn(TournObject * a, TournObject * b){
             t1 = -o/n;
             if(t1 < now - EPS)
                 return INFINITE;
-
         }
         else if(n < -EPS){
             t1 = INFINITE;
@@ -318,8 +326,6 @@ void newCertTourn(TournObject * obj){
     obj->p->cert[TOURN_CERT + dir] = newCert;
     i = obj->p->lastMatch[dir];
 
-    if(dir == 1 && obj->p->name == 'h')
-        printf("Hello\n");
 
     if(i == 1){
         newCert->value = INFINITE;
@@ -338,8 +344,6 @@ void updateTournCert(TournObject * a){
 
     i = a->p->lastMatch[dir];
 
-    if(dir == 1 && a->p->name == 'h')
-        printf("Hello\n");
 
     if(i == 1){
         cert->value = INFINITE;
