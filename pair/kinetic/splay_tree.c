@@ -155,12 +155,32 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         else if(order == DOWN)
             orientation = HORIZONTAL;
     }
-
     while(x != NULL){
         y = x;
         /* rounding errors */
         /* x(q) <= x(p) */
-        if(getX(getKeyS(x, type), orientation) < getX(p, orientation) + EPS) {
+        if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
+            if(getY(getKeyS(x, type), orientation) > getY(p, orientation) + EPS){
+                if(!mirror)
+                    x = getRightS(x, type);
+                else
+                    x = getLeftS(x, type);
+            }
+            else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
+                if(!mirror)
+                    x = getRightS(x, type);
+                else
+                    x = getLeftS(x, type);
+            }
+            else{
+                suc = x;
+                if(!mirror)
+                    x = getLeftS(x, type);
+                else
+                    x = getRightS(x, type);
+            }
+        }
+        else if(getX(getKeyS(x, type), orientation) < getX(p, orientation) - EPS) {
             if(!mirror)
                 x = getRightS(x, type);
             else
@@ -215,11 +235,35 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
             orientation = HORIZONTAL;
     }
 
+    if(p->name == 'q' && dir == DOWN)
+        printf("Hello\n");
+
     while(x != NULL){
         y = x;
         /* rounding errors */
         /* x(q) >= x(p) */
-        if(getX(getKeyS(x, type), orientation) > getX(p, orientation) - EPS){
+        if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
+            if(getY(getKeyS(x, type), orientation) < getY(p, orientation) - EPS){
+                if(!mirror)
+                    x = getLeftS(x, type);
+                else
+                    x = getRightS(x, type);
+            }
+            else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
+                if(!mirror)
+                    x = getLeftS(x, type);
+                else
+                    x = getRightS(x, type);
+            }
+            else{
+                pred = x;
+                if(!mirror)
+                    x = getRightS(x, type);
+                else
+                    x = getLeftS(x, type);
+            }
+        }
+        else if(getX(getKeyS(x, type), orientation) > getX(p, orientation) + EPS){
             if(!mirror)
                 x = getLeftS(x, type);
             else
@@ -516,7 +560,6 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
         return NULL;
     }
 
-
     if(getKeyS(root, type) == a){
         if(getLeftS(root, type) && getRightS(root, type)){
             aux = getRightS(root, type);
@@ -576,8 +619,24 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
 }
 
 int compareS(Point * a, Point * b, int type, int dir){
+    double vxa, vxb, aux;
     if(type == CANDS_TREE){
         return getY(a, dir) > getY(b, dir) + EPS;
+    }
+
+    if(mod(getX(a, dir) - getX(b, dir)) < EPS){
+        vxa = getVx(a, dir);
+        vxb = getVx(b, dir);
+
+        aux = max(mod(vxa), mod(vxb));
+
+        vxa -= aux;
+        vxb -= aux;
+
+        if(mod(vxa - vxb) < EPS)
+            return getY(a, dir) < getY(b, dir) - EPS;
+
+        return vxa > vxb + EPS;
     }
 
     return getX(a, dir) > getX(b, dir) + EPS;

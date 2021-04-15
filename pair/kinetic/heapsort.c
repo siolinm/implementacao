@@ -5,7 +5,26 @@ double valueHeapsort(Point **v, int i, int dir){
 }
 
 int compareH(Point **v, int i, int j, int dir){
-    return (valueHeapsort(v, i, dir) > valueHeapsort(v, j, dir) + EPS);
+    Point * a, * b;
+    double x, y, vxa, vxb, aux;
+    a = v[i];
+    b = v[j];
+    x = getX(a, dir);
+    y = getX(b, dir);
+    if(mod(x - y) < EPS){
+        // vxa = getVx(a, dir);
+        // vxb = getVx(b, dir);
+        // aux = max(mod(vxa), mod(vxb));
+        // vxa -= aux;
+        // vxb -= aux;
+        // if(mod(vxa - vxb) < EPS){
+            // if they've the same x-speed use y-coordinate
+            return getY(a, dir) < getY(b, dir) - EPS;
+        //}
+        return vxa < vxb - EPS;
+    }
+    return x - y > EPS;
+    /* return (valueHeapsort(v, i, dir) > valueHeapsort(v, j, dir) + EPS); */
 }
 
 void swapHeapsort(int i, int j, Point ** v){

@@ -154,6 +154,8 @@ int getDirection(int certType){
         retval = UP;
     else if(certType == DOWN_CERT)
         retval = DOWN;
+    else if(certType == ALL_CERT)
+        retval = 3;
     else
         retval = certType - TOURN_CERT;
 

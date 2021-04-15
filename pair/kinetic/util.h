@@ -35,6 +35,8 @@ enum cert_types{
     HORIZONTAL_CERT,
     /* -60-order event */
     DOWN_CERT,
+    /* UP, HORIZONTAL and DOWN CERT */
+    ALL_CERT,
     /* kinetic tourn event */
     TOURN_CERT
 };
@@ -80,7 +82,7 @@ typedef struct Point{
     struct AVLNode * listPosition[3];
     struct Point * prev[3];
     struct Point * next[3];
-    Cert * cert[6];
+    Cert * cert[7]; /* ALL_CERT created to degenerate cases */
     int lastMatch[3];
 } Point;
 

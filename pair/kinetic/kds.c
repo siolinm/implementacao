@@ -5,7 +5,8 @@ void sendPoint(Point * p){
     initial[lastID++] = p;
 
     p->id = lastID - 1;
-
+    for(i = 0; i < 7; i++)
+        p->cert[i] = NULL;
     for(i = 0; i < 3; i++){
         p->cands[i] = NULL;
         p->hitsLow[i] = NULL;

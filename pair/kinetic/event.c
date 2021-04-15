@@ -44,109 +44,96 @@ void tournEvent(){
     );
 }
 
-void listEvent(){
-    PQObject * aux = minPQ();
-    Point * p, * q;
-    int dir, eventType, skip = 1;
-    double vxp, vxq, auxv;
-    p = aux->p;
+void listEvent(Point * p, int eventType){
+    int dir, skip = 1;
+    Point * auxp, *q;
     char text[100];
 
-    if(aux->certType == HORIZONTAL_CERT){
-        eventType = HORIZONTAL;
-    }
-    else if(aux->certType == UP_CERT){
-        eventType = UP;
-    }
-    else{
-        eventType = DOWN;
+    if(eventType == ALL_CERT){
+        deletePQ(p, ALL_CERT);
+        q = p->prev[HORIZONTAL];
+        /* deal with everything and remove
+        ALL_CERT from PQ */
+        if(q->prev[UP] == p){
+            /* u, d, h */
+            listEvent(q, UP_CERT);
+            listEvent(p, DOWN_CERT);
+            listEvent(p, HORIZONTAL_CERT);
+        }
+        else if(q->prev[DOWN] == p){
+            /* h, u, d */
+            listEvent(p, HORIZONTAL_CERT);
+            listEvent(p, UP_CERT);
+            listEvent(q, DOWN_CERT);
+        }
+        else{
+            /* d, h, u */
+            listEvent(p, DOWN_CERT);
+            listEvent(p, HORIZONTAL_CERT);
+            listEvent(p, UP_CERT);
+        }
+        return;
     }
 
-    q = p->prev[eventType];
+    q = p->prev[getDirection(eventType)];
+    auxp = p;
 
     printf("Event between %c and %c\n", p->name, q->name);
     dir = HORIZONTAL;
     sprintf(text, "Event between %c and %c", p->name, q->name);
     drawEvent(p, q, NULL, NULL, 0, dir, text, -1, &skip);
 
-    if(eventType == HORIZONTAL){
+    if(eventType == HORIZONTAL_CERT){
         /* q must be above p */
         if(getY(p, HORIZONTAL) - getY(q, HORIZONTAL) > EPS){ /* Y(p) > Y(q) */
             p = q;
-            q = aux->p;
+            q = auxp;
         }
         else if(mod(getY(p, HORIZONTAL) - getY(q, HORIZONTAL)) < EPS){
-            vxp = getVx(p, dir);
-            vxq = getVx(q, dir);
-
-            auxv = max(mod(vxp), mod(vxq));
-
-            vxp += auxv;
-            vxq += auxv;
-
-            if(vxq > vxp + EPS){ /* q is "going to the right" */
-                p = q;
-                q = aux->p;
-            }
+            p = q;
+            q = auxp;
         }
 
         horizontalEvent(p, q, HORIZONTAL);
         downEvent(p, q, UP);
         upEvent(q, p, DOWN);
     }
-    else if(eventType == UP){
+    else if(eventType == UP_CERT){
         /* p must be to the left of q */
         if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
             p = q;
-            q = aux->p;
+            q = auxp;
         }
-        else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
-            vxp = getVx(p, dir);
-            vxq = getVx(q, dir);
-
-            auxv = max(mod(vxp), mod(vxq));
-
-            vxp -= auxv;
-            vxq -= auxv;
-
-            if(vxq < vxp - EPS){ /* q is "going to the left" */
-                p = q;
-                q = aux->p;
-            }
-        }
+        /* else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
+        } */
 
         upEvent(p, q, HORIZONTAL);
         horizontalEvent(q, p, UP);
         downEvent(p, q, DOWN);
     }
-    else if(eventType == DOWN){
+    else if(eventType == DOWN_CERT){
         if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
             p = q;
-            q = aux->p;
+            q = auxp;
         }
         else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
-            vxp = getVx(p, dir);
-            vxq = getVx(q, dir);
-
-            auxv = max(mod(vxp), mod(vxq));
-
-            vxp += auxv;
-            vxq += auxv;
-
-            if(vxq > vxp + EPS){ /* q is "going to the right" */
+            if(p->prev[HORIZONTAL] == p->prev[DOWN]){
                 p = q;
-                q = aux->p;
+                q = auxp;
             }
         }
+
+        if(p->name == 'h' && q->name == 'q')
+            printf("Hello\n");
 
         downEvent(p, q, HORIZONTAL);
         upEvent(p, q, UP);
         horizontalEvent(p, q, DOWN);
     }
 
-    dir = eventType;
-    p = aux->p;
-    q = p->prev[eventType];
+    dir = getDirection(eventType);
+    p = auxp;
+    q = p->prev[dir];
 
     listSwap(p, q, dir);
 
@@ -214,7 +201,6 @@ void horizontalEvent(Point * p, Point * q, int dir){
         sprintf(text, "Hits_up(%c) after deleting %c", q->name, p->name);
         drawEvent(p, q, t, q->hitsUpRoot[dir]->parent,
         HITS_UP_TREE, dir, text, HORIZONTAL, &skip);
-
 
         /* insert p in HitsUp(t) (if t != NULL)*/
         if(t != NULL){
@@ -734,7 +720,7 @@ void event(){
             });
         }
         else{
-            listEvent();
+            listEvent(aux->p, aux->certType);
         }
     }
 }

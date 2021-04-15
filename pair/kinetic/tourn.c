@@ -1,12 +1,94 @@
 #include"tourn.h"
 static int last;
 
+int checkDraw(TournObject * a, TournObject * b){
+    int i;
+    TournObject * aux;
+    double c[9], m, n, o, delta, t1, t2, auxv;
+    if(a->lcandp == NULL)
+        return 0;
+    else if(b->lcandp == NULL)
+        return 1;
+    aux = a;
+    for(i = 0; i < 2; i++){
+        c[4*i + 1] = getVx(aux->p, aux->direction) - getVx(aux->lcandp, aux->direction);
+        c[4*i + 2] = getX0(aux->p, aux->direction) - getX0(aux->lcandp, aux->direction);
+        c[4*i + 3] = getVy(aux->p, aux->direction) - getVy(aux->lcandp, aux->direction);
+        c[4*i + 4] = getY0(aux->p, aux->direction) - getY0(aux->lcandp, aux->direction);
+        aux = b;
+    }
+
+    m = c[1]*c[1] + c[3]*c[3] - c[5]*c[5] - c[7]*c[7];
+    n = 2*(c[1]*c[2] + c[3]*c[4] - c[5]*c[6] - c[7]*c[8]);
+    o = c[2]*c[2] + c[4]*c[4] - c[6]*c[6] - c[8]*c[8];
+    delta = n*n - 4*m*o;
+
+    if(m > EPS){
+        if(mod(delta) <= EPS){
+            return 0;
+        }
+        else{
+            t1 = -n + sqrt(delta);
+            t1 = t1/(2*m);
+            t2 = -n - sqrt(delta);
+            t2 = t2/(2*m);
+            auxv = min(t1,t2);
+            t2 = max(t1, t2);
+            t1 = auxv;
+
+            return mod(t1 - now) < EPS;
+
+            /* if(t1 <= now)
+                return INFINITE; */
+        }
+
+    }
+    else if (m < -EPS){
+        if(mod(delta) <= EPS)
+            return 1;
+
+        t1 = -n + sqrt(delta);
+        t1 = t1/(2*m);
+        t2 = -n - sqrt(delta);
+        t2 = t2/(2*m);
+        auxv = min(t1,t2);
+        t2 = max(t1, t2);
+        t1 = auxv;
+
+        return !(mod(t1 - now) < EPS);
+
+    }
+    else{
+        if(n > EPS){
+            t1 = -o/n;
+            return 0;
+        }
+        else if(n < -EPS){
+            return 1;
+        }
+        else{
+            if(o > EPS){
+                printf("Something gone wrong! o > 0 %.16lf\n", o);
+                exit(0);
+            }
+            else{
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 int compareTourn(int i, int j){
     double a, b;
     a = distance(tourn[i]->p, tourn[i]->lcandp, tourn[i]->direction);
     b = distance(tourn[j]->p, tourn[j]->lcandp, tourn[j]->direction);
-    if(mod(a - b) <= EPS) /* a = b */
-        return 1;
+    if(i == 18 || j == 18)
+        printf("Hello\n");
+    if(mod(a - b) <= EPS){
+        return checkDraw(tourn[i], tourn[j]);
+    } /* a = b */
     return a < b;
 }
 
@@ -275,11 +357,14 @@ double expireTourn(TournObject * a, TournObject * b){
             t2 = t2/(2*m);
 
             t1 = max(t1, t2);
-            if(t1 < -EPS)
+            if(t1 < -EPS){
+                printf("algo aconteceu aqui\n");
                 return INFINITE;
+            }
             /* if(t1 <= now)
                 return INFINITE; */
         }
+
     }
     else if (m < -EPS){
         if(mod(delta) <= EPS)
@@ -292,8 +377,11 @@ double expireTourn(TournObject * a, TournObject * b){
 
         if(min(t1, t2) > now + EPS)
             t1 = min(t1, t2);
-        else
+        else{
+            if(mod(m + 1) < EPS && mod(n - 4) < EPS)
+                printf("aaaaaa: %.8lf, %.8lf, %.8lf\n", t1, t2, now);
             return INFINITE;
+        }
     }
     else{
         if(n > EPS){
@@ -326,7 +414,6 @@ void newCertTourn(TournObject * obj){
     obj->p->cert[TOURN_CERT + dir] = newCert;
     i = obj->p->lastMatch[dir];
 
-
     if(i == 1){
         newCert->value = INFINITE;
     }
@@ -343,7 +430,6 @@ void updateTournCert(TournObject * a){
     cert = a->p->cert[TOURN_CERT + dir];
 
     i = a->p->lastMatch[dir];
-
 
     if(i == 1){
         cert->value = INFINITE;

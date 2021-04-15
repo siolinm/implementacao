@@ -146,12 +146,12 @@ void * insertSR(void * root, void * node, int type, int dir);
 void * deleteSR(void * root, Point * a, void **parent, int type, int dir);
 
 /*! Compares two points based on the three type and returns 1 if the point a
-must be to the left, 0 otherwise
+ must be to the right, 0 otherwise
  * @param a one of the points to be compared
  * @param b the other point to be compared
  * @param type the type of the tree (CANDS_TREE, HITS_LOW_TREE or HITS_UP_TREE)
  * @param dir the direction considered
- * @return 1 if a must be in the left subtree of b, 0 otherwise
+ * @return 1 if a must be in the right subtree of b, 0 otherwise
  */
 int compareS(Point * a, Point * b, int type, int dir);
 

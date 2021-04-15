@@ -295,8 +295,12 @@ void drawNextEvent(){
     int j;
     char text[100], eventType[50], direct[50];
     j = minPQ()->certType;
-    if(j < TOURN_CERT)
-        sprintf(eventType, "Swap in order: ");
+    if(j < TOURN_CERT){
+        if(j != ALL_CERT)
+            sprintf(eventType, "Swap in order: ");
+        else
+            sprintf(eventType, "Swap in all orders");
+    }
     else{
         sprintf(eventType, "Tourn event: ");
     }
@@ -309,6 +313,7 @@ void drawNextEvent(){
     else if(getDirection(j) == DOWN){
         sprintf(direct, "DOWN");
     }
+    else sprintf(direct, " ");
     sprintf(text, "%s%s", eventType, direct);
 
     drawText(text, BOTTOM_LEFT);
@@ -376,7 +381,6 @@ void drawLine(Point * p, Point * q, Color color, int style){
     cairo_stroke(ctx);
     cairo_set_line_width (ctx, LINE_WIDTH);
     cairo_set_dash(ctx, dashes, 0, 0);
-
 }
 
 void drawText(char * text, int pos){
@@ -714,8 +718,10 @@ void draw(){
                 break;
             case ENTER_KEY:
                 /*  */
-                if(sel > 0)
+                if(sel > 0){
                     enter = !enter;
+                    printS(initial[sel]->hitsUpRoot[UP], HITS_UP_TREE);
+                }
                 else
                     enter = 0;
                 break;

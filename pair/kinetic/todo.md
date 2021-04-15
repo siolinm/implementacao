@@ -7,6 +7,9 @@ Todo
     - [x] checar
 - [x] Desenhar lcandp na tela
 - [x] Adicionar desenhos de debug para os eventos (com textos)
+- [x] Repensar os desempates na splay_tree (provavelmente agora também envolvendo o eixo y)
+- [ ] Fazer mais testes envolvendo casos degenerados e refazer os testes normais
+- [ ] Pensar e checar se os certificados ALL_CERT podem acabar duplicados
 
 Bugs
 ===
@@ -23,34 +26,52 @@ Horizontal
 ---
 
 - [x] tests/h/h0.in
-- [ ] tests/h/h1.in
-- [ ] tests/h/d0.in
-- [ ] tests/h/d1.in
-- [ ] tests/h/u0.in
-- [ ] tests/h/u1.in
+- [x] tests/h/h1.in
+- [x] tests/h/d0.in
+- [x] tests/h/d1.in
+- [x] tests/h/u0.in
+- [x] tests/h/u1.in
 
 Down
 ---
 
-- [ ] tests/d/h0.in
-- [ ] tests/d/h1.in
-- [ ] tests/d/d0.in
-- [ ] tests/d/d1.in
-- [ ] tests/d/u0.in
-- [ ] tests/d/u1.in
+- [x] tests/d/h0.in
+- [x] tests/d/h1.in
+- [x] tests/d/d0.in
+- [x] tests/d/d1.in
+- [x] tests/d/u0.in
+- [x] tests/d/u1.in
 
 Up
 ---
 
-- [ ] tests/u/h0.in
-- [ ] tests/u/h1.in
-- [ ] tests/u/d0.in
-- [ ] tests/u/d1.in
-- [ ] tests/u/u0.in
-- [ ] tests/u/u1.in
+- [x] tests/u/h0.in
+- [x] tests/u/h1.in
+- [x] tests/u/d0.in
+- [x] tests/u/d1.in
+- [x] tests/u/u0.in
+- [x] tests/u/u1.in
+    - [x] erros no torneio, em casos onde o par empata no instante 0, mas a
+      partir de um momento o outro passa a vencer. O melhor a se fazer seria dar
+      um jeito de colocar esses pares vencendo logo de cara.
 
 Random
 ---
 
-- [ ] tests/r/r0.in
-- [ ] tests/r/r1.in
+- [x] tests/r/r0.in
+- [x] tests/r/r1.in
+    - [x] erros no evento do cone up entre q e a, possivelmente alguma query
+      chamada errada que deu certo por conta da quantidade de pontos utilizada.
+      Problema no empate, resolvido através de alterações em compareS.
+
+Random
+---
+- [x] tests/degenerate/1.in
+- [ ] tests/degenerate/2.in
+  - swap in all orders não está sendo identificado. Erros no extract
+- [ ] tests/degenerate/3.in
+  - swap in all orders não está sendo identificado
+- [x] tests/degenerate/4.in
+- [ ] tests/degenerate/5.in
+  - Erro na ordem de quem chamar ou em determinar p e q.
+- [ ] tests/degenerate/circle.in

@@ -5,6 +5,7 @@
         "tourn.h": "c",
         "kds.h": "c",
         "draw.h": "c",
-        "splay_tree.h": "c"
+        "splay_tree.h": "c",
+        "xlib.h": "c"
     }
 }

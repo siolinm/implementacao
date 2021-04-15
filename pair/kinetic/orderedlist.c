@@ -66,7 +66,15 @@ double expireList(Point *a, Point * b, int dir){
     aspeed = getVx(a, dir);
     bspeed = getVx(b, dir);
 
-    if(aspeed - bspeed >= 0)
+    if(mod(aspeed - bspeed) < EPS && mod(getX0(a, dir) - getX0(b, dir)) < EPS){
+        aspeed = getVy(a, dir);
+        bspeed = getVy(b, dir);
+        if(aspeed < bspeed - EPS)
+            return INFINITE;
+        return (getY0(b, dir) - getY0(a, dir))/(aspeed - bspeed);
+    }
+
+    if(aspeed - bspeed > -EPS)
         return INFINITE;
 
     return (getX0(a, dir) - getX0(b, dir))/(bspeed - aspeed);
@@ -74,21 +82,63 @@ double expireList(Point *a, Point * b, int dir){
 
 void newCertList(Point *p, int dir){
     Cert *cert;
+    int type;
 
     if(p == NULL) return;
 
     cert = malloc(sizeof(*cert));
+    type = certType(dir);
 
-    p->cert[dir] = cert;
-    p->cert[dir]->value = expireList(p, p->prev[dir], dir);
+    p->cert[type] = cert;
+    p->cert[type]->value = 0;
 
-    insertPQ(p, certType(dir));
+    insertPQ(p, type);
+    updateListCert(p, dir);
 }
 
 void updateListCert(Point * p, int dir){
-    int type;
-
+    int type, i, a;
+    Point * q;
+    Cert * c;
+    double time, aux;
     if(p == NULL) return;
+
+/*     if(p->prev[HORIZONTAL] != p->prev[dir] && p->next[dir] != NULL){
+        q = p->next[dir];
+        time = expireList(q, p, dir);
+    }
+    else{ */
+        q = p->prev[dir];
+        time = expireList(p, q, dir);
+    //}
+
+    for(i = a = 0; i < 3; i++){
+        if(i == dir) continue;
+        if(q != NULL && p->prev[i] == q){
+            aux = expireList(p, p->prev[i], i);
+            a += (mod(time - aux) < EPS);
+        }
+        else if(q != NULL && q->prev[i] == p){
+            aux = expireList(q, p, i);
+            a += (mod(time - aux) < EPS);
+        }
+    }
+
+    if(a == 2 && q != NULL){
+        q = p;
+        if(p->prev[HORIZONTAL] != p->prev[dir])
+            q = p->next[HORIZONTAL];
+
+        //if(q != NULL && q->cert[ALL_CERT] != NULL){
+            c = malloc(sizeof(*c));
+            q->cert[ALL_CERT] = c;
+            c->value = time;
+
+            insertPQ(q, ALL_CERT);
+        //}
+    }
+    /* else if(p->cert[ALL_CERT] != NULL)
+        deletePQ(p, ALL_CERT); */
 
     type = certType(dir);
 
@@ -174,8 +224,12 @@ int AVLCompare(Object * a, Object * b, int dir){
         aux = max(mod(vxa), mod(vxb));
         vxa -= aux;
         vxb -= aux;
-
-        return vxa > vxb + EPS;
+        printf("%.8lf\n", mod(vxa - vxb));
+        if(mod(vxa - vxb) < EPS){
+            // if they've the same x-speed use y-coordinate
+            return getY(a, dir) > getY(b, dir) + EPS;
+        }
+        return vxa < vxb - EPS;
     }
     return x - y < -EPS;
 }
@@ -305,7 +359,6 @@ AVLNode *deleteAVLNode(AVLNode *r, Object *key, int dir)
     }
 
     return r;
-
 }
 
 Object * query_kth(AVLNode *r, int i){
@@ -321,7 +374,7 @@ Object * query_kth(AVLNode *r, int i){
 void printListR(AVLNode * r, int dir){
     if(r != NULL){
         printListR(r->left, dir);
-        printf(" - %g - %c", r->key->cert[dir]->value, r->key->name);
+        printf(" - %g - %c", r->key->cert[certType(dir)]->value, r->key->name);
         printListR(r->right, dir);
     }
 }

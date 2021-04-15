@@ -11,15 +11,24 @@ void initPQ(){
 
 int comparePQ(PQObject * x, PQObject * y){
     int a;
+    double yx, yy;
+    double t;
     if(mod(valuePQObject(x) - valuePQObject(y)) < EPS){
-        /* if x->value = y->value DOWN_CERT highest priority, then UP_CERT, then
-         * HORIZONTAL_CERT, then TOURN_CERT
-         */
-        if(y->certType >= TOURN_CERT && x->certType < TOURN_CERT)
+        t = valuePQObject(x);
+        /* ALL_CERT highest priority, HORIZONTAL_CERT = DOWN_CERT = UP_CERT,
+        TOURN_CERT lowest priority */
+        yx = getY0(x->p, HORIZONTAL) + getVy(x->p, HORIZONTAL)*t;
+        yy = getY0(y->p, HORIZONTAL) + getVy(y->p, HORIZONTAL)*t;
+        if(yx > yy + EPS)
             return 1;
-        a = (x->certType == HORIZONTAL_CERT || x->certType == DOWN_CERT);
-        a = a && y->certType != DOWN_CERT && x->certType != y->certType;
-        return a;
+        else if(yx < yy - EPS)
+            return 0;
+        else{
+            if(y->certType >= TOURN_CERT && x->certType < TOURN_CERT)
+                return 1;
+            a = (x->certType == ALL_CERT && y->certType != ALL_CERT);
+            return a;
+        }
     }
 
     return valuePQObject(x) < valuePQObject(y);
@@ -49,6 +58,7 @@ void insertPQ(Point * p, int certType){
 
     Q[++pqSize] = pq;
     pqpos(pq) = pqSize;
+
     updatePQ(pq->p, pq->certType, valuePQ(pqSize));
 }
 
@@ -58,6 +68,9 @@ void deletePQ(Point * p, int certType){
     Q[pqpos(obj)] = Q[pqSize--];
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
+
+    free(p->cert[certType]);
+    p->cert[certType] = NULL;
 }
 
 PQObject * minPQ(){
@@ -81,17 +94,22 @@ void updatePQ(Point * p, int certType, double t){
     PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
 
+    if(t < 0)
+        printf("Hello\n");
+
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
 
         for (i = 1; 2*i < pqSize; i++){
             if(comparePQ(Q[2*i], Q[i])){
-                printf("Incorrect PQ\n");
+                printPQ();
+                printf("Incorrect PQ %d and %d\n", 2*i, i);
                 exit(42);
             }
             if(2*i + 1 < pqSize){
                 if(comparePQ(Q[2*i + 1], Q[i])){
-                    printf("Incorrect PQ\n");
+                    printPQ();
+                    printf("Incorrect PQ %d and %d\n", 2*i + 1, i);
                     exit(42);
                 }
             }
@@ -129,7 +147,7 @@ void sink(int i, int m){
 }
 
 void printPQR(char * prefix, int size, int j, int b){
-    int i;
+    int i, cert;
     char * newprefix;
 
     if(prefix == NULL){
@@ -140,13 +158,28 @@ void printPQR(char * prefix, int size, int j, int b){
     {
         for(i = 0; prefix[i] != '\0'; i++)
             printf("%c", prefix[i]);
-
+        cert = Q[j]->certType;
         if(b)
             printf("├──");
         else
             printf("└──" );
 
-        printf("%d: %g\n", j, valuePQ(j));
+        printf("%d: %c, %g, certType: ", j, Q[j]->p->name, valuePQ(j));
+        if(cert == HORIZONTAL_CERT){
+            printf("HORIZONTAL_CERT\n");
+        }
+        else if(cert == UP_CERT){
+            printf("UP_CERT\n");
+        }
+        else if(cert == DOWN_CERT){
+            printf("DOWN_CERT\n");
+        }
+        else if(cert == ALL_CERT){
+            printf("ALL_CERT\n");
+        }
+        else{
+            printf("TOURN_CERT\n");
+        }
 
         newprefix = malloc((size + 4)*sizeof(*newprefix));
         for(i = 0; i < size; i++)
