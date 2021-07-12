@@ -1,0 +1,120 @@
+Event between b and a
+Event between b and a -- UP
+Inserting a in Cands(b)
+Cands(b) after insert... updating lcand(b)
+Extracting everyone
+After extract
+After insert in Hits_up(b)
+Remove b from Hits_low(a)
+After remove
+New up(a) found
+Extracted these points from Cands(b) to Cands(a)
+Updating lcand(b)
+Points inserted in Cands(a)
+Updating lcand(a)
+Hits_up(b) before deleting a
+Hits_up(b) after deleting a
+Hits_low(a) before inserting b
+Hits_low(a) after inserting b
+Insert b in Hits_up(a)
+After insert
+Extracting everyone
+After insert in Hits_low(a)
+Remove a from Cands(b)
+After delete... update lcand(b)
+Event between c and b
+Event between b and c -- HORIZONTAL
+New up(b) found
+Extracted these points from Cands(c) to Cands(b)
+Updating lcand(c)
+Points inserted in Cands(b)
+Updating lcand(b)
+Hits_up(c) before deleting b
+Hits_up(c) after deleting b
+Hits_low(a) before deleting c
+Hits_low(a) after deleting c
+Hits_low(b) before inserting c
+Hits_low(b) after inserting c
+Event between c and a
+Event between c and a -- UP
+Updating lcand(a)
+Event between c and b
+Event between c and b -- UP
+Inserting b in Cands(c)
+Cands(c) after insert... updating lcand(c)
+Extracting everyone
+After extract
+After insert in Hits_up(c)
+Remove c from Hits_low(b)
+After remove
+Updating lcand(a)
+Event between a and b
+Event between b and a -- DOWN
+Insert b in Hits_up(a)
+After insert
+Extracting everyone
+After insert in Hits_low(a)
+Remove a from Cands(b)
+After delete... update lcand(b)
+Inserting a in Cands(c)
+After insert... updating lcand(c)
+Inserting a in Cands(b)
+Cands(b) after insert... updating lcand(b)
+Extracting everyone
+After extract
+After insert in Hits_up(b)
+Remove b from Hits_low(a)
+After remove
+New up(b) found
+Extracted these points from Cands(a) to Cands(b)
+Updating lcand(a)
+Points inserted in Cands(b)
+Updating lcand(b)
+Hits_up(a) before deleting b
+Hits_up(a) after deleting b
+Hits_low(b) before inserting a
+Hits_low(b) after inserting a
+Event between a and c
+Event between c and a -- DOWN
+Insert c in Hits_up(a)
+After insert
+Extracting everyone
+After insert in Hits_low(a)
+Remove a from Cands(c)
+After delete... update lcand(c)
+Event between b and c
+Event between c and b -- DOWN
+Delete c from Hits_up(a)
+After delete
+Insert c in Hits_up(b)
+After insert
+Extracting everyone
+After insert in Hits_low(b)
+Remove b from Cands(c)
+After delete... update lcand(c)
+Event between a and b
+Event between b and a -- HORIZONTAL
+New up(b) found
+Extracted these points from Cands(a) to Cands(b)
+Updating lcand(a)
+Points inserted in Cands(b)
+Updating lcand(b)
+Hits_up(a) before deleting b
+Hits_up(a) after deleting b
+Hits_low(b) before inserting a
+Hits_low(b) after inserting a
+Insert b in Hits_up(a)
+After insert
+Extracting everyone
+After insert in Hits_low(a)
+Remove a from Cands(b)
+After delete... update lcand(b)
+Inserting b in Cands(a)
+Cands(a) after insert... updating lcand(a)
+Extracting everyone
+After extract
+After insert in Hits_up(a)
+Remove a from Hits_low(b)
+After remove
+Event between a and c
+Event between c and a -- HORIZONTAL

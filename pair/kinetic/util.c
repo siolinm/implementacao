@@ -162,6 +162,209 @@ int getDirection(int certType){
     return retval;
 }
 
+int left(Point *p, Point *q, int dir){
+    double vxp, vxq, vyp, vyq, aux;
+    if(getX(p, dir) < getX(q, dir) - EPS){
+        return 1;
+    }
+    else if(getX(q, dir) < getX(p, dir) - EPS){
+        return 0;
+    }
+    else{
+        if(getY(p, dir) > getY(q, dir) + EPS)
+            return 1;
+        else if(getY(p, dir) < getY(q, dir) - EPS)
+            return 0;
+        else{
+            vxp = getVx(p, dir);
+            vxq = getVx(q, dir);
+
+            aux = max(mod(vxp), mod(vxq));
+
+            vxp -= aux;
+            vxq -= aux;
+
+            if(vxp < vxq - EPS) /* p is to the left after t+epsilon (was to the right) */
+                return 1;
+            else if(vxq < vxp - EPS)/* q is to the left after t+epsilon (was to the right) */
+                return 0;
+            else{
+                vyp = getVy(p, dir);
+                vyq = getVy(q, dir);
+
+                aux = max(mod(vyp), mod(vyq));
+
+                vyp -= aux;
+                vyq -= aux;
+                if(vyp < vyq - EPS) /* p is below q after t+epsilon (was above, therefore to the left) */
+                    return 0;
+                else
+                    return 1;
+            }
+        }
+    }
+}
+
+int wasLeft(Point *p, Point *q, int dir){
+    double vxp, vxq, vyp, vyq, aux;
+    if(getX(p, dir) < getX(q, dir) - EPS){
+        return 1;
+    }
+    else if(getX(q, dir) < getX(p, dir) - EPS){
+        return 0;
+    }
+    else{
+        if(getY(p, dir) > getY(q, dir) + EPS)
+            return 1;
+        else if(getY(p, dir) < getY(q, dir) - EPS)
+            return 0;
+        else{
+            vxp = getVx(p, dir);
+            vxq = getVx(q, dir);
+
+            aux = max(mod(vxp), mod(vxq));
+
+            vxp -= aux;
+            vxq -= aux;
+
+            if(vxp < vxq - EPS) /* p is to the left after t+epsilon (was to the right) */
+                return 0;
+            else if(vxq < vxp - EPS)/* q is to the left after t+epsilon (was to the right) */
+                return 1;
+            else{
+                vyp = getVy(p, dir);
+                vyq = getVy(q, dir);
+
+                aux = max(mod(vyp), mod(vyq));
+
+                vyp -= aux;
+                vyq -= aux;
+                if(vyp < vyq - EPS) /* p is below q after t+epsilon (was above, therefore to the left) */
+                    return 1;
+                else
+                    return 0;
+            }
+        }
+    }
+}
+
+int getCertPriority(Point * p, Point * q, int dir){
+    if(wasLeft(q, p, UP)){ /* Case 1 */
+        if(dir == UP)
+            return HIGH_PRIORITY;
+        else if(dir == DOWN)
+            return MEDIUM_PRIORITY;
+        else
+            return LOW_PRIORITY;
+    }
+    else if(wasLeft(q, p, DOWN)){ /* Case 3 */
+        if(dir == UP)
+            return MEDIUM_PRIORITY;
+        else if(dir == DOWN)
+            return LOW_PRIORITY;
+        else
+            return HIGH_PRIORITY;
+    }
+    else{ /* Case 2 */
+        if(dir == UP)
+            return LOW_PRIORITY;
+        else if(dir == DOWN)
+            return HIGH_PRIORITY;
+        else
+            return MEDIUM_PRIORITY;
+    }
+}
+
+int auxDir(int dir){
+    if(dir < 0){
+        if(dir == -7)
+            return UP;
+        else
+            return -dir;
+    }
+    return dir;
+}
+
+int leftTest(Point * p, Point * q, int dir){
+    int auxdir, prio;
+    Point * cert_point;
+    Point * left_point, * right_point;
+    PQObject * pq;
+    Cert * c;
+    if(getX(p, dir) < getX(q, dir) - EPS){
+        return 1;
+    }
+    else if(getX(q, dir) < getX(p, dir) - EPS){
+        return 0;
+    }
+    else{
+        if(getY(p, dir) > getY(q, dir) + EPS)
+            return 1;
+        else if(getY(p, dir) < getY(q, dir) - EPS)
+            return 0;
+        else{
+            auxdir = auxDir(dir);
+            left_point = p;
+            right_point = q;
+            if(wasLeft(q, p, HORIZONTAL)){
+                left_point = q;
+                right_point = p;
+            }
+            prio = getCertPriority(left_point, right_point, auxdir);
+            pq = Q[1];
+            if(pq == NULL)
+                return left(p, q, dir);
+            cert_point = pq->p;
+            c = cert_point->cert[pq->certType];
+            /* pego o evento no topo da fila atualmente */
+            /* checo se a troca entre p e q deveria ser processada
+            antes ou depois desse evento */
+            if(prio > c->priority){
+                return left(p, q, dir);
+            }
+            else if(prio < c->priority){
+                return wasLeft(p, q, dir);
+            }
+            else{
+                right_point = q;
+                if(wasLeft(q, p, dir))
+                    right_point = p;
+                if(prio == 1)
+                    prio = 2;
+                if(((-certType(dir) + (3 - prio)) % 3) < ((-pq->certType + (3 - prio)) % 3)){
+                    return left(p, q, dir);
+                }
+                else if(((-certType(dir) + (3 - prio)) % 3) > ((-pq->certType + (3 - prio)) % 3)){
+                    return wasLeft(p, q, dir);
+                }
+                else{
+                    if(right_point->id < cert_point->id)
+                        return left(p, q, dir);
+                    else if(right_point->id > cert_point->id)
+                        return wasLeft(p, q, dir);
+                    else{
+                        return left(p, q, dir);
+                    }
+                }
+                // if(right_point->id < cert_point->id)
+                //     return left(p, q, dir);
+                // else if(right_point->id > cert_point->id)
+                //     return wasLeft(p, q, dir);
+                // else{
+                //     if(certType(dir) < pq->certType){
+                //         return left(p, q, dir);
+                //     }
+                //     else if(certType(dir) > pq->certType){
+                //         return wasLeft(p, q, dir);
+                //     }
+                //     else
+                //         return left(p, q, dir);
+                // }
+            }
+        }
+    }
+}
+
 void destroy(){
 
 }

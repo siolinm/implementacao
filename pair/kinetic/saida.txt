@@ -1,0 +1,28 @@
+Event between b and a -- UP, prio: 3
+UP EVENT: case A, (b, a)
+left test (a, c) -- HORIZONTAL, result: yes
+left test (a, c) -- HORIZONTAL, result: yes
+Event between c and a -- UP, prio: 3
+UP EVENT: case A, (c, a)
+Event between b and c -- HORIZONTAL, prio: 3
+Entered HORIZONTAL EVENT: (b, c)
+HORIZONTAL EVENT: case A, (b, c)
+left test (b, a) -- DOWN, result: no
+Erasing up(b)
+Inserting something in Hits_up(a)
+Event between b and a -- DOWN, prio: 2
+DOWN EVENT: case A, (b, a)
+Deleting something from Hits_up(a)
+Erasing up(b)
+Event between c and a -- DOWN, prio: 2
+Event between c and b -- UP, prio: 2
+UP EVENT: case A, (c, b)
+Event between b and a -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (b, a)
+Event between c and a -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (c, a)
+Event between c and b -- DOWN, prio: 1
+DOWN EVENT: case B, (c, b)
+New up(c): b
+Testing: up(c) = b
+└── NULL

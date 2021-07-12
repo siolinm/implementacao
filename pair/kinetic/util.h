@@ -41,6 +41,13 @@ enum cert_types{
     TOURN_CERT
 };
 
+enum cert_priority{
+    TOURN_PRIORITY,
+    LOW_PRIORITY,
+    MEDIUM_PRIORITY,
+    HIGH_PRIORITY
+};
+
 enum splay_types{
     CANDS_TREE = 0,
     HITS_UP_TREE,
@@ -61,6 +68,7 @@ typedef struct Cert{
     /* certificate type */
     int pqpos;
     double value;
+    int priority;
 } Cert;
 
 typedef struct Point{
@@ -225,6 +233,26 @@ int getDirection(int certType);
  * @param dir the specified direction
  */
 void printPoint(Point * p, int dir);
+
+/*! int getCertPriority(Point * p, Point * q, int dir)
+ * @param p point p to the left of q, that will reach q in t'
+ * @param q point q to the right of p
+ * @param dir the direction of the certificate
+ * @return returns the certificate priority
+ */
+int getCertPriority(Point * p, Point * q, int dir);
+
+/*! int left(Point * p, Point * q, int dir)
+ * @param p point p
+ * @param q point q
+ * @param dir the direction considered
+ * @return returns 1 if p is to the left of q, 0 otherwise
+ */
+int left(Point *p, Point *q, int dir);
+
+int wasLeft(Point *p, Point *q, int dir);
+
+int leftTest(Point * p, Point * q, int dir);
 
 /* Frees all memory
  *

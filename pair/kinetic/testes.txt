@@ -1,1 +1,199 @@
-Uma troca nas 3 ordens ao mesmo tempo, ponto p e q com mesmo y e há uma troca horizontal, +60 e -60 ao mesmo tempo. Pensar se algo pode dar errado.
+Event between b and d -- UP, prio: 3
+UP EVENT: case A, (b, d)
+left test (d, c) -- HORIZONTAL, result: no
+left test (d, c) -- HORIZONTAL, result: no
+
+Event between c and a -- UP, prio: 3
+UP EVENT: case A, (c, a)
+left test (d, c) -- HORIZONTAL, result: no
+
+Event between c and d -- UP, prio: 3
+UP EVENT: case A, (c, d)
+
+Event between d and a -- HORIZONTAL, prio: 3
+Entered HORIZONTAL EVENT: (d, a)
+HORIZONTAL EVENT: case A, (d, a)
+Deleting something from Hits_up(a)
+Erasing up(d)
+left test (a, c) -- DOWN, result: yes
+left test (c, a) -- DOWN, result: yes
+
+Event between b and c -- HORIZONTAL, prio: 3
+Entered HORIZONTAL EVENT: (b, c)
+HORIZONTAL EVENT: case A, (b, c)
+left test (b, a) -- DOWN, result: yes
+left test (b, d) -- DOWN, result: yes
+Erasing up(b)
+
+Event between b and a -- DOWN, prio: 3
+DOWN EVENT: case B, (b, a)
+Inserting something in Hits_up(a)
+New up(b): a
+Testing: up(b) = a
+left test (a, c) -- UP, result: no
+left test (d, b) -- UP, result: no
+left test (b, d) -- UP, result: yes
+
+Event between a and d -- UP, prio: 2
+UP EVENT: case A, (a, d)
+
+Event between c and b -- UP, prio: 2
+UP EVENT: case A, (c, b)
+
+Event between b and a -- HORIZONTAL, prio: 2
+Entered HORIZONTAL EVENT: (b, a)
+HORIZONTAL EVENT: case A, (b, a)
+left test (b, d) -- DOWN, result: yes
+Deleting something from Hits_up(a)
+Erasing up(b)
+left test (a, c) -- DOWN, result: yes
+left test (c, a) -- DOWN, result: yes
+
+Event between c and a -- DOWN, prio: 2
+DOWN EVENT: case B, (c, a)
+Inserting something in Hits_up(a)
+New up(c): a
+Testing: up(c) = a
+left test (b, c) -- UP, result: no
+left test (c, b) -- UP, result: yes
+
+Event between b and d -- DOWN, prio: 2
+DOWN EVENT: case B, (b, d)
+New up(b): d
+Testing: up(b) = d
+left test (d, a) -- UP, result: no
+
+Event between c and d -- DOWN, prio: 2
+
+Event between a and b -- UP, prio: 1
+UP EVENT: case A, (a, b)
+
+Event between c and a -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (c, a)
+HORIZONTAL EVENT: case A, (c, a)
+left test (c, b) -- DOWN, result: yes
+Deleting something from Hits_up(a)
+Erasing up(c)
+
+Event between b and d -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (b, d)
+HORIZONTAL EVENT: case A, (b, d)
+Erasing up(b)
+left test (d, a) -- DOWN, result: no
+
+Event between c and d -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (c, d)
+
+Event between c and b -- DOWN, prio: 1
+DOWN EVENT: case B, (c, b)
+New up(c): b
+Testing: up(c) = b
+left test (b, a) -- UP, result: no
+
+Event between a and d -- DOWN, prio: 1
+left test (d, c) -- HORIZONTAL, result: yes
+
+
+Event between b and d -- UP, prio: 3
+UP EVENT: case A, (b, d)
+left test (d, c) -- HORIZONTAL, result: no
+left test (d, c) -- HORIZONTAL, result: no
+Event between c and a -- UP, prio: 3
+UP EVENT: case A, (c, a)
+left test (d, c) -- HORIZONTAL, result: no
+Event between c and d -- UP, prio: 3
+UP EVENT: case A, (c, d)
+Event between d and a -- HORIZONTAL, prio: 3
+Entered HORIZONTAL EVENT: (d, a)
+HORIZONTAL EVENT: case A, (d, a)
+Deleting something from Hits_up(a)
+Erasing up(d)
+left test (a, c) -- DOWN, result: yes
+left test (c, a) -- DOWN, result: yes
+Event between b and c -- HORIZONTAL, prio: 3
+Entered HORIZONTAL EVENT: (b, c)
+HORIZONTAL EVENT: case A, (b, c)
+left test (b, a) -- DOWN, result: yes
+left test (b, d) -- DOWN, result: yes
+Erasing up(b)
+Event between b and a -- DOWN, prio: 3
+DOWN EVENT: case B, (b, a)
+Inserting something in Hits_up(a)
+New up(b): a
+Testing: up(b) = a
+left test (a, c) -- UP, result: no
+left test (d, b) -- UP, result: no
+left test (b, d) -- UP, result: yes
+Event between c and a -- DOWN, prio: 2
+DOWN EVENT: case B, (c, a)
+Inserting something in Hits_up(a)
+New up(c): a
+Testing: up(c) = a
+left test (d, c) -- UP, result: no
+Event between b and d -- DOWN, prio: 2
+DOWN EVENT: case B, (b, d)
+Deleting something from Hits_up(a)
+Erasing up(b)
+New up(b): d
+Testing: up(b) = d
+left test (d, c) -- UP, result: no
+Event between c and d -- DOWN, prio: 2
+DOWN EVENT: case B, (c, d)
+Deleting something from Hits_up(a)
+Erasing up(c)
+New up(c): d
+Testing: up(c) = d
+Event between a and d -- UP, prio: 2
+UP EVENT: case A, (a, d)
+left test (c, a) -- HORIZONTAL, result: yes
+left test (b, a) -- HORIZONTAL, result: yes
+Event between c and b -- UP, prio: 2
+UP EVENT: case A, (c, b)
+left test (b, a) -- HORIZONTAL, result: yes
+left test (b, d) -- HORIZONTAL, result: yes
+left test (b, a) -- HORIZONTAL, result: yes
+Event between b and a -- HORIZONTAL, prio: 2
+Entered HORIZONTAL EVENT: (b, a)
+HORIZONTAL EVENT: case A, (b, a)
+left test (b, d) -- DOWN, result: no
+Deleting something from Hits_up(a)
+Erasing up(b)
+left test (a, c) -- DOWN, result: yes
+left test (c, a) -- DOWN, result: no
+
+Event between c and a -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (c, a)
+HORIZONTAL EVENT: case A, (c, a)
+left test (c, d) -- DOWN, result: no
+Deleting something from Hits_up(a)
+Erasing up(c)
+
+Event between b and d -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (b, d)
+HORIZONTAL EVENT: case A, (b, d)
+Erasing up(b)
+
+Event between c and d -- HORIZONTAL, prio: 1
+Entered HORIZONTAL EVENT: (c, d)
+HORIZONTAL EVENT: case A, (c, d)
+Erasing up(c)
+
+Event between c and b -- DOWN, prio: 1
+DOWN EVENT: case B, (c, b)
+New up(c): b
+Testing: up(c) = b
+left test (b, d) -- UP, result: yes
+left test (b, a) -- UP, result: yes
+left test (c, d) -- UP, result: yes
+
+Event between a and d -- DOWN, prio: 1
+DOWN EVENT: case B, (a, d)
+New up(a): d
+Testing: up(a) = d
+left test (b, a) -- UP, result: yes
+
+Event between a and b -- UP, prio: 1
+UP EVENT: case A, (a, b)
+left test (c, a) -- HORIZONTAL, result: no
+left test (b, d) -- HORIZONTAL, result: no
+└── NULL

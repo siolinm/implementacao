@@ -84,8 +84,6 @@ int compareTourn(int i, int j){
     double a, b;
     a = distance(tourn[i]->p, tourn[i]->lcandp, tourn[i]->direction);
     b = distance(tourn[j]->p, tourn[j]->lcandp, tourn[j]->direction);
-    if(i == 18 || j == 18)
-        printf("Hello\n");
     if(mod(a - b) <= EPS){
         return checkDraw(tourn[i], tourn[j]);
     } /* a = b */
@@ -413,6 +411,7 @@ void newCertTourn(TournObject * obj){
     dir = obj->direction;
     obj->p->cert[TOURN_CERT + dir] = newCert;
     i = obj->p->lastMatch[dir];
+    newCert->priority = TOURN_PRIORITY;
 
     if(i == 1){
         newCert->value = INFINITE;

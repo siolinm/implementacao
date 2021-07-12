@@ -9,29 +9,43 @@ void initPQ(){
     pqSize = 0;
 }
 
-int comparePQ(PQObject * x, PQObject * y){
-    int a;
-    double yx, yy;
-    double t;
-    if(mod(valuePQObject(x) - valuePQObject(y)) < EPS){
-        t = valuePQObject(x);
-        /* ALL_CERT highest priority, HORIZONTAL_CERT = DOWN_CERT = UP_CERT,
-        TOURN_CERT lowest priority */
-        yx = getY0(x->p, HORIZONTAL) + getVy(x->p, HORIZONTAL)*t;
-        yy = getY0(y->p, HORIZONTAL) + getVy(y->p, HORIZONTAL)*t;
-        if(yx > yy + EPS)
-            return 1;
-        else if(yx < yy - EPS)
+int comparePQ(PQObject * a, PQObject * b){
+    double ta, tb;
+    Point * pa = a->p;
+    Point * pb = b->p;
+    Cert * ca, *cb;
+    Point * qa;
+    Point * qb;
+    int prio;
+    ca = pa->cert[a->certType];
+    cb = pb->cert[b->certType];
+    ta = valuePQObject(a);
+    tb = valuePQObject(b);
+    if(mod(ta - tb) < EPS && ta < INFINITE){
+        if(a->certType >= TOURN_CERT)
             return 0;
-        else{
-            if(y->certType >= TOURN_CERT && x->certType < TOURN_CERT)
-                return 1;
-            a = (x->certType == ALL_CERT && y->certType != ALL_CERT);
-            return a;
+        else if(b->certType >= TOURN_CERT)
+            return 1;
+        if(ca->priority == cb->priority){
+            if(a->certType == b->certType)
+                return pa->id < pb->id;
+            prio = ca->priority;
+            if(prio == 2)
+                prio = 1;
+            return ((-a->certType + (3-prio)) % 3) <
+            ((-b->certType + (3-prio)) % 3);
+            // if(pa->id == pb->id)
+            //     return a->certType < b->certType;
+            // return pa->id < pb->id;
+            /* prio = AZUL, 2, 1, 0 */
+            /* prio = VERD, 2, 1, 0 */
+            /* prio = VERM, 2, 1, 0 */
         }
+        return ca->priority > cb->priority;
+
     }
 
-    return valuePQObject(x) < valuePQObject(y);
+    return valuePQObject(a) < valuePQObject(b);
 }
 
 void resizePQ(){
@@ -94,26 +108,22 @@ void updatePQ(Point * p, int certType, double t){
     PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
 
-    if(t < 0)
-        printf("Hello\n");
-
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
-
-        for (i = 1; 2*i < pqSize; i++){
-            if(comparePQ(Q[2*i], Q[i])){
-                printPQ();
-                printf("Incorrect PQ %d and %d\n", 2*i, i);
-                exit(42);
-            }
-            if(2*i + 1 < pqSize){
-                if(comparePQ(Q[2*i + 1], Q[i])){
-                    printPQ();
-                    printf("Incorrect PQ %d and %d\n", 2*i + 1, i);
-                    exit(42);
-                }
-            }
-        }
+    // for (i = 1; 2*i < pqSize; i++){
+    //     if(comparePQ(Q[2*i], Q[i])){
+    //         printPQ();
+    //         printf("Incorrect PQ %d and %d, %d\n", 2*i, i, comparePQ(Q[i], Q[2*i]));
+    //         exit(42);
+    //     }
+    //     if(2*i + 1 < pqSize){
+    //         if(comparePQ(Q[2*i + 1], Q[i])){
+    //             printPQ();
+    //             printf("Incorrect PQ %d and %d, %d\n", 2*i + 1, i, comparePQ(Q[i], Q[2*i+1]));
+    //             exit(42);
+    //         }
+    //     }
+    // }
 
 }
 
@@ -148,6 +158,7 @@ void sink(int i, int m){
 
 void printPQR(char * prefix, int size, int j, int b){
     int i, cert;
+    char aux;
     char * newprefix;
 
     if(prefix == NULL){
@@ -163,8 +174,11 @@ void printPQR(char * prefix, int size, int j, int b){
             printf("├──");
         else
             printf("└──" );
-
-        printf("%d: %c, %g, certType: ", j, Q[j]->p->name, valuePQ(j));
+        aux = ' ';
+        if(Q[j]->p->prev[getDirection(cert)])
+            aux = Q[j]->p->prev[getDirection(cert)]->name;
+        printf("%d: %c -- %c, %g, prio: %d, certType: ", j, Q[j]->p->name,
+        aux, valuePQ(j), Q[j]->p->cert[cert]->priority);
         if(cert == HORIZONTAL_CERT){
             printf("HORIZONTAL_CERT\n");
         }

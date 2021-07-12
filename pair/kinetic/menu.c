@@ -97,7 +97,7 @@ int main(){
                 if(j < TOURN_CERT)
                     printf("Swap in order: ");
                 else{
-                    printTourn();
+                    // printTourn();
                     printf("Tourn event: ");
                 }
 

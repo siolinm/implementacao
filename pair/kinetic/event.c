@@ -16,7 +16,7 @@ void tournEvent(){
 
     j = aux->p->lastMatch[dir];
     k = 2*(j/2) + !(j % 2);
-    db(printf("Tourn event between %d and %d\n", j, k););
+    // db(printf("Tourn event between %d and %d\n", j, k););
 
     tourn[j/2] = tourn[j];
     dir = tourn[k]->direction;
@@ -39,53 +39,28 @@ void tournEvent(){
     dir = tourn[j]->direction;
     tourn[j]->p->lastMatch[dir] = j;
     updateTournCert(tourn[j]);
-    db(
-        printTourn();
-    );
+    // db(
+    //     printTourn();
+    // );
 }
 
 void listEvent(Point * p, int eventType){
-    int dir, skip = 1;
+    int dir, skip = 1, prio;
     Point * auxp, *q;
     char text[100];
 
-    if(eventType == ALL_CERT){
-        deletePQ(p, ALL_CERT);
-        q = p->prev[HORIZONTAL];
-        /* deal with everything and remove
-        ALL_CERT from PQ */
-        if(q->prev[UP] == p){
-            /* u, d, h */
-            listEvent(q, UP_CERT);
-            listEvent(p, DOWN_CERT);
-            listEvent(p, HORIZONTAL_CERT);
-        }
-        else if(q->prev[DOWN] == p){
-            /* h, u, d */
-            listEvent(p, HORIZONTAL_CERT);
-            listEvent(p, UP_CERT);
-            listEvent(q, DOWN_CERT);
-        }
-        else{
-            /* d, h, u */
-            listEvent(p, DOWN_CERT);
-            listEvent(p, HORIZONTAL_CERT);
-            listEvent(p, UP_CERT);
-        }
-        return;
-    }
-
     q = p->prev[getDirection(eventType)];
     auxp = p;
+    prio = p->cert[eventType]->priority;
 
-    printf("Event between %c and %c\n", p->name, q->name);
+    // printf("Event between %c and %c -- ", p->name, q->name);
     dir = HORIZONTAL;
     sprintf(text, "Event between %c and %c", p->name, q->name);
     drawEvent(p, q, NULL, NULL, 0, dir, text, -1, &skip);
 
     if(eventType == HORIZONTAL_CERT){
         /* q must be above p */
-        if(getY(p, HORIZONTAL) - getY(q, HORIZONTAL) > EPS){ /* Y(p) > Y(q) */
+        if(getY(p, HORIZONTAL) > EPS + getY(q, HORIZONTAL)){ /* Y(p) > Y(q) */
             p = q;
             q = auxp;
         }
@@ -93,6 +68,8 @@ void listEvent(Point * p, int eventType){
             p = q;
             q = auxp;
         }
+        printf("Event between %c and %c -- ", p->name, q->name);
+        printf("HORIZONTAL, prio: %d\n", prio);
 
         horizontalEvent(p, q, HORIZONTAL);
         downEvent(p, q, UP);
@@ -100,31 +77,62 @@ void listEvent(Point * p, int eventType){
     }
     else if(eventType == UP_CERT){
         /* p must be to the left of q */
-        if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
-            p = q;
-            q = auxp;
-        }
+        // if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
+        //     p = q;
+        //     q = auxp;
+        // }
         /* else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
         } */
-
-        upEvent(p, q, HORIZONTAL);
-        horizontalEvent(q, p, UP);
-        downEvent(p, q, DOWN);
-    }
-    else if(eventType == DOWN_CERT){
-        if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
-            p = q;
-            q = auxp;
+        /* */
+        /* U (q, p) -- LOW ou MEDIUM */
+        if(prio == LOW_PRIORITY || prio == MEDIUM_PRIORITY){
+            if(left(q, p, HORIZONTAL)){
+                p = q;
+                q = auxp;
+            }
         }
-        else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
-            if(p->prev[HORIZONTAL] == p->prev[DOWN]){
+        else{
+            if(wasLeft(q, p, HORIZONTAL)){
                 p = q;
                 q = auxp;
             }
         }
 
-        if(p->name == 'h' && q->name == 'q')
-            printf("Hello\n");
+        printf("Event between %c and %c -- ", p->name, q->name);
+        printf("UP, prio: %d\n", prio);
+        upEvent(p, q, HORIZONTAL);
+        horizontalEvent(q, p, UP);
+        downEvent(p, q, DOWN);
+    }
+    else if(eventType == DOWN_CERT){
+        /* p must be to the left of q */
+        // if(getX(p, HORIZONTAL) - getX(q, HORIZONTAL) > EPS){ /* X(p) > X(q) */
+        //     p = q;
+        //     q = auxp;
+        // }
+        // else if(mod(getX(p, HORIZONTAL) - getX(q, HORIZONTAL)) < EPS){
+        //     if(p->prev[HORIZONTAL] == p->prev[DOWN]){
+        //         p = q;
+        //         q = auxp;
+        //     }
+        // }
+        if(prio == LOW_PRIORITY){
+            if(left(q, p, HORIZONTAL)){
+                p = q;
+                q = auxp;
+            }
+        }
+        else{
+            if(wasLeft(q, p, HORIZONTAL)){
+                p = q;
+                q = auxp;
+            }
+        }
+
+        printf("Event between %c and %c -- ", p->name, q->name);
+        printf("DOWN, prio: %d\n", prio);
+        // if(p->name == 'h' && q->name == 'q')
+        //     printf("Hello\n");
 
         downEvent(p, q, HORIZONTAL);
         upEvent(p, q, UP);
@@ -134,14 +142,26 @@ void listEvent(Point * p, int eventType){
     dir = getDirection(eventType);
     p = auxp;
     q = p->prev[dir];
-
     listSwap(p, q, dir);
 
     p = p->next[dir];
-
     updateListCert(p, dir);
     updateListCert(p->prev[dir], dir);
     updateListCert(p->next[dir], dir);
+    for (int i = 1; 2*i < pqSize; i++){
+        if(comparePQ(Q[2*i], Q[i])){
+            printPQ();
+            printf("Incorrect PQ %d and %d, %d\n", 2*i, i, comparePQ(Q[i], Q[2*i]));
+            exit(42);
+        }
+        if(2*i + 1 < pqSize){
+            if(comparePQ(Q[2*i + 1], Q[i])){
+                printPQ();
+                printf("Incorrect PQ %d and %d, %d\n", 2*i + 1, i, comparePQ(Q[i], Q[2*i+1]));
+                exit(42);
+            }
+        }
+    }
 }
 
 /* horizontal-order event */
@@ -151,7 +171,17 @@ void horizontalEvent(Point * p, Point * q, int dir){
     double vxp, vxq, aux;
     int change, skip = 1;
     char text[200];
+    db(
+        if(dir == HORIZONTAL){
+            printf("Entered HORIZONTAL EVENT: (%c, %c)\n", p->name, q->name);
+            // printf("CASE A: %c\n", ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)->name);
+        }
+    );
     if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("HORIZONTAL EVENT: case A, (%c, %c)\n", p->name, q->name);
+        );
         t = NULL;
         up = (CandsNode *)predecessorS(q->candsRoot[dir], p, CANDS_TREE, dir, UP);
         if(up != NULL)
@@ -241,6 +271,10 @@ void horizontalEvent(Point * p, Point * q, int dir){
     }
     else if(p == ownerS(q->hitsLow[dir], HITS_LOW_TREE, dir)){ /* q is in HitsLow(p) */
         /* searching for low(q) in Cands(p) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("HORIZONTAL EVENT: case B, (%c, %c)\n", p->name, q->name);
+        );
         low = (CandsNode *)predecessorS(p->candsRoot[dir], q, CANDS_TREE, dir, DOWN);
         if(low != NULL)
             t = low->key;
@@ -362,6 +396,10 @@ void upEvent(Point * p, Point * q, int dir){
     int change, skip = 1;
     char text[200];
     if(q == ownerS(p->hitsLow[dir], HITS_LOW_TREE, dir)){ /* p is in HitsLow(q) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("UP EVENT: case A, (%c, %c)\n", p->name, q->name);
+        );
         v = ownerS(q->cands[dir], CANDS_TREE, dir); /* search for q in Cands(v) */
         if(v != NULL){
             sprintf(text, "Deleting %c from Cands(%c)", q->name, v->name);
@@ -442,6 +480,10 @@ void upEvent(Point * p, Point * q, int dir){
 
     }
     else if(p == ownerS(q->cands[dir], CANDS_TREE, dir)){ /* q is in Cands(p) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("UP EVENT: case B, (%c, %c)\n", p->name, q->name);
+        );
         t = ownerS(p->hitsLow[dir], HITS_LOW_TREE, dir);
 
         if(t != NULL){
@@ -517,12 +559,12 @@ void upEvent(Point * p, Point * q, int dir){
         }
     }
 
-    db(
-        printf("Printing point %c\n", p->name);
-        printPoint(p, dir);
-        printf("Printing point %c\n", q->name);
-        printPoint(q, dir);
-    );
+    // db(
+    //     printf("Printing point %c\n", p->name);
+    //     printPoint(p, dir);
+    //     printf("Printing point %c\n", q->name);
+    //     printPoint(q, dir);
+    // );
 }
 
 /* -60-order event */
@@ -533,6 +575,10 @@ void downEvent(Point * p, Point * q, int dir){
     char text[200];
 
     if(q == ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)){ /* p is in HitsUp(q) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("DOWN EVENT: case A, (%c, %c)\n", p->name, q->name);
+        );
         v = ownerS(q->cands[dir], CANDS_TREE, dir); /* search for q in Cands(v) */
         if(v != NULL){
             sprintf(text, "Deleting %c from Cands(%c)", q->name, v->name);
@@ -609,6 +655,10 @@ void downEvent(Point * p, Point * q, int dir){
         }
     }
     else if(p == ownerS(q->cands[dir], CANDS_TREE, dir)){ /* q is in Cands(p) */
+        db(
+            if(dir == HORIZONTAL)
+                printf("DOWN EVENT: case B, (%c, %c)\n", p->name, q->name);
+        );
         t = ownerS(p->hitsUp[dir], HITS_UP_TREE, dir);
 
         if(t != NULL){
@@ -624,6 +674,13 @@ void downEvent(Point * p, Point * q, int dir){
         drawEvent(p, q, t, q->hitsUpRoot[dir]->parent,
         HITS_UP_TREE, dir, text, DOWN, &skip);
         insertS(q->hitsUpRoot[dir], p, HITS_UP_TREE, dir);
+        db(
+            if(dir == HORIZONTAL){
+                printf("New up(%c): %c\n", p->name, q->name);
+                printf("Testing: up(%c) = %c\n", p->name,
+                ownerS(p->hitsUp[dir], HITS_UP_TREE, dir)->name);
+            }
+        );
         sprintf(text, "After insert");
         drawEvent(p, q, t, q->hitsUpRoot[dir]->parent,
         HITS_UP_TREE, dir, text, DOWN, &skip);
@@ -657,7 +714,6 @@ void downEvent(Point * p, Point * q, int dir){
         sprintf(text, "Remove %c from Cands(%c)", q->name, p->name);
         drawEvent(p, q, v, p->candsRoot[dir]->parent,
         CANDS_TREE, dir, text, DOWN, &skip);
-
         deleteS(p->candsRoot[dir], q, CANDS_TREE, dir);
 
         sprintf(text, "After delete... update lcand(%c)", p->name);
@@ -680,12 +736,12 @@ void downEvent(Point * p, Point * q, int dir){
         }
     }
 
-    db(
-        printf("Printing point %c\n", p->name);
-        printPoint(p, dir);
-        printf("Printing point %c\n", q->name);
-        printPoint(q, dir);
-    );
+    // db(
+    //     printf("Printing point %c\n", p->name);
+    //     printPoint(p, dir);
+    //     printf("Printing point %c\n", q->name);
+    //     printPoint(q, dir);
+    // );
 }
 
 /*

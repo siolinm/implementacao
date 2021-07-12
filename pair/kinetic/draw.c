@@ -566,6 +566,8 @@ void drawEvent(Point * p, Point * q, Point * t, void * root, int type,
 int dir, char * text, int eventType, int * skip){
     int c;
     char event[100];
+    if(dir != HORIZONTAL)
+        return;
     if(eventType == HORIZONTAL)
         sprintf(event, "Horizontal event");
     else if(eventType == UP)

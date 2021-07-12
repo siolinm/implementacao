@@ -8,7 +8,7 @@ Todo
 - [x] Desenhar lcandp na tela
 - [x] Adicionar desenhos de debug para os eventos (com textos)
 - [x] Repensar os desempates na splay_tree (provavelmente agora também envolvendo o eixo y)
-- [ ] Fazer mais testes envolvendo casos degenerados e refazer os testes normais
+- [x] Fazer mais testes envolvendo casos degenerados e refazer os testes normais
 - [ ] Pensar e checar se os certificados ALL_CERT podem acabar duplicados
 
 Bugs
@@ -66,11 +66,13 @@ Random
 
 Random
 ---
-- [x] tests/degenerate/1.in
-- [ ] tests/degenerate/2.in
-  - swap in all orders não está sendo identificado. Erros no extract
-- [ ] tests/degenerate/3.in
-  - swap in all orders não está sendo identificado
+- [ ] tests/degenerate/1.in
+  - swap in all orders não está sendo identificado. A função updateListCert não
+    é chamada durante a construção da lista ordenada, logo se existe um ALL_CERT
+    logo de cara ele não é marcado, mas colocar updateListCert na construção não
+    resolve, porque os pontos são inseridos um a um.
+- [x] tests/degenerate/2.in
+- [x] tests/degenerate/3.in
 - [x] tests/degenerate/4.in
 - [ ] tests/degenerate/5.in
   - Erro na ordem de quem chamar ou em determinar p e q.

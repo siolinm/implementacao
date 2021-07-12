@@ -5,25 +5,20 @@ double valueHeapsort(Point **v, int i, int dir){
 }
 
 int compareH(Point **v, int i, int j, int dir){
-    Point * a, * b;
-    double x, y, vxa, vxb, aux;
-    a = v[i];
-    b = v[j];
-    x = getX(a, dir);
-    y = getX(b, dir);
-    if(mod(x - y) < EPS){
-        // vxa = getVx(a, dir);
-        // vxb = getVx(b, dir);
-        // aux = max(mod(vxa), mod(vxb));
-        // vxa -= aux;
-        // vxb -= aux;
-        // if(mod(vxa - vxb) < EPS){
-            // if they've the same x-speed use y-coordinate
-            return getY(a, dir) < getY(b, dir) - EPS;
-        //}
-        return vxa < vxb - EPS;
-    }
-    return x - y > EPS;
+    return wasLeft(v[j], v[i], dir);
+    // if(mod(x - y) < EPS){
+    //     // vxa = getVx(a, dir);
+    //     // vxb = getVx(b, dir);
+    //     // aux = max(mod(vxa), mod(vxb));
+    //     // vxa -= aux;
+    //     // vxb -= aux;
+    //     // if(mod(vxa - vxb) < EPS){
+    //         // if they've the same x-speed use y-coordinate
+    //         return getY(a, dir) < getY(b, dir) - EPS;
+    //     //}
+    //     return vxa < vxb - EPS;
+    // }
+    // return x - y > EPS;
     /* return (valueHeapsort(v, i, dir) > valueHeapsort(v, j, dir) + EPS); */
 }
 
@@ -36,13 +31,12 @@ void swapHeapsort(int i, int j, Point ** v){
 
 void sinkHeap(Point **v, int i, int m, int dir){
     int s = 2*i, p = i;
-    double x = valueHeapsort(v, i, dir);
     Point * aux = v[i];
 
     while(s <= m){
         if(s < m && compareH(v, s, s + 1, dir))
             s += 1;
-        if(x < valueHeapsort(v, s, dir) - EPS)
+        if(wasLeft(aux, v[s], dir))
             break;
         v[p] = v[s];
 

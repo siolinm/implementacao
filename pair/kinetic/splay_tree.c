@@ -6,9 +6,11 @@
 
 void insertS(void * root, Point * a, int type, int dir){
     void * new;
-
+    db(
+        if(type == HITS_UP_TREE && getKeyS(root, HITS_UP_TREE)->name == 'a' && dir == HORIZONTAL)
+            printf("Inserting something in Hits_up(a)\n");
+    );
     new = createNodeS(a, type, dir);
-
     insertSR(detach(root, type, dir), new, type, dir);
     splay(new, type, dir);
     attach(root, new, type, dir);
@@ -16,6 +18,10 @@ void insertS(void * root, Point * a, int type, int dir){
 
 void deleteS(void * root, Point * a, int type, int dir){
     void * parent = NULL;
+
+    if(type == HITS_UP_TREE && getKeyS(root, HITS_UP_TREE)->name == 'a' && dir == HORIZONTAL)
+        printf("Deleting something from Hits_up(a)\n");
+
 
     deleteSR(detach(root, type, dir), a, &parent, type, dir);
     if(parent != NULL){
@@ -27,8 +33,13 @@ void deleteS(void * root, Point * a, int type, int dir){
         a->cands[dir] = NULL;
     else if(type == HITS_LOW_TREE)
         a->hitsLow[dir] = NULL;
-    else
+    else{
         a->hitsUp[dir] = NULL;
+        db(
+            if(dir == HORIZONTAL)
+                printf("Erasing up(%c)\n", a->name);
+        );
+    }
 }
 
 void splay(void * x, int type, int dir){
@@ -159,40 +170,79 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         y = x;
         /* rounding errors */
         /* x(q) <= x(p) */
-        if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
-            if(getY(getKeyS(x, type), orientation) > getY(p, orientation) + EPS){
-                if(!mirror)
-                    x = getRightS(x, type);
-                else
-                    x = getLeftS(x, type);
+        db(
+            printf("left test (%c, %c) -- ", getKeyS(x, type)->name, p->name);
+            if(orientation == -7){
+                printf("UP, ");
             }
-            else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
-                if(!mirror)
-                    x = getRightS(x, type);
-                else
-                    x = getLeftS(x, type);
+            else if(orientation < 0 ){
+                if(-orientation == DOWN)
+                   printf("DOWN, ");
+                else if(-orientation == HORIZONTAL)
+                   printf("HORIZONTAL, ");
             }
             else{
-                suc = x;
-                if(!mirror)
-                    x = getLeftS(x, type);
+                if(orientation == DOWN)
+                   printf("DOWN, ");
+                else if(orientation == HORIZONTAL)
+                   printf("HORIZONTAL, ");
                 else
-                    x = getRightS(x, type);
+                   printf("UP, ");
             }
-        }
-        else if(getX(getKeyS(x, type), orientation) < getX(p, orientation) - EPS) {
+        );
+        /* b -- a -- c -- d (UP) */
+        /* C_1 < C_2 < C_3 < C_4 */
+        /*  b -t'- a -- c -- d (HORIZONTAL) */
+        /* a -- b -- c -- d (DOWN) */
+        if(leftTest(getKeyS(x, type), p, orientation)){
+            db(printf("result: yes\n"););
             if(!mirror)
                 x = getRightS(x, type);
             else
                 x = getLeftS(x, type);
         }
         else{
+            db(printf("result: no\n"););
             suc = x;
             if(!mirror)
                 x = getLeftS(x, type);
             else
                 x = getRightS(x, type);
         }
+        // if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
+        //     if(getY(getKeyS(x, type), orientation) > getY(p, orientation) + EPS){
+        //         if(!mirror)
+        //             x = getRightS(x, type);
+        //         else
+        //             x = getLeftS(x, type);
+        //     }
+        //     else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
+        //         if(!mirror)
+        //             x = getRightS(x, type);
+        //         else
+        //             x = getLeftS(x, type);
+        //     }
+        //     else{
+        //         suc = x;
+        //         if(!mirror)
+        //             x = getLeftS(x, type);
+        //         else
+        //             x = getRightS(x, type);
+        //     }
+        // }
+        // else if(getX(getKeyS(x, type), orientation) < getX(p, orientation) - EPS) {
+        //     if(!mirror)
+        //         x = getRightS(x, type);
+        //     else
+        //         x = getLeftS(x, type);
+        // }
+        // else{
+        //     suc = x;
+        //     if(!mirror)
+        //         x = getLeftS(x, type);
+        //     else
+        //         x = getRightS(x, type);
+        // }
     }
 
     if(y != NULL){
@@ -235,47 +285,80 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
             orientation = HORIZONTAL;
     }
 
-    if(p->name == 'q' && dir == DOWN)
-        printf("Hello\n");
-
     while(x != NULL){
         y = x;
         /* rounding errors */
         /* x(q) >= x(p) */
-        if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
-            if(getY(getKeyS(x, type), orientation) < getY(p, orientation) - EPS){
-                if(!mirror)
-                    x = getLeftS(x, type);
-                else
-                    x = getRightS(x, type);
+        db(
+            printf("left test (%c, %c) -- ", p->name, getKeyS(x, type)->name);
+            if(orientation == -7){
+                printf("UP, ");
             }
-            else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
-                if(!mirror)
-                    x = getLeftS(x, type);
-                else
-                    x = getRightS(x, type);
+            else if(orientation < 0 ){
+                if(-orientation == DOWN)
+                   printf("DOWN, ");
+                else if(-orientation == HORIZONTAL)
+                   printf("HORIZONTAL, ");
             }
             else{
-                pred = x;
-                if(!mirror)
-                    x = getRightS(x, type);
+                if(orientation == DOWN)
+                   printf("DOWN, ");
+                else if(orientation == HORIZONTAL)
+                   printf("HORIZONTAL, ");
                 else
-                    x = getLeftS(x, type);
+                   printf("UP, ");
             }
-        }
-        else if(getX(getKeyS(x, type), orientation) > getX(p, orientation) + EPS){
+            /* b -> [] -> [] -> (a) */
+        );
+        if(leftTest(p, getKeyS(x, type), orientation)){
+            db(printf("result: yes\n"););
             if(!mirror)
                 x = getLeftS(x, type);
             else
                 x = getRightS(x, type);
         }
         else{
+            db(printf("result: no\n"););
             pred = x;
             if(!mirror)
                 x = getRightS(x, type);
             else
                 x = getLeftS(x, type);
         }
+        // if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
+        //     if(getY(getKeyS(x, type), orientation) < getY(p, orientation) - EPS){
+        //         if(!mirror)
+        //             x = getLeftS(x, type);
+        //         else
+        //             x = getRightS(x, type);
+        //     }
+        //     else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
+        //         if(!mirror)
+        //             x = getLeftS(x, type);
+        //         else
+        //             x = getRightS(x, type);
+        //     }
+        //     else{
+        //         pred = x;
+        //         if(!mirror)
+        //             x = getRightS(x, type);
+        //         else
+        //             x = getLeftS(x, type);
+        //     }
+        // }
+        // else if(getX(getKeyS(x, type), orientation) > getX(p, orientation) + EPS){
+        //     if(!mirror)
+        //         x = getLeftS(x, type);
+        //     else
+        //         x = getRightS(x, type);
+        // }
+        // else{
+        //     pred = x;
+        //     if(!mirror)
+        //         x = getRightS(x, type);
+        //     else
+        //         x = getLeftS(x, type);
+        // }
     }
 
     if(y != NULL){
@@ -298,7 +381,8 @@ Point * ownerS(void * root, int type, int dir){
             updateLeftmost(aux, dir);
         aux = getParentS(aux, type);
     }
-
+    /* []  ()
+    () <-() -> */
     if(aux){
         aux = getParentS(aux, type);
         detach(aux, type, dir);
@@ -504,15 +588,16 @@ void * insertSR(void * root, void * node, int type, int dir){
     if(type == CANDS_TREE)
         updateLeftmost(root, dir);
 
+    // printf("Returning root\n");
     return root;
 }
 
 void * extractS(void * root, void * low, void * up, int type, int dir){
     void * r = NULL;
-    db(
-        printf("extractS:: before extract\n");
-        printS(root, type);
-    );
+    // db(
+    //     printf("extractS:: before extract\n");
+    //     printS(root, type);
+    // );
     r = detach(root, type, dir);
     if(low != NULL){
         splay(low, type, dir);
@@ -544,10 +629,10 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
 
     }
 
-    db(
-        printf("extractS:: after extract\n");
-        printS(root, type);
-    );
+    // db(
+    //     printf("extractS:: after extract\n");
+    //     printS(root, type);
+    // );
 
     return r;
 }
@@ -619,27 +704,27 @@ void * deleteSR(void * root, Point * a, void **parent, int type, int dir){
 }
 
 int compareS(Point * a, Point * b, int type, int dir){
-    double vxa, vxb, aux;
     if(type == CANDS_TREE){
         return getY(a, dir) > getY(b, dir) + EPS;
     }
 
-    if(mod(getX(a, dir) - getX(b, dir)) < EPS){
-        vxa = getVx(a, dir);
-        vxb = getVx(b, dir);
+    // if(mod(getX(a, dir) - getX(b, dir)) < EPS){
+    //     vxa = getVx(a, dir);
+    //     vxb = getVx(b, dir);
 
-        aux = max(mod(vxa), mod(vxb));
+    //     aux = max(mod(vxa), mod(vxb));
 
-        vxa -= aux;
-        vxb -= aux;
+    //     vxa -= aux;
+    //     vxb -= aux;
 
-        if(mod(vxa - vxb) < EPS)
-            return getY(a, dir) < getY(b, dir) - EPS;
+    //     if(mod(vxa - vxb) < EPS)
+    //         return getY(a, dir) < getY(b, dir) - EPS;
 
-        return vxa > vxb + EPS;
-    }
+    //     return vxa > vxb + EPS;
+    // }
 
-    return getX(a, dir) > getX(b, dir) + EPS;
+    // return getX(a, dir) > getX(b, dir) + EPS;
+    return left(b, a, dir);
 }
 
 void swapS(void * roota, void * rootb, int type, int dir){

@@ -1,0 +1,162 @@
+--------------- MENU ---------------
+(a)dvance
+(c)hange trajectory
+(d)elete
+dra(w)
+(i)nsert point
+(l)oad file
+(n)ow
+next (e)vent
+(q)uery
+show in(f)o
+(s)top
+(t)est
+---------------      ---------------
+>>> Enter the file name: b
+c
+a
+MAXIMA -- point a
+MAXIMA -- point c
+MAXIMA -- point b
+MAXIMA -- point c
+MAXIMA -- point b
+MAXIMA -- point a
+MAXIMA -- point a
+MAXIMA -- point b
+MAXIMA -- point c
+Next event: 4
+Swap in order: UP
+--------------- MENU ---------------
+(a)dvance
+(c)hange trajectory
+(d)elete
+dra(w)
+(i)nsert point
+(l)oad file
+(n)ow
+next (e)vent
+(q)uery
+show in(f)o
+(s)top
+(t)est
+---------------      ---------------
+>>> Event between b and a, dir: 1
+Event between b and a -- UP, prio: 2
+Inserting a in Cands(b), dir: 1
+Cands(b) after insert... updating lcand(b), dir: 1
+Extracting everyone, dir: 1
+After extract, dir: 1
+After insert in Hits_up(b), dir: 1
+Remove b from Hits_low(a), dir: 1
+After remove, dir: 1
+New up(a) found, dir: 0
+Extracted these points from Cands(b) to Cands(a), dir: 0
+Updating lcand(b), dir: 0
+Points inserted in Cands(a), dir: 0
+Updating lcand(a), dir: 0
+Hits_up(b) before deleting a, dir: 0
+Hits_up(b) after deleting a, dir: 0
+Hits_low(a) before inserting b, dir: 0
+Hits_low(a) after inserting b, dir: 0
+Insert b in Hits_up(a), dir: 2
+After insert, dir: 2
+Extracting everyone, dir: 2
+After insert in Hits_low(a), dir: 2
+Remove a from Cands(b), dir: 2
+After delete... update lcand(b), dir: 2
+Event between c and b, dir: 1
+Event between b and c -- HORIZONTAL, prio: 2
+New up(b) found, dir: 1
+Extracted these points from Cands(c) to Cands(b), dir: 1
+Updating lcand(c), dir: 1
+Points inserted in Cands(b), dir: 1
+Updating lcand(b), dir: 1
+Hits_up(c) before deleting b, dir: 1
+Hits_up(c) after deleting b, dir: 1
+Hits_low(a) before deleting c, dir: 1
+Hits_low(a) after deleting c, dir: 1
+Hits_low(b) before inserting c, dir: 1
+Hits_low(b) after inserting c, dir: 1
+Event between c and a, dir: 1
+Event between c and a -- UP, prio: 2
+Updating lcand(a), dir: 0
+Event between c and b, dir: 1
+Event between c and b -- UP, prio: 1
+Inserting b in Cands(c), dir: 1
+Cands(c) after insert... updating lcand(c), dir: 1
+Extracting everyone, dir: 1
+After extract, dir: 1
+After insert in Hits_up(c), dir: 1
+Remove c from Hits_low(b), dir: 1
+After remove, dir: 1
+Updating lcand(a), dir: 0
+Event between a and b, dir: 1
+Event between b and a -- DOWN, prio: 1
+Insert b in Hits_up(a), dir: 1
+After insert, dir: 1
+Extracting everyone, dir: 1
+After insert in Hits_low(a), dir: 1
+Remove a from Cands(b), dir: 1
+After delete... update lcand(b), dir: 1
+Inserting a in Cands(c), dir: 1
+After insert... updating lcand(c), dir: 1
+Inserting a in Cands(b), dir: 0
+Cands(b) after insert... updating lcand(b), dir: 0
+Extracting everyone, dir: 0
+After extract, dir: 0
+After insert in Hits_up(b), dir: 0
+Remove b from Hits_low(a), dir: 0
+After remove, dir: 0
+New up(b) found, dir: 2
+Extracted these points from Cands(a) to Cands(b), dir: 2
+Updating lcand(a), dir: 2
+Points inserted in Cands(b), dir: 2
+Updating lcand(b), dir: 2
+Hits_up(a) before deleting b, dir: 2
+Hits_up(a) after deleting b, dir: 2
+Hits_low(b) before inserting a, dir: 2
+Hits_low(b) after inserting a, dir: 2
+Event between a and c, dir: 1
+Event between c and a -- DOWN, prio: 1
+Insert c in Hits_up(a), dir: 1
+After insert, dir: 1
+Extracting everyone, dir: 1
+After insert in Hits_low(a), dir: 1
+Remove a from Cands(c), dir: 1
+After delete... update lcand(c), dir: 1
+Event between b and c, dir: 1
+Event between c and b -- DOWN, prio: 0
+Delete c from Hits_up(a), dir: 1
+After delete, dir: 1
+Insert c in Hits_up(b), dir: 1
+After insert, dir: 1
+Extracting everyone, dir: 1
+After insert in Hits_low(b), dir: 1
+Remove b from Cands(c), dir: 1
+After delete... update lcand(c), dir: 1
+Event between a and b, dir: 1
+Event between b and a -- HORIZONTAL, prio: 0
+New up(b) found, dir: 1
+Extracted these points from Cands(a) to Cands(b), dir: 1
+Updating lcand(a), dir: 1
+Points inserted in Cands(b), dir: 1
+Updating lcand(b), dir: 1
+Hits_up(a) before deleting b, dir: 1
+Hits_up(a) after deleting b, dir: 1
+Hits_low(b) before inserting a, dir: 1
+Hits_low(b) after inserting a, dir: 1
+Insert b in Hits_up(a), dir: 0
+After insert, dir: 0
+Extracting everyone, dir: 0
+After insert in Hits_low(a), dir: 0
+Remove a from Cands(b), dir: 0
+After delete... update lcand(b), dir: 0
+Inserting b in Cands(a), dir: 2
+Cands(a) after insert... updating lcand(a), dir: 2
+Extracting everyone, dir: 2
+After extract, dir: 2
+After insert in Hits_up(a), dir: 2
+Remove a from Hits_low(b), dir: 2
+After remove, dir: 2
+Event between a and c, dir: 1
+Event between c and a -- HORIZONTAL, prio: 0
