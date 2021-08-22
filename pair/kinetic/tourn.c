@@ -337,12 +337,6 @@ double expireTourn(TournObject * a, TournObject * b){
     o = c[2]*c[2] + c[4]*c[4] - c[6]*c[6] - c[8]*c[8];
     delta = n*n - 4*m*o;
 
-    db(
-        b->a = m;
-        b->b = n;
-        b->c = o;
-    );
-
     if(m > EPS){
         if(mod(delta) <= EPS){
             printf("Something gone wrong! Delta isn't positive\n");
@@ -411,7 +405,7 @@ void newCertTourn(TournObject * obj){
     dir = obj->direction;
     obj->p->cert[TOURN_CERT + dir] = newCert;
     i = obj->p->lastMatch[dir];
-    newCert->priority = TOURN_PRIORITY;
+    newCert->priority = M_PI;
 
     if(i == 1){
         newCert->value = INFINITE;

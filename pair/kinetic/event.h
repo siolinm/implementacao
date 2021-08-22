@@ -11,8 +11,7 @@ void tournEvent();
 
 /*! Updates the list after an event and calls the functions horizontalEvent,
  * upEvent and downEvent
- * @param p 
- * @param eventType
+ *
  */
 void listEvent();
 

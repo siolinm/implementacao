@@ -33,6 +33,28 @@ void drawInit(){
     drawState = 0;
     drawDebug = 0;
     SCALE = INITIAL_SCALE;
+    drawCircle = 0;
+    theta = 0;
+    current_theta = 0;
+}
+
+Coordinate getPointCoord(Point * p){
+    Coordinate a;
+    double vx, vy, aux_norm, cos_aux, sin_aux;
+    vx = getVx(p, HORIZONTAL);
+    vy = getVy(p, HORIZONTAL);
+    aux_norm = sqrt(vx*vx + vy*vy);
+    vx /= aux_norm;
+    vy /= aux_norm;
+    cos_aux = vx;
+    sin_aux = vy;
+    vx = cos_aux*cos(current_theta) - sin_aux*sin(current_theta);
+    vy = sin_aux*cos(current_theta) + sin(current_theta)*cos_aux;
+
+    a.x = -aux_norm*vx;
+    a.y = -aux_norm*vy;
+
+    return a;
 }
 
 void drawCreate(int x, int y){
@@ -71,6 +93,9 @@ void drawCreate(int x, int y){
     yellow.r = 1;
     yellow.g = 1;
     yellow.b = 0;
+    pblue.r = 0.4;
+    pblue.g = 1;
+    pblue.b = 1;
 }
 
 Vector getVector(int dir, int order){
@@ -98,7 +123,11 @@ Coordinate drawEdge(Point * p, int dir, int edge){
     Vector v2 = getVector(dir, DOWN);
     a.x = getX(p, HORIZONTAL);
     a.y = getY(p, HORIZONTAL);
-
+    db(
+    if(drawCircle){
+        a = getPointCoord(p);
+    }
+    );
     if(edge == UP){
 
         up = ownerS(p->hitsUp[dir], HITS_UP_TREE, dir);
@@ -110,6 +139,11 @@ Coordinate drawEdge(Point * p, int dir, int edge){
         else{
             b.x = getX(up, HORIZONTAL);
             b.y = getY(up, HORIZONTAL);
+            db(
+            if(drawCircle){
+                b = getPointCoord(up);
+            }
+            );
             alpha = (b.y - a.y)*v2.x - v2.y*(b.x - a.x);
             alpha /= -v1.x*v2.y + v2.x*v1.y;
 
@@ -130,6 +164,11 @@ Coordinate drawEdge(Point * p, int dir, int edge){
     else{
         b.x = getX(low, HORIZONTAL);
         b.y = getY(low, HORIZONTAL);
+        db(
+        if(drawCircle){
+            b = getPointCoord(low);
+        }
+        );
         alpha = (b.y - a.y)*v2.x - v2.y*(b.x - a.x);
         alpha /= -v1.x*v2.y + v2.x*v1.y;
 
@@ -172,6 +211,11 @@ void drawEdges(int dir){
         p = initial[i];
         a.x = getX(p, HORIZONTAL);
         a.y = getY(p, HORIZONTAL);
+        db(
+        if(drawCircle){
+            a = getPointCoord(p);
+        }
+        );
         cairo_set_line_width (ctx, 2);
         b = drawEdge(p, dir, UP);
         a.x *= SCALE;
@@ -200,11 +244,26 @@ void drawPoints(Point * sel, Point * sel2){
     Coordinate a;
     cairo_text_extents_t te;
     char text[2];
+    double norm, vx, vy;
 
     for(i = 1; i <= n; i++){
         p = initial[i];
         a.x = getX(p, HORIZONTAL);
         a.y = getY(p, HORIZONTAL);
+        if(drawCircle){
+            vx = getVx(p, HORIZONTAL);
+            vy = getVy(p, HORIZONTAL);
+            norm = sqrt(vx*vx + vy*vy);
+            cairo_set_line_width (ctx, 2);
+            cairo_set_source_rgb(ctx, pblue.r, pblue.g, pblue.b);
+            cairo_arc(ctx, a.x + vx, a.y + vy,
+            norm*SCALE, 0, 2*M_PI);
+            cairo_stroke(ctx);
+            cairo_set_line_width (ctx, LINE_WIDTH);
+        }
+        if(drawCircle){
+            a = getPointCoord(p);
+        }
         a.x *= SCALE;
         a.y *= SCALE;
         cairo_set_line_width (ctx, LINE_WIDTH);
@@ -349,6 +408,9 @@ void drawPoint(Point * p, Color color){
     Coordinate a;
     a.x = getX(p, HORIZONTAL);
     a.y = getY(p, HORIZONTAL);
+    if(drawCircle){
+        a = getPointCoord(p);
+    }
     a.x *= SCALE;
     a.y *= SCALE;
 
@@ -362,11 +424,17 @@ void drawLine(Point * p, Point * q, Color color, int style){
     double dashes[2] = {5, 2};
     a.x = getX(p, HORIZONTAL);
     a.y = getY(p, HORIZONTAL);
+    if(drawCircle){
+        a = getPointCoord(p);
+    }
     a.x *= SCALE;
     a.y *= SCALE;
 
     b.x = getX(q, HORIZONTAL);
     b.y = getY(q, HORIZONTAL);
+    if(drawCircle){
+        b = getPointCoord(q);
+    }
     b.x *= SCALE;
     b.y *= SCALE;
 
@@ -385,7 +453,7 @@ void drawLine(Point * p, Point * q, Color color, int style){
 
 void drawText(char * text, int pos){
     Coordinate a;
-    double c = 30, d = 22.5;
+    double c = 30, d = 45;
     cairo_text_extents_t te;
     switch (pos){
         case TOP_LEFT:
@@ -405,7 +473,7 @@ void drawText(char * text, int pos){
             a.y = y_c;
             break;
         case CENTER:
-            a.x = x_c - d*sizeof(text);
+            a.x = x_c - d*sizeof(text)/2;
             a.y = y_c;
             break;
         case CENTER_RIGHT:
@@ -534,6 +602,9 @@ void drawLow(Point * p, int dir, Color color){
     if(q != NULL){
         a.x = getX(q, HORIZONTAL);
         a.y = getY(q, HORIZONTAL);
+        if(drawCircle){
+            a = getPointCoord(q);
+        }
         a.x *= SCALE;
         a.y *= SCALE;
         cairo_set_source_rgb(ctx, color.r, color.g, color.b);
@@ -550,6 +621,9 @@ void drawUp(Point * p, int dir, Color color){
     if(q != NULL){
         a.x = getX(q, HORIZONTAL);
         a.y = getY(q, HORIZONTAL);
+        if(drawCircle){
+            a = getPointCoord(q);
+        }
         a.x *= SCALE;
         a.y *= SCALE;
         cairo_set_source_rgb(ctx, color.r, color.g, color.b);
@@ -566,14 +640,14 @@ void drawEvent(Point * p, Point * q, Point * t, void * root, int type,
 int dir, char * text, int eventType, int * skip){
     int c;
     char event[100];
-    if(dir != HORIZONTAL)
+    if(dir != UP)
         return;
     if(eventType == HORIZONTAL)
-        sprintf(event, "Horizontal event");
+        sprintf(event, "Horizontal event between %c and %c", p->name, q->name);
     else if(eventType == UP)
-        sprintf(event, "Up event");
+        sprintf(event, "Up event between %c and %c", p->name, q->name);
     else if(eventType == DOWN)
-        sprintf(event, "Down event");
+        sprintf(event, "Down event between %c and %c", p->name, q->name);
     for(c = 1; c && drawDebug && drawState && *skip;){
         cairo_push_group(ctx);
         cairo_set_source_rgb(ctx, black.r, black.g, black.b);
@@ -632,6 +706,12 @@ int dir, char * text, int eventType, int * skip){
             default:
                 break;
         }
+        if(current_theta < theta){
+            current_theta += STEP/10;
+        }
+        if(current_theta > theta){
+            current_theta = theta;
+        }
     }
 }
 
@@ -644,10 +724,20 @@ void draw(){
     sel = enter = 0;
     autom = 0;
 
+    draw_menu();
+
     for(;;){
         cairo_push_group(ctx);
         cairo_set_source_rgb(ctx, black.r, black.g, black.b);
         cairo_paint(ctx);
+
+        // if(drawCircle){
+        //     cairo_set_line_width (ctx, 2);
+        //     cairo_set_source_rgb(ctx, pblue.r, pblue.g, pblue.b);
+        //     cairo_arc(ctx, 0, 0, RADIUS*SCALE, 0, 2*M_PI);
+        //     cairo_stroke(ctx);
+        //     cairo_set_line_width (ctx, LINE_WIDTH);
+        // }
 
         drawNextEvent();
         drawTime();
@@ -743,6 +833,9 @@ void draw(){
                 y_c += translate;
                 cairo_translate(ctx, 0, -translate);
                 break;
+            case V_KEY:
+                drawCircle = !drawCircle;
+                break;
             case Z_KEY:
                 SCALE += 1;
                 break;
@@ -758,5 +851,27 @@ void draw(){
             }
             advance(min(now + STEP, nextEvent()));
         }
+        if(current_theta < theta){
+            current_theta += STEP/10;
+        }
+        if(current_theta > theta){
+            current_theta = theta;
+        }
     }
+}
+
+
+void draw_menu(){
+    printf("a - advance 0.1s in time\n");
+    printf("e - auto advance in time\n");
+    printf("z - zoom in\n");
+    printf("x - zoom out\n");
+    printf("j - move left\n");
+    printf("k - move down\n");
+    printf("i - move up\n");
+    printf("l - move down\n");
+    printf("right arrow - draw edges in horizontal direction\n");
+    printf("up arrow - draw edges in up direction\n");
+    printf("down arrow - draw edges in down direction\n");
+    printf("left arrow - no edges drawn\n");
 }

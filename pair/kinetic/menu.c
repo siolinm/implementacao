@@ -20,7 +20,6 @@ void loadFile(){
     for(i = 1, j = 2*n - 1; i <= n; i++, j--){
         obj = malloc(sizeof(*obj));
         fscanf(file, "%lf %lf %lf %lf %c", &(obj->x0.x), &(obj->x0.y), &(obj->speed.x), &(obj->speed.y), &(obj->name));
-        printf("%c\n", obj->name);
         sendPoint(obj);
     }
 

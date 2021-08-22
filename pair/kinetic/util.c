@@ -51,6 +51,12 @@ double getY0(Point * p, int direction){
 
 double getVx(Point * p, int direction){
     double angle = PI_3;
+    double ret = 1;
+
+    if(direction < 0){
+        direction = -direction;
+        ret = -1;
+    }
 
     if(direction == HORIZONTAL){
         angle = 0;
@@ -59,11 +65,17 @@ double getVx(Point * p, int direction){
         angle = -PI_3;
     }
 
-    return (p->speed.x)*cos(angle) + (p->speed.y)*sin(angle);
+    return ret*((p->speed.x)*cos(angle) + (p->speed.y)*sin(angle));
 }
 
 double getVy(Point * p, int direction){
     double angle = PI_3;
+    double ret = 1;
+
+    if(direction < 0){
+        direction = -direction;
+        ret = -1;
+    }
 
     if(direction == HORIZONTAL){
         angle = 0;
@@ -72,7 +84,7 @@ double getVy(Point * p, int direction){
         angle = -PI_3;
     }
 
-    return -(p->speed.x)*sin(angle) + (p->speed.y)*cos(angle);
+    return ret*(-(p->speed.x)*sin(angle) + (p->speed.y)*cos(angle));
 }
 
 double distance(Point * a, Point * b, int direction){
@@ -248,31 +260,89 @@ int wasLeft(Point *p, Point *q, int dir){
     }
 }
 
-int getCertPriority(Point * p, Point * q, int dir){
-    if(wasLeft(q, p, UP)){ /* Case 1 */
-        if(dir == UP)
-            return HIGH_PRIORITY;
-        else if(dir == DOWN)
-            return MEDIUM_PRIORITY;
-        else
-            return LOW_PRIORITY;
+double auxAtan(double x){
+    double ret = atan(x);
+    if(ret < -EPS)
+        ret += M_PI;
+    if(mod(ret) < EPS)
+        ret = M_PI;
+    return ret;
+}
+
+double getAngle(Vector a, Vector b){
+    double anorm, bnorm;
+    double x = a.x*b.x + a.y*b.y;
+    anorm = sqrt(a.x*a.x + a.y*a.y);
+    bnorm = sqrt(b.x*b.x + b.y*b.y);
+    if(anorm < EPS || bnorm < EPS)
+    /* problema */
+        return 0;
+    x /= anorm;
+    x /= bnorm;
+
+    return x;
+}
+
+double getCertPriority(Point * p, Point * q, int dir){
+    double a, b, cosalp, sinalp, c, d;
+    double alpha = 0, theta = 0, x;
+    Point * auxp;
+    Vector aux;
+    double norm_vp, norm_vq;
+    if(wasLeft(q, p, dir)){
+        auxp = q;
+        q = p;
+        p = auxp;
     }
-    else if(wasLeft(q, p, DOWN)){ /* Case 3 */
-        if(dir == UP)
-            return MEDIUM_PRIORITY;
-        else if(dir == DOWN)
-            return LOW_PRIORITY;
-        else
-            return HIGH_PRIORITY;
+    norm_vp = sqrt(p->speed.x*p->speed.x + p->speed.y*p->speed.y);
+    norm_vq = sqrt(q->speed.x*q->speed.x + q->speed.y*q->speed.y);
+    if(mod(p->speed.x) < EPS && mod(p->speed.y) < EPS){
+        return auxAtan(getVx(q, dir)/getVy(q, dir));
     }
-    else{ /* Case 2 */
-        if(dir == UP)
-            return LOW_PRIORITY;
-        else if(dir == DOWN)
-            return HIGH_PRIORITY;
-        else
-            return MEDIUM_PRIORITY;
+    if(mod(q->speed.x) < EPS && mod(q->speed.y) < EPS){
+        return auxAtan(getVx(p, dir)/getVy(p, dir));
     }
+    aux.x = -1;
+    aux.y = 0;
+    if(dir == UP)
+        alpha = PI_3;
+    else if(dir == DOWN)
+        alpha = -PI_3;
+    cosalp = cos(alpha);
+    if(mod(cosalp) < EPS)
+        cosalp = 0;
+    sinalp = sin(alpha);
+    if(mod(sinalp) < EPS)
+        sinalp = 0;
+    c = getAngle(p->speed, aux);
+    if(mod(c) < EPS)
+        c = 0;
+    d = getAngle(q->speed, aux);
+    if(mod(d) < EPS)
+        d = 0;
+    a = (norm_vp/norm_vq)*c - d;
+    c = sqrt(1 - c*c);
+
+    if(-p->speed.y < -EPS)
+        c = -c;
+
+    d = sqrt(1 - d*d);
+    if(-q->speed.y < -EPS)
+        d = -d;
+    if(mod(c) < EPS)
+        c = 0;
+    if(mod(d) < EPS)
+        d = 0;
+    b = (norm_vp/norm_vq)*c - d;
+    if(mod(a) < EPS)
+        a = 0;
+    if(mod(b) < EPS)
+        b = 0;
+    x = a*cosalp + b*sinalp;
+    x = x/(b*cosalp - a*sinalp);
+    theta = auxAtan(x);
+
+    return theta;
 }
 
 int auxDir(int dir){
@@ -286,9 +356,9 @@ int auxDir(int dir){
 }
 
 int leftTest(Point * p, Point * q, int dir){
-    int auxdir, prio;
+    int auxdir;
+    double prio;
     Point * cert_point;
-    Point * left_point, * right_point;
     PQObject * pq;
     Cert * c;
     if(getX(p, dir) < getX(q, dir) - EPS){
@@ -304,13 +374,7 @@ int leftTest(Point * p, Point * q, int dir){
             return 0;
         else{
             auxdir = auxDir(dir);
-            left_point = p;
-            right_point = q;
-            if(wasLeft(q, p, HORIZONTAL)){
-                left_point = q;
-                right_point = p;
-            }
-            prio = getCertPriority(left_point, right_point, auxdir);
+            prio = getCertPriority(p, q, auxdir);
             pq = Q[1];
             if(pq == NULL)
                 return left(p, q, dir);
@@ -319,50 +383,33 @@ int leftTest(Point * p, Point * q, int dir){
             /* pego o evento no topo da fila atualmente */
             /* checo se a troca entre p e q deveria ser processada
             antes ou depois desse evento */
-            if(prio > c->priority){
+            printf("compare: %.2lf with: %.2lf\n", prio, c->priority);
+            if(mod(prio - c->priority) < EPS){
+                printf("PASSEI POR AQUI\n");
                 return left(p, q, dir);
             }
-            else if(prio < c->priority){
+            else if(prio < c->priority - EPS){
+                return left(p, q, dir);
+            }
+            else if(prio > c->priority + EPS){
                 return wasLeft(p, q, dir);
             }
             else{
-                right_point = q;
-                if(wasLeft(q, p, dir))
-                    right_point = p;
-                if(prio == 1)
-                    prio = 2;
-                if(((-certType(dir) + (3 - prio)) % 3) < ((-pq->certType + (3 - prio)) % 3)){
-                    return left(p, q, dir);
-                }
-                else if(((-certType(dir) + (3 - prio)) % 3) > ((-pq->certType + (3 - prio)) % 3)){
-                    return wasLeft(p, q, dir);
-                }
-                else{
-                    if(right_point->id < cert_point->id)
-                        return left(p, q, dir);
-                    else if(right_point->id > cert_point->id)
-                        return wasLeft(p, q, dir);
-                    else{
-                        return left(p, q, dir);
-                    }
-                }
-                // if(right_point->id < cert_point->id)
-                //     return left(p, q, dir);
-                // else if(right_point->id > cert_point->id)
-                //     return wasLeft(p, q, dir);
-                // else{
-                //     if(certType(dir) < pq->certType){
-                //         return left(p, q, dir);
-                //     }
-                //     else if(certType(dir) > pq->certType){
-                //         return wasLeft(p, q, dir);
-                //     }
-                //     else
-                //         return left(p, q, dir);
-                // }
+                printf("%lf, %lf\n", prio, c->priority);
+                exit(1);
+                return 0;
             }
         }
     }
+}
+
+void printDir(int dir){
+    if(dir == HORIZONTAL)
+        printf("HORIZONTAL");
+    else if(dir == UP)
+        printf("UP");
+    else if(dir == DOWN)
+        printf("DOWN");
 }
 
 void destroy(){

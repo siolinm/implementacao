@@ -87,7 +87,7 @@ void newCertList(Point *p, int dir){
     if(p == NULL) return;
 
     cert = malloc(sizeof(*cert));
-    cert->priority = HIGH_PRIORITY;
+    cert->priority = 0.0;
     type = certType(dir);
 
     p->cert[type] = cert;
@@ -101,7 +101,7 @@ void updateListCert(Point * p, int dir){
     int type;
     Point * q;
     double time, dx, dy;
-    int prio = HIGH_PRIORITY;
+    double prio = 0.0;
     if(p == NULL) return;
 
     q = p->prev[dir];
@@ -111,11 +111,7 @@ void updateListCert(Point * p, int dir){
         dy = getY0(p, dir) + time*getVy(p, dir) - (getY0(q, dir) + time*getVy(q, dir));
         if(sqrt(dx*dx + dy*dy) < EPS){
             /* colisao */
-            // fprintf(stderr, "collision between %c and %c\n", p->name, q->name);
-            if(wasLeft(p, q, HORIZONTAL))
-                prio = getCertPriority(p, q, dir);
-            else
-                prio = getCertPriority(q, p, dir);
+            prio = getCertPriority(p, q, dir);
         }
     }
     type = certType(dir);
@@ -353,13 +349,16 @@ Object * query_kth(AVLNode *r, int i){
 void printListR(AVLNode * r, int dir){
     if(r != NULL){
         printListR(r->left, dir);
-        printf(" - %g - %c", r->key->cert[certType(dir)]->value, r->key->name);
+        printf(" -- %c", r->key->name);
+        // printf(" - %g - %c", r->key->cert[certType(dir)]->value, r->key->name);
         printListR(r->right, dir);
     }
 }
 
 void printList(int dir){
+    printf("NULL");
     printListR(listRoot[dir], dir);
+    printf(" -- NULL");
     printf("\n");
 }
 

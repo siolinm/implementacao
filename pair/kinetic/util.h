@@ -68,7 +68,7 @@ typedef struct Cert{
     /* certificate type */
     int pqpos;
     double value;
-    int priority;
+    double priority;
 } Cert;
 
 typedef struct Point{
@@ -125,7 +125,6 @@ typedef struct TournObject{
     Point * p;
     Point * lcandp;
     int direction;
-    db(double a; double b; double c;)
 } TournObject;
 
 typedef struct PQObject{
@@ -240,19 +239,40 @@ void printPoint(Point * p, int dir);
  * @param dir the direction of the certificate
  * @return returns the certificate priority
  */
-int getCertPriority(Point * p, Point * q, int dir);
+double getCertPriority(Point * p, Point * q, int dir);
+
 
 /*! int left(Point * p, Point * q, int dir)
  * @param p point p
  * @param q point q
  * @param dir the direction considered
- * @return returns 1 if p is to the left of q, 0 otherwise
+ * @return returns 1 if p is to the left of q or will be to the left at
+ * now + epsilon, 0 otherwise
  */
 int left(Point *p, Point *q, int dir);
 
+/*! int wasLeft(Point * p, Point * q, int dir)
+ * @param p point p
+ * @param q point q
+ * @param dir the direction considered
+ * @return returns 1 if p is to the left of q or was to the left at
+ * now - epsilon, 0 otherwise
+ */
 int wasLeft(Point *p, Point *q, int dir);
 
+/*! int left(Point * p, Point * q, int dir)
+ * @param p point p
+ * @param q point q
+ * @param dir the direction considered
+ * @return returns 1 if p is to the left of q (based on the state of
+ * the lists, but not using the lists), 0 otherwise
+ */
 int leftTest(Point * p, Point * q, int dir);
+
+/*! Prints the name of the given direction (for debug)
+ * @param dir the given direction
+ */
+void printDir(int dir);
 
 /* Frees all memory
  *

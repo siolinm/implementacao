@@ -31,6 +31,7 @@
 #define N_KEY 0x6e
 #define S_KEY 0x73
 #define T_KEY 0x74
+#define V_KEY 0x76
 #define X_KEY 0x78
 #define Z_KEY 0x7a
 #define RIGHT_KEY 0xff53
@@ -39,6 +40,8 @@
 #define DOWN_KEY 0xff54
 #define ENTER_KEY 0xff0d
 #define ESC_KEY 0xff1b
+
+#define RADIUS 4
 
 /* surface where things are drawn */
 cairo_surface_t *sfc;
@@ -56,6 +59,8 @@ int drawDebug;
  */
 double SCALE, translate, x_c, y_c;
 
+int drawCircle;
+double theta, current_theta;
 /* rgb colors */
 typedef struct Color{
     double r, g, b;
@@ -79,7 +84,7 @@ enum line_style{
 };
 
 /* some predefined colors */
-Color red, green, blue, black, white, yellow;
+Color red, green, blue, black, white, yellow, pblue;
 
 /* time to wait for screen to be refreshed */
 struct timespec ts;
@@ -234,5 +239,17 @@ void drawPointsTree(void * root, int type, Color color);
  * @param dir the direction considered
  */
 void drawLcand(Point * p, int dir);
+
+/*! menu for draw interface
+ *
+ */
+void draw_menu();
+
+/*! Receives a point p and returns a coordinate in the circunference
+ * that is drawn for collisions (for debug)
+ * @param p the given point
+ * @return returns a coordinate in the circunference of the point
+*/
+Coordinate getPointCoord(Point * p);
 
 #endif

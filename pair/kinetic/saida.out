@@ -1,0 +1,86 @@
+LIST BEFORE: NULL -- d -- b -- c -- a -- NULL
+Event between b and d -- UP, prio: 0.10
+UP EVENT: case A, (b, d)
+LIST AFTER: NULL -- b -- d -- c -- a -- NULL
+
+LIST BEFORE: NULL -- b -- d -- c -- a -- NULL
+Event between a and c -- UP, prio: 0.26
+UP EVENT: case A, (a, c)
+LIST AFTER: NULL -- b -- d -- a -- c -- NULL
+
+LIST BEFORE: NULL -- b -- a -- c -- d -- NULL
+Event between c and d -- HORIZONTAL, prio: 0.39
+Entered HORIZONTAL EVENT: (c, d)
+LIST AFTER: NULL -- b -- a -- d -- c -- NULL
+
+LIST BEFORE: NULL -- b -- d -- a -- c -- NULL
+Event between a and d -- UP, prio: 0.65
+UP EVENT: case A, (a, d)
+LIST AFTER: NULL -- b -- a -- d -- c -- NULL
+
+LIST BEFORE: NULL -- b -- a -- d -- c -- NULL
+Event between b and a -- HORIZONTAL, prio: 1.02
+Entered HORIZONTAL EVENT: (b, a)
+LIST AFTER: NULL -- a -- b -- d -- c -- NULL
+
+LIST BEFORE: NULL -- b -- a -- c -- d -- NULL
+Event between a and c -- DOWN, prio: 1.31
+DOWN EVENT: case B, (a, c)
+LIST AFTER: NULL -- b -- c -- a -- d -- NULL
+
+LIST BEFORE: NULL -- b -- c -- a -- d -- NULL
+Event between b and c -- DOWN, prio: 0.76       <----
+DOWN EVENT: case B, (b, c)
+LIST AFTER: NULL -- c -- b -- a -- d -- NULL
+
+LIST BEFORE: NULL -- b -- a -- d -- c -- NULL
+Event between d and c -- UP, prio: 1.44
+LIST AFTER: NULL -- b -- a -- c -- d -- NULL
+
+LIST BEFORE: NULL -- c -- b -- a -- d -- NULL
+Event between a and d -- DOWN, prio: 1.70
+DOWN EVENT: case B, (a, d)
+LIST AFTER: NULL -- c -- b -- d -- a -- NULL
+
+LIST BEFORE: NULL -- c -- b -- d -- a -- NULL
+Event between b and d -- DOWN, prio: 1.15       <----
+DOWN EVENT: case B, (b, d)
+LIST AFTER: NULL -- c -- d -- b -- a -- NULL
+
+LIST BEFORE: NULL -- b -- a -- c -- d -- NULL
+Event between a and b -- UP, prio: 2.06
+LIST AFTER: NULL -- a -- b -- c -- d -- NULL
+
+LIST BEFORE: NULL -- a -- b -- d -- c -- NULL
+Event between b and d -- HORIZONTAL, prio: 2.20
+Entered HORIZONTAL EVENT: (b, d)
+HORIZONTAL EVENT: case A, (b, d)
+LIST AFTER: NULL -- a -- d -- b -- c -- NULL
+
+LIST BEFORE: NULL -- a -- d -- b -- c -- NULL
+Event between b and c -- HORIZONTAL, prio: 1.80 <----
+Entered HORIZONTAL EVENT: (b, c)
+LIST AFTER: NULL -- a -- d -- c -- b -- NULL
+
+LIST BEFORE: NULL -- c -- d -- b -- a -- NULL
+Event between d and c -- DOWN, prio: 2.49
+LIST AFTER: NULL -- d -- c -- b -- a -- NULL
+
+LIST BEFORE: NULL -- a -- d -- c -- b -- NULL
+Event between a and d -- HORIZONTAL, prio: 2.75
+Entered HORIZONTAL EVENT: (a, d)
+HORIZONTAL EVENT: case A, (a, d)
+LIST AFTER: NULL -- d -- a -- c -- b -- NULL
+
+LIST BEFORE: NULL -- d -- a -- c -- b -- NULL
+Event between a and c -- HORIZONTAL, prio: 2.36 <----
+Entered HORIZONTAL EVENT: (a, c)
+LIST AFTER: NULL -- d -- c -- a -- b -- NULL
+
+LIST BEFORE: NULL -- a -- b -- c -- d -- NULL
+Event between c and b -- UP, prio: 2.85
+LIST AFTER: NULL -- a -- c -- b -- d -- NULL
+
+LIST BEFORE: NULL -- d -- c -- b -- a -- NULL
+Event between a and b -- DOWN, prio: 3.11
+LIST AFTER: NULL -- d -- c -- a -- b -- NULL

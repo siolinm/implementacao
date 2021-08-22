@@ -14,9 +14,7 @@ int comparePQ(PQObject * a, PQObject * b){
     Point * pa = a->p;
     Point * pb = b->p;
     Cert * ca, *cb;
-    Point * qa;
-    Point * qb;
-    int prio;
+
     ca = pa->cert[a->certType];
     cb = pb->cert[b->certType];
     ta = valuePQObject(a);
@@ -26,23 +24,7 @@ int comparePQ(PQObject * a, PQObject * b){
             return 0;
         else if(b->certType >= TOURN_CERT)
             return 1;
-        if(ca->priority == cb->priority){
-            if(a->certType == b->certType)
-                return pa->id < pb->id;
-            prio = ca->priority;
-            if(prio == 2)
-                prio = 1;
-            return ((-a->certType + (3-prio)) % 3) <
-            ((-b->certType + (3-prio)) % 3);
-            // if(pa->id == pb->id)
-            //     return a->certType < b->certType;
-            // return pa->id < pb->id;
-            /* prio = AZUL, 2, 1, 0 */
-            /* prio = VERD, 2, 1, 0 */
-            /* prio = VERM, 2, 1, 0 */
-        }
-        return ca->priority > cb->priority;
-
+        return ca->priority < cb->priority;
     }
 
     return valuePQObject(a) < valuePQObject(b);
@@ -104,26 +86,11 @@ double valuePQObject(PQObject * obj){
 }
 
 void updatePQ(Point * p, int certType, double t){
-    int i;
     PQObject * obj = Q[p->cert[certType]->pqpos];
     p->cert[certType]->value = t;
 
     swim(pqpos(obj));
     sink(pqpos(obj), pqSize);
-    // for (i = 1; 2*i < pqSize; i++){
-    //     if(comparePQ(Q[2*i], Q[i])){
-    //         printPQ();
-    //         printf("Incorrect PQ %d and %d, %d\n", 2*i, i, comparePQ(Q[i], Q[2*i]));
-    //         exit(42);
-    //     }
-    //     if(2*i + 1 < pqSize){
-    //         if(comparePQ(Q[2*i + 1], Q[i])){
-    //             printPQ();
-    //             printf("Incorrect PQ %d and %d, %d\n", 2*i + 1, i, comparePQ(Q[i], Q[2*i+1]));
-    //             exit(42);
-    //         }
-    //     }
-    // }
 
 }
 
@@ -177,7 +144,7 @@ void printPQR(char * prefix, int size, int j, int b){
         aux = ' ';
         if(Q[j]->p->prev[getDirection(cert)])
             aux = Q[j]->p->prev[getDirection(cert)]->name;
-        printf("%d: %c -- %c, %g, prio: %d, certType: ", j, Q[j]->p->name,
+        printf("%d: %c -- %c, %g, prio: %.2lf, certType: ", j, Q[j]->p->name,
         aux, valuePQ(j), Q[j]->p->cert[cert]->priority);
         if(cert == HORIZONTAL_CERT){
             printf("HORIZONTAL_CERT\n");

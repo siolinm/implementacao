@@ -6,10 +6,6 @@
 
 void insertS(void * root, Point * a, int type, int dir){
     void * new;
-    db(
-        if(type == HITS_UP_TREE && getKeyS(root, HITS_UP_TREE)->name == 'a' && dir == HORIZONTAL)
-            printf("Inserting something in Hits_up(a)\n");
-    );
     new = createNodeS(a, type, dir);
     insertSR(detach(root, type, dir), new, type, dir);
     splay(new, type, dir);
@@ -35,10 +31,6 @@ void deleteS(void * root, Point * a, int type, int dir){
         a->hitsLow[dir] = NULL;
     else{
         a->hitsUp[dir] = NULL;
-        db(
-            if(dir == HORIZONTAL)
-                printf("Erasing up(%c)\n", a->name);
-        );
     }
 }
 
@@ -170,79 +162,19 @@ void * successorS(void * root, Item * p, int type, int dir, int order){
         y = x;
         /* rounding errors */
         /* x(q) <= x(p) */
-        db(
-            printf("left test (%c, %c) -- ", getKeyS(x, type)->name, p->name);
-            if(orientation == -7){
-                printf("UP, ");
-            }
-            else if(orientation < 0 ){
-                if(-orientation == DOWN)
-                   printf("DOWN, ");
-                else if(-orientation == HORIZONTAL)
-                   printf("HORIZONTAL, ");
-            }
-            else{
-                if(orientation == DOWN)
-                   printf("DOWN, ");
-                else if(orientation == HORIZONTAL)
-                   printf("HORIZONTAL, ");
-                else
-                   printf("UP, ");
-            }
-        );
-        /* b -- a -- c -- d (UP) */
-        /* C_1 < C_2 < C_3 < C_4 */
-        /*  b -t'- a -- c -- d (HORIZONTAL) */
-        /* a -- b -- c -- d (DOWN) */
         if(leftTest(getKeyS(x, type), p, orientation)){
-            db(printf("result: yes\n"););
             if(!mirror)
                 x = getRightS(x, type);
             else
                 x = getLeftS(x, type);
         }
         else{
-            db(printf("result: no\n"););
             suc = x;
             if(!mirror)
                 x = getLeftS(x, type);
             else
                 x = getRightS(x, type);
         }
-        // if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
-        //     if(getY(getKeyS(x, type), orientation) > getY(p, orientation) + EPS){
-        //         if(!mirror)
-        //             x = getRightS(x, type);
-        //         else
-        //             x = getLeftS(x, type);
-        //     }
-        //     else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
-        //         if(!mirror)
-        //             x = getRightS(x, type);
-        //         else
-        //             x = getLeftS(x, type);
-        //     }
-        //     else{
-        //         suc = x;
-        //         if(!mirror)
-        //             x = getLeftS(x, type);
-        //         else
-        //             x = getRightS(x, type);
-        //     }
-        // }
-        // else if(getX(getKeyS(x, type), orientation) < getX(p, orientation) - EPS) {
-        //     if(!mirror)
-        //         x = getRightS(x, type);
-        //     else
-        //         x = getLeftS(x, type);
-        // }
-        // else{
-        //     suc = x;
-        //     if(!mirror)
-        //         x = getLeftS(x, type);
-        //     else
-        //         x = getRightS(x, type);
-        // }
     }
 
     if(y != NULL){
@@ -289,76 +221,19 @@ void * predecessorS(void * root, Item * p, int type, int dir, int order){
         y = x;
         /* rounding errors */
         /* x(q) >= x(p) */
-        db(
-            printf("left test (%c, %c) -- ", p->name, getKeyS(x, type)->name);
-            if(orientation == -7){
-                printf("UP, ");
-            }
-            else if(orientation < 0 ){
-                if(-orientation == DOWN)
-                   printf("DOWN, ");
-                else if(-orientation == HORIZONTAL)
-                   printf("HORIZONTAL, ");
-            }
-            else{
-                if(orientation == DOWN)
-                   printf("DOWN, ");
-                else if(orientation == HORIZONTAL)
-                   printf("HORIZONTAL, ");
-                else
-                   printf("UP, ");
-            }
-            /* b -> [] -> [] -> (a) */
-        );
         if(leftTest(p, getKeyS(x, type), orientation)){
-            db(printf("result: yes\n"););
             if(!mirror)
                 x = getLeftS(x, type);
             else
                 x = getRightS(x, type);
         }
         else{
-            db(printf("result: no\n"););
             pred = x;
             if(!mirror)
                 x = getRightS(x, type);
             else
                 x = getLeftS(x, type);
         }
-        // if(mod(getX(getKeyS(x, type), orientation) - getX(p, orientation)) < EPS){
-        //     if(getY(getKeyS(x, type), orientation) < getY(p, orientation) - EPS){
-        //         if(!mirror)
-        //             x = getLeftS(x, type);
-        //         else
-        //             x = getRightS(x, type);
-        //     }
-        //     else if(mod(getY(getKeyS(x, type), orientation) - getY(p, orientation)) < EPS){
-        //         if(!mirror)
-        //             x = getLeftS(x, type);
-        //         else
-        //             x = getRightS(x, type);
-        //     }
-        //     else{
-        //         pred = x;
-        //         if(!mirror)
-        //             x = getRightS(x, type);
-        //         else
-        //             x = getLeftS(x, type);
-        //     }
-        // }
-        // else if(getX(getKeyS(x, type), orientation) > getX(p, orientation) + EPS){
-        //     if(!mirror)
-        //         x = getLeftS(x, type);
-        //     else
-        //         x = getRightS(x, type);
-        // }
-        // else{
-        //     pred = x;
-        //     if(!mirror)
-        //         x = getRightS(x, type);
-        //     else
-        //         x = getLeftS(x, type);
-        // }
     }
 
     if(y != NULL){
@@ -381,8 +256,7 @@ Point * ownerS(void * root, int type, int dir){
             updateLeftmost(aux, dir);
         aux = getParentS(aux, type);
     }
-    /* []  ()
-    () <-() -> */
+
     if(aux){
         aux = getParentS(aux, type);
         detach(aux, type, dir);
@@ -594,10 +468,6 @@ void * insertSR(void * root, void * node, int type, int dir){
 
 void * extractS(void * root, void * low, void * up, int type, int dir){
     void * r = NULL;
-    // db(
-    //     printf("extractS:: before extract\n");
-    //     printS(root, type);
-    // );
     r = detach(root, type, dir);
     if(low != NULL){
         splay(low, type, dir);
@@ -629,10 +499,7 @@ void * extractS(void * root, void * low, void * up, int type, int dir){
 
     }
 
-    // db(
-    //     printf("extractS:: after extract\n");
-    //     printS(root, type);
-    // );
+
 
     return r;
 }
